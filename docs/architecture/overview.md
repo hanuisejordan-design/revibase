@@ -157,6 +157,15 @@ Calculé à la lecture, par priorité décroissante :
   peut pas faire l'UPDATE direct (RLS `answers_update_author_or_trainer`).
 - La page question affiche désormais la liste des réponses + le formulaire.
 
+## Discussions (Phase 6)
+
+- `src/features/discussions/` : `queries.ts` (`listComments`, chronologique),
+  `actions.ts` (`createCommentAction`, `deleteCommentAction`).
+- Fil plat par question (`comments`), sans vote ni statut. Suppression par
+  l'auteur du message ou un formateur.
+- La page question distingue « Réponses » (tentatives de réponse) et
+  « Discussion » (échange autour de la question).
+
 ## Flux d'une requête authentifiée
 
 1. `src/proxy.ts` rafraîchit la session Supabase (cookies).

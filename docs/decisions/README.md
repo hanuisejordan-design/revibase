@@ -44,3 +44,4 @@ qui remplace l'ancien (et on met à jour le statut de l'ancien).
 | 0007 | [Chapitres gérables par tout membre](0007-chapitres-tout-membre.md) | accepté           |
 | 0008 | [Questions : liste, filtres, détail](0008-questions.md)             | accepté           |
 | 0009 | [Réponses & votes](0009-reponses-votes.md)                          | accepté           |
+| 0010 | [Discussions](0010-discussions.md)                                  | accepté           |

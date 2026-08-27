@@ -5,10 +5,13 @@ import { getUser } from "@/lib/auth/dal";
 import { getClassContext } from "@/features/classes/queries";
 import { getQuestion } from "@/features/questions/queries";
 import { listAnswers } from "@/features/answers/queries";
+import { listComments } from "@/features/discussions/queries";
 import { relativeTime } from "@/lib/utils/date";
 import { DeleteQuestionButton } from "@/components/questions/delete-question-button";
 import { AnswerList } from "@/components/answers/answer-list";
 import { CreateAnswerForm } from "@/components/answers/create-answer-form";
+import { CommentList } from "@/components/discussions/comment-list";
+import { CreateCommentForm } from "@/components/discussions/create-comment-form";
 
 export async function generateMetadata({
   params,
@@ -30,10 +33,11 @@ export default async function QuestionPage({
   const question = await getQuestion(classId, questionId);
   if (!question) notFound();
 
-  const [ctx, user, answers] = await Promise.all([
+  const [ctx, user, answers, comments] = await Promise.all([
     getClassContext(classId),
     getUser(),
     listAnswers(questionId),
+    listComments(questionId),
   ]);
   if (!ctx || !user) notFound();
 
@@ -74,9 +78,23 @@ export default async function QuestionPage({
         <CreateAnswerForm classId={classId} questionId={question.id} />
       </section>
 
-      <section className="rounded-xl border border-dashed border-zinc-300 p-4 text-sm text-zinc-500 dark:border-zinc-700">
-        {question.commentCount} commentaire{question.commentCount > 1 ? "s" : ""} — la discussion
-        s&apos;affichera ici à la prochaine étape.
+      <section className="flex flex-col gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+            Discussion ({comments.length})
+          </h2>
+          <p className="text-xs text-zinc-500">
+            Pour échanger autour de la question. Les tentatives de réponse vont dans « Réponses ».
+          </p>
+        </div>
+        <CommentList
+          comments={comments}
+          classId={classId}
+          questionId={question.id}
+          viewerId={user.id}
+          viewerIsTrainer={ctx.role === "trainer"}
+        />
+        <CreateCommentForm classId={classId} questionId={question.id} />
       </section>
 
       {question.isAuthor ? (
