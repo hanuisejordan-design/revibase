@@ -12,7 +12,9 @@ type AnswerRow = {
   accepted: boolean;
   validated_by: string | null;
   created_at: string;
-  profiles: { display_name: string } | null;
+  // `answers` a deux FK vers `profiles` (author_id, validated_by) : on
+  // désambiguïse la jointure par le nom de contrainte.
+  author: { display_name: string } | null;
 };
 
 /** Réponses d'une question, triées : validée > retenue > votes > ancienneté. */
@@ -22,7 +24,9 @@ export const listAnswers = cache(async (questionId: string): Promise<AnswerItem[
 
   const { data, error } = await supabase
     .from("answers")
-    .select("id, body, author_id, accepted, validated_by, created_at, profiles(display_name)")
+    .select(
+      "id, body, author_id, accepted, validated_by, created_at, author:profiles!answers_author_id_fkey(display_name)",
+    )
     .eq("question_id", questionId);
 
   if (error || !data || data.length === 0) return [];
@@ -55,7 +59,7 @@ export const listAnswers = cache(async (questionId: string): Promise<AnswerItem[
     id: r.id,
     body: r.body,
     authorId: r.author_id,
-    authorName: r.profiles?.display_name ?? "Membre",
+    authorName: r.author?.display_name ?? "Membre",
     createdAt: r.created_at,
     voteCount: voteCount.get(r.id) ?? 0,
     viewerHasVoted: viewerVoted.has(r.id),
