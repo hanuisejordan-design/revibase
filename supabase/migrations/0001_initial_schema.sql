@@ -514,8 +514,11 @@ create policy "chapters_delete_member" on public.chapters
   for delete using (public.is_class_member(class_id));
 
 -- ---- questions -----------------------------------------------------
+-- La RLS ne gère que l'autorisation (la classe). Le masquage des questions
+-- supprimées (`deleted_at`) est fait par l'application : mettre `deleted_at`
+-- dans cette policy casserait l'UPDATE de suppression douce.
 create policy "questions_select_member" on public.questions
-  for select using (public.is_class_member(class_id) and deleted_at is null);
+  for select using (public.is_class_member(class_id));
 
 create policy "questions_insert_member" on public.questions
   for insert with check (public.is_class_member(class_id) and author_id = auth.uid());

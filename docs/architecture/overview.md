@@ -127,6 +127,23 @@ Calculé à la lecture, par priorité décroissante :
 - Supprimer un chapitre laisse ses questions (`chapter_id` → `NULL` via
   `ON DELETE SET NULL`) ; message d'avertissement dans l'UI.
 
+## Questions (Phase 4)
+
+- `src/features/questions/` : `schema.ts`, `types.ts`, `queries.ts`
+  (`listQuestions`, `getRecentQuestions`, `getQuestion`), `actions.ts`
+  (`createQuestionAction`, `deleteQuestionAction`).
+- Routes : `class/[classId]/questions` (liste — filtre chapitre, recherche
+  `ILIKE` titre, tri récent/sans réponse/populaire, tout via `searchParams`),
+  `.../questions/new` (formulaire), `.../questions/[questionId]` (détail).
+- Statut d'une question = `validated` / `answered` / `unanswered`, calculé
+  depuis `answers` (2 requêtes de comptage par lot d'ids).
+- **Suppression douce** (`deleted_at`) par l'auteur ou un formateur ; les
+  lectures filtrent `.is('deleted_at', null)`. La RLS `questions_select_member`
+  ne porte QUE sur l'appartenance à la classe (sinon l'UPDATE de suppression
+  casse — cf. ADR 0008).
+- L'accueil de classe est orienté questions ; code d'invitation + participants
+  déplacés dans `settings`.
+
 ## Flux d'une requête authentifiée
 
 1. `src/proxy.ts` rafraîchit la session Supabase (cookies).

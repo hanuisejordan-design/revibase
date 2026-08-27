@@ -1,70 +1,85 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getClassContext, getClassMembers } from "@/features/classes/queries";
+import { getClassContext } from "@/features/classes/queries";
 import { listChapters } from "@/features/chapters/queries";
-import { RoleBadge } from "@/components/classes/role-badge";
-import { InviteCode } from "@/components/classes/invite-code";
-import { LeaveClassButton } from "@/components/classes/leave-class-button";
+import { getRecentQuestions } from "@/features/questions/queries";
+import { QuestionCard } from "@/components/questions/question-card";
 
 export default async function ClassHomePage({ params }: { params: Promise<{ classId: string }> }) {
   const { classId } = await params;
   const ctx = await getClassContext(classId);
   if (!ctx) notFound();
 
-  const [members, chapters] = await Promise.all([getClassMembers(classId), listChapters(classId)]);
+  const [chapters, recent] = await Promise.all([
+    listChapters(classId),
+    getRecentQuestions(classId, 5),
+  ]);
 
   return (
-    <div className="flex flex-col gap-6">
-      <section className="flex flex-col gap-4 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-        <div className="flex flex-wrap items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-          <RoleBadge role={ctx.role} />
-          <span>
-            {members.length} membre{members.length > 1 ? "s" : ""}
-          </span>
-        </div>
-        <InviteCode code={ctx.joinCode} />
-      </section>
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-wrap gap-3">
+        <Link
+          href={`/class/${classId}/questions/new`}
+          className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        >
+          Poser une question
+        </Link>
+        <Link
+          href={`/class/${classId}/questions`}
+          className="inline-flex items-center justify-center rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+        >
+          Toutes les questions
+        </Link>
+      </div>
 
-      <section className="flex flex-col gap-2">
-        <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">Chapitres</h2>
-        {chapters.length > 0 ? (
-          <ul className="flex flex-wrap gap-2">
-            {chapters.map((ch) => (
-              <li
-                key={ch.id}
-                className="rounded-full border border-zinc-200 px-3 py-1 text-sm dark:border-zinc-800"
-              >
-                {ch.name}
+      <section className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+            Questions récentes
+          </h2>
+          {recent.length > 0 ? (
+            <Link
+              href={`/class/${classId}/questions`}
+              className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
+            >
+              Voir tout
+            </Link>
+          ) : null}
+        </div>
+        {recent.length > 0 ? (
+          <ul className="flex flex-col gap-3">
+            {recent.map((question) => (
+              <li key={question.id}>
+                <QuestionCard classId={classId} question={question} />
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-zinc-500">Aucun chapitre.</p>
+          <p className="text-sm text-zinc-500">Aucune question pour l&apos;instant.</p>
         )}
       </section>
 
-      <section className="flex flex-col gap-2">
-        <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
-          Participants
-        </h2>
-        <ul className="flex flex-col gap-1 text-sm">
-          {members.map((m) => (
-            <li key={m.userId} className="flex items-center gap-2">
-              <span>{m.displayName}</span>
-              <RoleBadge role={m.role} />
-            </li>
-          ))}
-        </ul>
-      </section>
+      {chapters.length > 0 ? (
+        <section className="flex flex-col gap-2">
+          <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">Chapitres</h2>
+          <ul className="flex flex-wrap gap-2">
+            {chapters.map((ch) => (
+              <li key={ch.id}>
+                <Link
+                  href={`/class/${classId}/questions?chapter=${ch.id}`}
+                  className="rounded-full border border-zinc-200 px-3 py-1 text-sm hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
+                >
+                  {ch.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section className="rounded-xl border border-dashed border-zinc-300 p-4 text-sm text-zinc-500 dark:border-zinc-700">
-        Les questions et les quiz de cette classe arrivent aux prochaines étapes.
+        Les quiz de cette classe arrivent à une prochaine étape.
       </section>
-
-      {!ctx.isCreator ? (
-        <div className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
-          <LeaveClassButton classId={ctx.id} />
-        </div>
-      ) : null}
     </div>
   );
 }

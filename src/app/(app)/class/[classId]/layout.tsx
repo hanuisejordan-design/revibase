@@ -42,6 +42,12 @@ export default async function ClassLayout({
             Accueil
           </Link>
           <Link
+            href={`/class/${classId}/questions`}
+            className="text-zinc-600 hover:underline dark:text-zinc-400"
+          >
+            Questions
+          </Link>
+          <Link
             href={`/class/${classId}/settings`}
             className="text-zinc-600 hover:underline dark:text-zinc-400"
           >
