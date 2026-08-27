@@ -1,36 +1,128 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Revibase
 
-## Getting Started
+Plateforme communautaire de révision pour une classe. Les étudiants posent des
+questions, y répondent, en discutent dans un fil rattaché à la question, votent,
+identifient une réponse correcte, rangent chaque question dans un chapitre, et
+génèrent des quiz à partir de la bibliothèque de questions accumulée.
 
-First, run the development server:
+L'idée centrale : **une question posée ne se perd pas dans un fil de discussion.
+Elle devient un objet permanent, retrouvable et réutilisable pour réviser.**
+
+Premier terrain d'utilisation : une promotion de formation de conducteur de train.
+
+## Stack
+
+| Domaine     | Choix                                                 |
+| ----------- | ----------------------------------------------------- |
+| Framework   | Next.js 16 (App Router) + React 19, TypeScript strict |
+| Style       | Tailwind CSS v4                                       |
+| Base & Auth | Supabase (PostgreSQL, Auth, Row Level Security)       |
+| Validation  | Zod                                                   |
+| Tests       | Vitest + Testing Library                              |
+| Hébergement | Vercel (app) + Supabase (base)                        |
+
+Détails et justification : [`docs/decisions/0001-stack.md`](docs/decisions/0001-stack.md).
+
+## Prérequis
+
+- **Node.js ≥ 22** (`.nvmrc` fourni ; `nvm use`). Node 20 fonctionne mais
+  déclenche des avertissements de version sur certaines dépendances.
+- npm ≥ 10
+- Un projet Supabase (gratuit) — voir ci-dessous.
+
+## Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # puis renseigner les valeurs Supabase
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Variables d'environnement
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Dans le tableau de bord Supabase → _Project Settings_ :
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable                        | Où la trouver                 | Exposée au navigateur  |
+| ------------------------------- | ----------------------------- | ---------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Data API → Project URL        | oui                    |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | API Keys → clé `anon`         | oui (protégée par RLS) |
+| `SUPABASE_SERVICE_ROLE_KEY`     | API Keys → clé `service_role` | **non — secrète**      |
 
-## Learn More
+> Ces variables ne sont réellement nécessaires qu'à partir de la Phase 1
+> (authentification). La page d'accueil actuelle fonctionne sans.
 
-To learn more about Next.js, take a look at the following resources:
+### Base de données
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Le schéma vit dans [`supabase/migrations/`](supabase/migrations). Deux options :
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**A. Rapide — via Supabase Studio**
+Copier le contenu de `supabase/migrations/0001_initial_schema.sql` dans
+_SQL Editor_ et exécuter. Optionnel : faire de même avec `supabase/seed.sql`
+sur un projet de test pour avoir des données d'exemple.
 
-## Deploy on Vercel
+**B. Avec la CLI Supabase** (nécessite Docker pour le mode local)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npx supabase start        # base locale
+npx supabase db reset     # applique migrations + seed.sql
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Lancer le projet
+
+```bash
+npm run dev        # http://localhost:3000
+```
+
+## Scripts
+
+| Script                 | Effet                                    |
+| ---------------------- | ---------------------------------------- |
+| `npm run dev`          | Serveur de développement                 |
+| `npm run build`        | Build de production                      |
+| `npm start`            | Sert le build de production              |
+| `npm run lint`         | ESLint                                   |
+| `npm run typecheck`    | Vérification TypeScript (`tsc --noEmit`) |
+| `npm run format`       | Formatage Prettier (écriture)            |
+| `npm run format:check` | Vérifie le formatage sans modifier       |
+| `npm test`             | Tests Vitest (une passe)                 |
+| `npm run test:watch`   | Tests en mode watch                      |
+
+## Structure
+
+```
+src/
+├── app/            Routes (App Router) et pages
+├── components/     UI : primitives (ui/) + composants par domaine
+├── features/       Logique par domaine : schema.ts / queries.ts / actions.ts
+├── lib/            Config partagée : supabase/, auth/, validation/, utils/, env.ts
+├── services/       Logique métier transverse : quiz-generator/, notifications/
+├── types/          Types de domaine partagés
+└── constants/      Constantes et énumérations
+
+supabase/
+├── migrations/     Schéma SQL versionné
+└── seed.sql        Données de démonstration
+
+docs/
+├── architecture/   Vue d'ensemble technique
+├── decisions/      Décisions techniques (ADR)
+└── product/        Périmètre produit / MVP
+```
+
+Chaque dossier `features/*` et `components/*` a son propre `README.md`.
+
+## Tests
+
+```bash
+npm test
+```
+
+Les tests couvriront en priorité les règles métier et de sécurité :
+authentification, appartenance aux classes, permissions entre classes,
+votes, validation formateur, calcul du score de quiz.
+
+## Feuille de route
+
+Le développement suit des phases laissant l'app fonctionnelle à chaque étape :
+**0. Initialisation** (en cours) → 1. Auth → 2. Classes → 3. Chapitres → 4. Questions → 5. Réponses & votes → 6. Discussions → 7. Validation formateur → 8. Quiz → 9. Notifications → 10. Polissage.
+
+Détail : [`docs/product/mvp.md`](docs/product/mvp.md).
