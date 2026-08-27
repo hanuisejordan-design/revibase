@@ -179,6 +179,22 @@ Calculé à la lecture, par priorité décroissante :
   retirer via l'API).
 - Gestion des rôles (promouvoir un membre) reportée (ADR 0011).
 
+## Quiz (Phase 8)
+
+- `services/quiz-generator/` : tire N questions (filtre chapitre, priorité aux
+  questions ayant une réponse de référence).
+- `src/features/quizzes/` : `schema.ts`, `types.ts`, `queries.ts`
+  (`getRunnerData`, `getResult`, `listMyAttempts`), `actions.ts`
+  (`createQuizAction`, `submitQuizAction`, `retakeQuizAction`).
+- Routes : `class/[classId]/quiz` (créer + mes quiz récents),
+  `class/[classId]/quiz/[attemptId]` (passage ou résultat selon
+  `completed_at`).
+- Mode auto-évaluation (ADR 0003) : `QuizRunner` (client), état local, envoi
+  groupé des résultats en fin de quiz. Réponse de référence = validée >
+  retenue > la plus votée.
+- Score = nombre de « je savais » ; questions à revoir = « à revoir ».
+- Aucune migration (tables `quiz*` et RLS déjà dans 0001).
+
 ## Flux d'une requête authentifiée
 
 1. `src/proxy.ts` rafraîchit la session Supabase (cookies).

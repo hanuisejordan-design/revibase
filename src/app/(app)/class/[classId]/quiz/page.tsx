@@ -1,0 +1,37 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { getClassContext } from "@/features/classes/queries";
+import { listChapters } from "@/features/chapters/queries";
+import { listMyAttempts } from "@/features/quizzes/queries";
+import { CreateQuizForm } from "@/components/quizzes/create-quiz-form";
+import { AttemptList } from "@/components/quizzes/attempt-list";
+
+export const metadata: Metadata = { title: "Quiz" };
+
+export default async function QuizPage({ params }: { params: Promise<{ classId: string }> }) {
+  const { classId } = await params;
+  const ctx = await getClassContext(classId);
+  if (!ctx) notFound();
+
+  const [chapters, attempts] = await Promise.all([listChapters(classId), listMyAttempts(classId)]);
+
+  return (
+    <div className="flex flex-col gap-8">
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-semibold">Faire un quiz</h2>
+        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          L&apos;app tire des questions de la classe. Pour chacune : réfléchis, révèle la réponse de
+          référence, puis dis si tu la savais.
+        </p>
+        <CreateQuizForm classId={classId} chapters={chapters} />
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+          Mes quiz récents
+        </h2>
+        <AttemptList classId={classId} attempts={attempts} />
+      </section>
+    </div>
+  );
+}

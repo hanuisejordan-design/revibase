@@ -30,6 +30,12 @@ export default async function ClassHomePage({ params }: { params: Promise<{ clas
         >
           Toutes les questions
         </Link>
+        <Link
+          href={`/class/${classId}/quiz`}
+          className="inline-flex items-center justify-center rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+        >
+          Faire un quiz
+        </Link>
       </div>
 
       <section className="flex flex-col gap-3">
@@ -76,10 +82,6 @@ export default async function ClassHomePage({ params }: { params: Promise<{ clas
           </ul>
         </section>
       ) : null}
-
-      <section className="rounded-xl border border-dashed border-zinc-300 p-4 text-sm text-zinc-500 dark:border-zinc-700">
-        Les quiz de cette classe arrivent à une prochaine étape.
-      </section>
     </div>
   );
 }

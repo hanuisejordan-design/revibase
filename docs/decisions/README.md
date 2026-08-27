@@ -46,3 +46,4 @@ qui remplace l'ancien (et on met à jour le statut de l'ancien).
 | 0009 | [Réponses & votes](0009-reponses-votes.md)                          | accepté           |
 | 0010 | [Discussions](0010-discussions.md)                                  | accepté           |
 | 0011 | [Validation formateur](0011-validation-formateur.md)                | accepté           |
+| 0012 | [Quiz](0012-quiz.md)                                                | accepté           |
