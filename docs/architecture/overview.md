@@ -80,13 +80,32 @@ Calculé à la lecture, par priorité décroissante :
 - Défense en profondeur : les Server Actions revérifient l'appartenance et le
   rôle avant d'écrire. Les contrôles d'interface ne sont jamais considérés
   comme suffisants.
+- Privilèges au niveau table accordés à `authenticated` / `service_role`
+  (migration 0001 §12 / correctif 0003) ; la RLS reste le filtre fin.
+
+## Authentification (Phase 1)
+
+- **Supabase Auth** (e-mail + mot de passe). L'inscription passe le nom dans
+  `options.data.display_name` ; un trigger `handle_new_user` crée la ligne
+  `profiles` correspondante.
+- **`src/proxy.ts`** (ex-`middleware`, renommé en Next.js 16) rafraîchit la
+  session à chaque requête via `@supabase/ssr`.
+- **DAL** — `src/lib/auth/dal.ts` : `getUser()` (session revérifiée par
+  `supabase.auth.getUser()`, mémoïsée avec `cache()`) et `requireUser()`
+  (redirige vers `/login`). Appelés en tête des layouts protégés.
+- Groupes de routes : `(auth)` (public, redirige les connectés vers
+  `/dashboard`) et `(app)` (garde `requireUser()`).
+- Server Actions `signUpAction` / `signInAction` / `signOutAction` dans
+  `src/features/auth/actions.ts` ; validation Zod dans `schema.ts` ; erreurs
+  traduites en français, jamais l'erreur brute.
 
 ## Flux d'une requête authentifiée
 
-1. `middleware` (dès la Phase 1) rafraîchit la session Supabase (cookies).
-2. Le Server Component appelle `features/*/queries.ts` avec le client serveur.
-3. PostgreSQL applique la RLS selon `auth.uid()`.
-4. Les mutations passent par une Server Action → validation Zod → RPC ou
+1. `src/proxy.ts` rafraîchit la session Supabase (cookies).
+2. Le layout `(app)` appelle `requireUser()` → redirection si non connecté.
+3. Le Server Component appelle `features/*/queries.ts` avec le client serveur.
+4. PostgreSQL applique la RLS selon `auth.uid()`.
+5. Les mutations passent par une Server Action → validation Zod → RPC ou
    `insert/update` → la RLS et les triggers refont respecter les règles.
 
 ## Notifications

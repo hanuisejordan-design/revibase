@@ -4,7 +4,7 @@ import { clientEnv } from "@/lib/env";
 
 /**
  * Rafraîchit la session Supabase à chaque requête et propage les cookies mis
- * à jour à la réponse. À brancher depuis `src/middleware.ts` en Phase 1.
+ * à jour à la réponse. Branché depuis `src/proxy.ts` (ex-middleware Next.js).
  *
  * Règle @supabase/ssr : ne rien exécuter entre la création du client et
  * l'appel à `getUser()`, sous peine de déconnexions aléatoires.

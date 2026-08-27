@@ -638,3 +638,38 @@ create policy "notifications_update_self" on public.notifications
 
 -- Aucune policy INSERT sur notifications : l''écriture se fait via le rôle
 -- `service_role` (serveur) ou de futurs triggers `security definer`.
+
+-- ============================================================================
+-- 12. Privilèges des rôles API
+-- ----------------------------------------------------------------------------
+-- Certains projets Supabase n''accordent PAS automatiquement les privilèges
+-- aux rôles `anon` / `authenticated` / `service_role` sur les tables créées
+-- via l''éditeur SQL (=> "permission denied for table ...").
+--
+-- Ces GRANT ouvrent l''accès AU NIVEAU TABLE ; la RLS reste le filtre fin,
+-- ligne par ligne. `anon` (non connecté) ne reçoit rien : aucune de nos
+-- policies ne l''autorise, donc il ne voit rien même avec un GRANT.
+-- ============================================================================
+
+grant usage on schema public to anon, authenticated, service_role;
+
+-- authenticated : CRUD sur toutes les tables (filtré ensuite par la RLS)
+grant select, insert, update, delete on all tables in schema public to authenticated;
+
+-- service_role : tout (contourne la RLS — usage serveur / admin uniquement)
+grant all on all tables in schema public to service_role;
+
+grant usage, select on all sequences in schema public to authenticated, service_role;
+
+-- Fonctions : requis pour les RPC ET pour les fonctions appelées dans la RLS
+grant execute on all functions in schema public to authenticated, service_role;
+
+-- Objets créés plus tard (prochaines migrations) : mêmes privilèges par défaut
+alter default privileges in schema public
+  grant select, insert, update, delete on tables to authenticated;
+alter default privileges in schema public
+  grant all on tables to service_role;
+alter default privileges in schema public
+  grant usage, select on sequences to authenticated, service_role;
+alter default privileges in schema public
+  grant execute on functions to authenticated, service_role;

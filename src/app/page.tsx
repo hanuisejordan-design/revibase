@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { APP_NAME, APP_TAGLINE } from "@/constants/app";
 
 const CORE_ACTIONS = [
@@ -42,8 +43,23 @@ export default function HomePage() {
         ))}
       </ul>
 
+      <div className="flex flex-wrap gap-3">
+        <Link
+          href="/register"
+          className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        >
+          Créer un compte
+        </Link>
+        <Link
+          href="/login"
+          className="inline-flex items-center justify-center rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+        >
+          Se connecter
+        </Link>
+      </div>
+
       <p className="text-sm text-zinc-500">
-        Projet en cours de construction — Phase 0 : initialisation.
+        Projet en cours de construction — Phase 1 : authentification.
       </p>
     </main>
   );

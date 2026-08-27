@@ -55,9 +55,12 @@ Dans le tableau de bord Supabase → _Project Settings_ :
 Le schéma vit dans [`supabase/migrations/`](supabase/migrations). Deux options :
 
 **A. Rapide — via Supabase Studio**
-Copier le contenu de `supabase/migrations/0001_initial_schema.sql` dans
-_SQL Editor_ et exécuter. Optionnel : faire de même avec `supabase/seed.sql`
-sur un projet de test pour avoir des données d'exemple.
+Dans _SQL Editor_, exécuter **dans l'ordre** le contenu de chaque fichier de
+`supabase/migrations/` (`0001`, `0002`, `0003`, …). Le `0001` à jour se
+suffit à lui-même pour un projet neuf ; `0002` et `0003` ne servent que si
+`0001` a été appliqué avant leurs correctifs (voir l'en-tête de chaque
+fichier). Optionnel : exécuter ensuite `supabase/seed.sql` sur un projet de
+test pour des données d'exemple.
 
 **B. Avec la CLI Supabase** (nécessite Docker pour le mode local)
 
@@ -122,7 +125,6 @@ votes, validation formateur, calcul du score de quiz.
 
 ## Feuille de route
 
-Le développement suit des phases laissant l'app fonctionnelle à chaque étape :
-**0. Initialisation** (en cours) → 1. Auth → 2. Classes → 3. Chapitres → 4. Questions → 5. Réponses & votes → 6. Discussions → 7. Validation formateur → 8. Quiz → 9. Notifications → 10. Polissage.
+Le développement suit des phases laissant l'app fonctionnelle à chaque étape : 0. Initialisation ✅ · **1. Authentification ✅** · 2. Classes _(en cours)_ · 3. Chapitres · 4. Questions · 5. Réponses & votes · 6. Discussions · 7. Validation formateur · 8. Quiz · 9. Notifications · 10. Polissage.
 
 Détail : [`docs/product/mvp.md`](docs/product/mvp.md).
