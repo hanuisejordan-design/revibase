@@ -39,3 +39,4 @@ qui remplace l'ancien (et on met à jour le statut de l'ancien).
 | 0002 | [Modèle de données](0002-modele-donnees.md)                    | accepté |
 | 0003 | [Quiz en auto-évaluation](0003-quiz-auto-evaluation.md)        | accepté |
 | 0004 | [Authentification via Supabase Auth](0004-authentification.md) | accepté |
+| 0005 | [Classes : création, adhésion, isolation](0005-classes.md)     | accepté |

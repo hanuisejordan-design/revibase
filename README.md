@@ -52,22 +52,24 @@ Dans le tableau de bord Supabase → _Project Settings_ :
 
 ### Base de données
 
-Le schéma vit dans [`supabase/migrations/`](supabase/migrations). Deux options :
+**1. Schéma** — dans _SQL Editor_ (Supabase Studio), exécuter **dans l'ordre**
+le contenu de chaque fichier de [`supabase/migrations/`](supabase/migrations)
+(`0001`, `0002`, `0003`, …). Le `0001` à jour se suffit à lui-même pour un
+projet neuf ; `0002` et `0003` ne servent que si `0001` a été appliqué avant
+leurs correctifs (voir l'en-tête de chaque fichier).
 
-**A. Rapide — via Supabase Studio**
-Dans _SQL Editor_, exécuter **dans l'ordre** le contenu de chaque fichier de
-`supabase/migrations/` (`0001`, `0002`, `0003`, …). Le `0001` à jour se
-suffit à lui-même pour un projet neuf ; `0002` et `0003` ne servent que si
-`0001` a été appliqué avant leurs correctifs (voir l'en-tête de chaque
-fichier). Optionnel : exécuter ensuite `supabase/seed.sql` sur un projet de
-test pour des données d'exemple.
-
-**B. Avec la CLI Supabase** (nécessite Docker pour le mode local)
+**2. Données de démo (optionnel)** — après avoir renseigné `.env.local` :
 
 ```bash
-npx supabase start        # base locale
-npx supabase db reset     # applique migrations + seed.sql
+node --env-file=.env.local supabase/seed.mjs
 ```
+
+Le script crée des comptes de test (`*.@revibase.test`, mot de passe
+`password123`) via l'API d'administration Supabase, puis une classe d'exemple
+(code `DEMO2026`) avec chapitres, questions et réponses.
+
+> `supabase/cleanup_test_users.sql` supprime tous les comptes `@revibase.test`
+> (utile pour repartir de zéro ; à coller dans _SQL Editor_).
 
 ## Lancer le projet
 
@@ -103,7 +105,7 @@ src/
 
 supabase/
 ├── migrations/     Schéma SQL versionné
-└── seed.sql        Données de démonstration
+└── seed.mjs        Données de démonstration (script Node)
 
 docs/
 ├── architecture/   Vue d'ensemble technique
@@ -125,6 +127,6 @@ votes, validation formateur, calcul du score de quiz.
 
 ## Feuille de route
 
-Le développement suit des phases laissant l'app fonctionnelle à chaque étape : 0. Initialisation ✅ · **1. Authentification ✅** · 2. Classes _(en cours)_ · 3. Chapitres · 4. Questions · 5. Réponses & votes · 6. Discussions · 7. Validation formateur · 8. Quiz · 9. Notifications · 10. Polissage.
+Le développement suit des phases laissant l'app fonctionnelle à chaque étape : 0. Initialisation ✅ · 1. Authentification ✅ · **2. Classes ✅** · 3. Chapitres _(à venir)_ · 4. Questions · 5. Réponses & votes · 6. Discussions · 7. Validation formateur · 8. Quiz · 9. Notifications · 10. Polissage.
 
 Détail : [`docs/product/mvp.md`](docs/product/mvp.md).

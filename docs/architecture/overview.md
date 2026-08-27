@@ -99,6 +99,21 @@ Calculé à la lecture, par priorité décroissante :
   `src/features/auth/actions.ts` ; validation Zod dans `schema.ts` ; erreurs
   traduites en français, jamais l'erreur brute.
 
+## Classes (Phase 2)
+
+- `src/features/classes/` : `schema.ts` (Zod), `queries.ts`
+  (`getMyClasses`, `getClassContext`, `getClassMembers`), `actions.ts`
+  (`createClassAction`, `joinClassAction`, `leaveClassAction`),
+  `types.ts` (projections locales, faute de types générés Supabase).
+- Création / adhésion via les RPC `security definer` `create_class()` et
+  `join_class_by_code()` (atomiques : classe + adhésion + chapitres).
+- **Isolation** : `class/[classId]/layout.tsx` appelle `getClassContext()` ;
+  si l'utilisateur n'est pas membre → `notFound()`. La RLS garantit qu'aucune
+  donnée d'une autre classe n'est lisible.
+- `getMyClasses()` filtre sur `user_id = auth.uid()` (la RLS de
+  `class_members` laisse voir tous les co-membres).
+- Page `not-found.tsx` en français à la racine.
+
 ## Flux d'une requête authentifiée
 
 1. `src/proxy.ts` rafraîchit la session Supabase (cookies).
