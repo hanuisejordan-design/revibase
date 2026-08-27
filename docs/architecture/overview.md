@@ -118,12 +118,12 @@ Calculé à la lecture, par priorité décroissante :
 
 - `src/features/chapters/` : `schema.ts`, `queries.ts` (`listChapters`),
   `actions.ts` (`createChapter`, `renameChapter`, `moveChapter`,
-  `deleteChapter`). Chaque action revérifie `role === 'trainer'` via
-  `getClassContext` avant d'écrire (la RLS `chapters_*_trainer` est la
-  seconde barrière).
-- Gérés depuis `class/[classId]/settings` : le formateur ajoute / renomme /
-  réordonne (échange de `position`) / supprime ; l'élève voit la liste en
-  lecture seule.
+  `deleteChapter`). Chaque action revérifie l'appartenance à la classe via
+  `getClassContext` avant d'écrire (la RLS `chapters_*_member` est la seconde
+  barrière).
+- **Tout membre** gère les chapitres (ADR 0007) depuis
+  `class/[classId]/settings` : ajouter / renommer / réordonner (échange de
+  `position`) / supprimer.
 - Supprimer un chapitre laisse ses questions (`chapter_id` → `NULL` via
   `ON DELETE SET NULL`) ; message d'avertissement dans l'UI.
 

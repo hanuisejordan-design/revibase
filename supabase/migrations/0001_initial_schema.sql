@@ -499,17 +499,19 @@ create policy "members_delete_self_or_trainer" on public.class_members
   for delete using (user_id = auth.uid() or public.is_class_trainer(class_id));
 
 -- ---- chapters --------------------------------------------------------
+-- Vision communautaire : tout membre gère les chapitres. Le rôle formateur
+-- reste réservé à la validation des réponses (cf. answers, notifications).
 create policy "chapters_select_member" on public.chapters
   for select using (public.is_class_member(class_id));
 
-create policy "chapters_insert_trainer" on public.chapters
-  for insert with check (public.is_class_trainer(class_id));
+create policy "chapters_insert_member" on public.chapters
+  for insert with check (public.is_class_member(class_id));
 
-create policy "chapters_update_trainer" on public.chapters
-  for update using (public.is_class_trainer(class_id)) with check (public.is_class_trainer(class_id));
+create policy "chapters_update_member" on public.chapters
+  for update using (public.is_class_member(class_id)) with check (public.is_class_member(class_id));
 
-create policy "chapters_delete_trainer" on public.chapters
-  for delete using (public.is_class_trainer(class_id));
+create policy "chapters_delete_member" on public.chapters
+  for delete using (public.is_class_member(class_id));
 
 -- ---- questions -----------------------------------------------------
 create policy "questions_select_member" on public.questions

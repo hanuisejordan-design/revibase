@@ -12,10 +12,10 @@ export interface ChapterFormState {
   ok?: boolean;
 }
 
-/** Renvoie `true` si l'utilisateur courant est formateur de la classe. */
-async function isTrainerOf(classId: string): Promise<boolean> {
+/** Renvoie `true` si l'utilisateur courant est membre de la classe. */
+async function isMemberOf(classId: string): Promise<boolean> {
   const ctx = await getClassContext(classId);
-  return ctx?.role === "trainer";
+  return ctx !== null;
 }
 
 function revalidateClass(classId: string) {
@@ -28,8 +28,8 @@ export async function createChapterAction(
   formData: FormData,
 ): Promise<ChapterFormState> {
   const classId = String(formData.get("classId") ?? "");
-  if (!(await isTrainerOf(classId))) {
-    return { formError: "Action réservée au formateur." };
+  if (!(await isMemberOf(classId))) {
+    return { formError: "Tu dois être membre de la classe." };
   }
 
   const parsed = parseInput(chapterNameSchema, { name: formData.get("name") });
@@ -70,8 +70,8 @@ export async function renameChapterAction(
 ): Promise<ChapterFormState> {
   const classId = String(formData.get("classId") ?? "");
   const chapterId = String(formData.get("chapterId") ?? "");
-  if (!(await isTrainerOf(classId))) {
-    return { formError: "Action réservée au formateur." };
+  if (!(await isMemberOf(classId))) {
+    return { formError: "Tu dois être membre de la classe." };
   }
 
   const parsed = parseInput(chapterNameSchema, { name: formData.get("name") });
@@ -98,7 +98,7 @@ export async function renameChapterAction(
 export async function deleteChapterAction(formData: FormData): Promise<void> {
   const classId = String(formData.get("classId") ?? "");
   const chapterId = String(formData.get("chapterId") ?? "");
-  if (!(await isTrainerOf(classId))) return;
+  if (!(await isMemberOf(classId))) return;
 
   const supabase = await createClient();
   await supabase.from("chapters").delete().eq("id", chapterId).eq("class_id", classId);
@@ -110,7 +110,7 @@ export async function moveChapterAction(formData: FormData): Promise<void> {
   const classId = String(formData.get("classId") ?? "");
   const chapterId = String(formData.get("chapterId") ?? "");
   const direction = formData.get("direction") === "up" ? "up" : "down";
-  if (!(await isTrainerOf(classId))) return;
+  if (!(await isMemberOf(classId))) return;
 
   const supabase = await createClient();
   const { data } = await supabase

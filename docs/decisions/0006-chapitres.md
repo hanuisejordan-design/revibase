@@ -1,6 +1,6 @@
 # 0006 — Chapitres : gestion par le formateur
 
-- Statut : accepté
+- Statut : **remplacé par [0007](0007-chapitres-tout-membre.md)**
 - Date : 2026-08-27
 
 ## Contexte
