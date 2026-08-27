@@ -133,4 +133,7 @@ votes, validation formateur, calcul du score de quiz.
 
 Le développement suit des phases laissant l'app fonctionnelle à chaque étape : 0. Initialisation ✅ · 1. Authentification ✅ · 2. Classes ✅ · 3. Chapitres ✅ · 4. Questions ✅ · 5. Réponses & votes ✅ · 6. Discussions ✅ · 7. Validation formateur ✅ · **8. Quiz ✅** · 9. Notifications _(à venir)_ · 10. Polissage.
 
-Détail : [`docs/product/mvp.md`](docs/product/mvp.md).
+La boucle MVP est en ligne et testée en conditions réelles.
+
+- Périmètre & critères : [`docs/product/mvp.md`](docs/product/mvp.md)
+- Idées et reports (types de question, photos, responsive…) : [`docs/product/backlog.md`](docs/product/backlog.md)
