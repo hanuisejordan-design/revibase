@@ -144,6 +144,19 @@ Calculé à la lecture, par priorité décroissante :
 - L'accueil de classe est orienté questions ; code d'invitation + participants
   déplacés dans `settings`.
 
+## Réponses & votes (Phase 5)
+
+- `src/features/answers/` : `queries.ts` (`listAnswers` — tri validée >
+  retenue > votes > ancienneté), `actions.ts` (`createAnswerAction`,
+  `toggleVoteAction`, `toggleAcceptAction`, `deleteAnswerAction`).
+- Vote = ligne `answer_votes` (unique par personne) ; `toggleVoteAction`
+  insère/supprime.
+- Badge par réponse : `validated` / `accepted` / `community` / `unverified`.
+- « Retenir » une réponse passe par le RPC `security definer`
+  `accept_answer(p_answer)` (migration 0006) : l'auteur de la question ne
+  peut pas faire l'UPDATE direct (RLS `answers_update_author_or_trainer`).
+- La page question affiche désormais la liste des réponses + le formulaire.
+
 ## Flux d'une requête authentifiée
 
 1. `src/proxy.ts` rafraîchit la session Supabase (cookies).
