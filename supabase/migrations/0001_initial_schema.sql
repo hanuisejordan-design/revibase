@@ -204,6 +204,13 @@ create trigger answers_set_updated_at
 
 -- Garantit que seule une personne `trainer` de la classe peut valider une
 -- réponse, et normalise `validated_at`. Règle métier appliquée EN BASE.
+--
+-- Deux contextes :
+--   * utilisateur authentifié (JWT) : il DOIT être formateur de la classe,
+--     et c'est lui qui est enregistré comme validateur (`validated_by`) ;
+--   * contexte serveur / admin sans session (service_role, script SQL,
+--     seed) : `auth.uid()` est NULL, on fait confiance à l'appelant et on
+--     conserve la valeur fournie.
 create or replace function public.enforce_answer_validation()
 returns trigger
 language plpgsql
@@ -214,10 +221,12 @@ begin
   if new.validated_by is not null
      and (tg_op = 'INSERT' or new.validated_by is distinct from old.validated_by)
   then
-    if not public.is_class_trainer(public.question_class(new.question_id)) then
-      raise exception 'Seul un formateur de la classe peut valider une réponse';
+    if auth.uid() is not null then
+      if not public.is_class_trainer(public.question_class(new.question_id)) then
+        raise exception 'Seul un formateur de la classe peut valider une réponse';
+      end if;
+      new.validated_by := auth.uid();
     end if;
-    new.validated_by := auth.uid();
     new.validated_at := now();
   end if;
 
