@@ -77,6 +77,10 @@ Le script crée des comptes de test (`*.@revibase.test`, mot de passe
 npm run dev        # http://localhost:3000
 ```
 
+## Déploiement
+
+Vercel + Supabase. Marche à suivre : [`docs/deployment.md`](docs/deployment.md).
+
 ## Scripts
 
 | Script                 | Effet                                    |
