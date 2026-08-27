@@ -6,11 +6,16 @@
 -- des réponses (Phase 7) et d'éventuels déploiements « école ».
 --
 -- À exécuter dans le SQL Editor si tu as appliqué 0001 avant ce changement.
+-- Ré-exécutable sans erreur (idempotent).
 -- ============================================================================
 
 drop policy if exists "chapters_insert_trainer" on public.chapters;
 drop policy if exists "chapters_update_trainer" on public.chapters;
 drop policy if exists "chapters_delete_trainer" on public.chapters;
+
+drop policy if exists "chapters_insert_member" on public.chapters;
+drop policy if exists "chapters_update_member" on public.chapters;
+drop policy if exists "chapters_delete_member" on public.chapters;
 
 create policy "chapters_insert_member" on public.chapters
   for insert with check (public.is_class_member(class_id));
