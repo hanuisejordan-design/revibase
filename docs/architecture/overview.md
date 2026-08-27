@@ -114,6 +114,19 @@ Calculé à la lecture, par priorité décroissante :
   `class_members` laisse voir tous les co-membres).
 - Page `not-found.tsx` en français à la racine.
 
+## Chapitres (Phase 3)
+
+- `src/features/chapters/` : `schema.ts`, `queries.ts` (`listChapters`),
+  `actions.ts` (`createChapter`, `renameChapter`, `moveChapter`,
+  `deleteChapter`). Chaque action revérifie `role === 'trainer'` via
+  `getClassContext` avant d'écrire (la RLS `chapters_*_trainer` est la
+  seconde barrière).
+- Gérés depuis `class/[classId]/settings` : le formateur ajoute / renomme /
+  réordonne (échange de `position`) / supprime ; l'élève voit la liste en
+  lecture seule.
+- Supprimer un chapitre laisse ses questions (`chapter_id` → `NULL` via
+  `ON DELETE SET NULL`) ; message d'avertissement dans l'UI.
+
 ## Flux d'une requête authentifiée
 
 1. `src/proxy.ts` rafraîchit la session Supabase (cookies).

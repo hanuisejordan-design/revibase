@@ -34,6 +34,20 @@ export default async function ClassLayout({
           </Link>
           <h1 className="text-xl font-semibold">{ctx.name}</h1>
         </div>
+        <nav className="flex gap-3 pt-1 text-sm">
+          <Link
+            href={`/class/${classId}`}
+            className="text-zinc-600 hover:underline dark:text-zinc-400"
+          >
+            Accueil
+          </Link>
+          <Link
+            href={`/class/${classId}/settings`}
+            className="text-zinc-600 hover:underline dark:text-zinc-400"
+          >
+            Paramètres
+          </Link>
+        </nav>
       </div>
       {children}
     </div>
