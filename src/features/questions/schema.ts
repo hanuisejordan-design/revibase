@@ -1,12 +1,5 @@
 import { z } from "zod";
 
-/** "" (aucun) ou un UUID de chapitre. */
-const optionalChapterId = z
-  .string()
-  .trim()
-  .transform((v) => (v === "" ? null : v))
-  .pipe(z.string().uuid("Chapitre invalide.").nullable());
-
 export const createQuestionSchema = z.object({
   title: z.string().trim().min(5, "Au moins 5 caractères.").max(300, "300 caractères maximum."),
   body: z
@@ -14,7 +7,14 @@ export const createQuestionSchema = z.object({
     .trim()
     .max(5000, "5000 caractères maximum.")
     .transform((v) => (v === "" ? null : v)),
-  chapterId: optionalChapterId,
+  // Chapitre obligatoire à la création : chaque question doit être classée
+  // (bibliothèque structurée + quiz par chapitre). L'état « sans chapitre »
+  // n'existe que pour les questions orphelines d'un chapitre supprimé.
+  chapterId: z
+    .string()
+    .trim()
+    .min(1, "Choisis un chapitre pour classer ta question.")
+    .pipe(z.string().uuid("Chapitre invalide.")),
 });
 
 export type CreateQuestionInput = z.infer<typeof createQuestionSchema>;

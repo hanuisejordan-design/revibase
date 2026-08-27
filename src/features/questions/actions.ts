@@ -23,9 +23,9 @@ export async function createQuestionAction(
   if (!ctx) return { formError: "Tu dois être membre de la classe." };
 
   const parsed = parseInput(createQuestionSchema, {
-    title: formData.get("title"),
-    body: formData.get("body"),
-    chapterId: formData.get("chapterId"),
+    title: String(formData.get("title") ?? ""),
+    body: String(formData.get("body") ?? ""),
+    chapterId: String(formData.get("chapterId") ?? ""),
   });
   if (!parsed.success) return { errors: parsed.errors };
 

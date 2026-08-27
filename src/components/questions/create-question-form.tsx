@@ -32,7 +32,9 @@ export function CreateQuestionForm({
           defaultValue={defaultChapterId ?? ""}
           className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
         >
-          <option value="">— Sans chapitre —</option>
+          <option value="" disabled>
+            — Choisir un chapitre —
+          </option>
           {chapters.map((ch) => (
             <option key={ch.id} value={ch.id}>
               {ch.name}

@@ -24,9 +24,16 @@ page dédiée. C'est le cœur du produit — la question comme objet permanent.
   nombre de réponses / commentaires et le statut (`validated` si une réponse
   validée, sinon `answered` / `unanswered`). Tri `unanswered` / `popular`
   appliqué en mémoire. Acceptable à l'échelle d'une classe.
-- **Chapitre à la création** : optionnel (`— Sans chapitre —`). L'action
-  vérifie que le chapitre choisi appartient bien à la classe (la RLS
-  `questions_insert_member` ne contrôle que la classe + l'auteur).
+- **Chapitre à la création** : **obligatoire** (choix explicite dans le
+  formulaire ; message « Choisis un chapitre pour classer ta question »).
+  Motif : bibliothèque structurée + quiz par chapitre fiables. L'action
+  vérifie que le chapitre appartient bien à la classe (la RLS
+  `questions_insert_member` ne contrôle que la classe + l'auteur). Si la
+  classe n'a aucun chapitre, le formulaire renvoie vers Paramètres.
+  `questions.chapter_id` reste nullable en base : l'état « sans chapitre »
+  n'existe que pour les questions orphelines d'un chapitre supprimé
+  (`ON DELETE SET NULL`), et le filtre « Sans chapitre » permet de les
+  reclasser.
 - **Suppression** : douce (`deleted_at`), réservée à l'auteur ou à un
   formateur, avec confirmation. Les données restent (« objet permanent ») ;
   toutes les lectures filtrent `.is('deleted_at', null)`.

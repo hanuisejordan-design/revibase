@@ -36,11 +36,24 @@ export default async function NewQuestionPage({
         </Link>
         <h2 className="text-lg font-semibold">Poser une question</h2>
       </div>
-      <CreateQuestionForm
-        classId={classId}
-        chapters={chapters}
-        defaultChapterId={first(sp.chapter)}
-      />
+
+      {chapters.length === 0 ? (
+        <div className="flex flex-col gap-2 rounded-xl border border-dashed border-zinc-300 p-4 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+          <p>
+            Cette classe n&apos;a pas encore de chapitre. Il en faut au moins un pour classer les
+            questions.
+          </p>
+          <Link href={`/class/${classId}/settings`} className="font-medium underline">
+            Créer un chapitre
+          </Link>
+        </div>
+      ) : (
+        <CreateQuestionForm
+          classId={classId}
+          chapters={chapters}
+          defaultChapterId={first(sp.chapter)}
+        />
+      )}
     </div>
   );
 }
