@@ -99,18 +99,22 @@ async function main() {
   if (clsErr) throw clsErr;
   const classId = cls.id;
 
-  await db
+  const { error: memErr } = await db
     .from("class_members")
     .insert(PEOPLE.map((p) => ({ class_id: classId, user_id: ids[p.key], role: p.role })));
+  if (memErr) throw memErr;
 
   const chapterNames = ["Signalisation", "Réglementation", "Matériel", "Sécurité"];
-  const { data: chapters } = await db
+  const { data: chapters, error: chErr } = await db
     .from("chapters")
     .insert(chapterNames.map((name, position) => ({ class_id: classId, name, position })))
     .select("id, name");
+  if (chErr) throw chErr;
   const chapterId = Object.fromEntries(chapters.map((c) => [c.name, c.id]));
 
-  const { data: questions } = await db
+  // NB : toutes les lignes d'un insert multiple doivent avoir EXACTEMENT les
+  // mêmes clés — sinon PostgREST envoie NULL pour les clés absentes.
+  const { data: questions, error: qErr } = await db
     .from("questions")
     .insert([
       {
@@ -125,6 +129,7 @@ async function main() {
         chapter_id: chapterId["Signalisation"],
         author_id: ids.julie,
         title: "Différence entre un sémaphore et un carré ?",
+        body: null,
       },
       {
         class_id: classId,
@@ -142,10 +147,11 @@ async function main() {
       },
     ])
     .select("id, title");
+  if (qErr) throw qErr;
 
   const q = Object.fromEntries(questions.map((row) => [row.title, row.id]));
 
-  const { data: answers } = await db
+  const { data: answers, error: ansErr } = await db
     .from("answers")
     .insert([
       {
@@ -158,14 +164,17 @@ async function main() {
         question_id: q["Que signifie un carré violet ?"],
         author_id: ids.marc,
         body: "Moyen mnémo : violet = manœuvre.",
+        accepted: false,
       },
       {
         question_id: q["Ordre des actions en cas de heurt d'obstacle ?"],
         author_id: ids.marc,
         body: "Protéger (couvrir la voie et les voies contiguës si besoin), alerter l'agent-circulation, rendre compte, puis reconnaître si les conditions le permettent.",
+        accepted: false,
       },
     ])
     .select("id, question_id, body");
+  if (ansErr) throw ansErr;
 
   const validated = answers.find((a) => a.body.startsWith("Le carré violet"));
   await db
