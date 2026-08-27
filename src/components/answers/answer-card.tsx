@@ -3,6 +3,7 @@ import { relativeTime } from "@/lib/utils/date";
 import { AnswerStatusBadge } from "./answer-status-badge";
 import { VoteButton } from "./vote-button";
 import { AcceptButton } from "./accept-button";
+import { ValidateButton } from "./validate-button";
 import { DeleteAnswerButton } from "./delete-answer-button";
 
 function statusOf(answer: AnswerItem): AnswerStatus {
@@ -52,6 +53,14 @@ export function AnswerCard({
               questionId={questionId}
               answerId={answer.id}
               accepted={answer.accepted}
+            />
+          ) : null}
+          {viewerIsTrainer ? (
+            <ValidateButton
+              classId={classId}
+              questionId={questionId}
+              answerId={answer.id}
+              validated={answer.validated}
             />
           ) : null}
           {canModerate ? (

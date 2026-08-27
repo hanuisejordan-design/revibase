@@ -98,6 +98,33 @@ export async function toggleAcceptAction(formData: FormData): Promise<void> {
   revalidateQuestion(classId, questionId);
 }
 
+/** Validation officielle d'une réponse. Réservée aux formateurs (RLS + trigger). */
+export async function toggleValidateAction(formData: FormData): Promise<void> {
+  const classId = String(formData.get("classId") ?? "");
+  const questionId = String(formData.get("questionId") ?? "");
+  const answerId = String(formData.get("answerId") ?? "");
+
+  const [user, ctx] = await Promise.all([getUser(), getClassContext(classId)]);
+  if (!user || ctx?.role !== "trainer") redirect(`/class/${classId}/questions/${questionId}`);
+
+  const supabase = await createClient();
+  const { data: answer } = await supabase
+    .from("answers")
+    .select("validated_by")
+    .eq("id", answerId)
+    .maybeSingle();
+
+  const currentlyValidated = (answer as { validated_by: string | null } | null)?.validated_by;
+  // Le trigger `enforce_answer_validation` force validated_by = auth.uid() et
+  // gère validated_at ; on se contente d'activer / désactiver.
+  await supabase
+    .from("answers")
+    .update({ validated_by: currentlyValidated ? null : user.id })
+    .eq("id", answerId);
+
+  revalidateQuestion(classId, questionId);
+}
+
 export async function deleteAnswerAction(formData: FormData): Promise<void> {
   const classId = String(formData.get("classId") ?? "");
   const questionId = String(formData.get("questionId") ?? "");

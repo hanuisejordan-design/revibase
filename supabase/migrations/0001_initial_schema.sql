@@ -218,6 +218,7 @@ security definer
 set search_path = public
 as $$
 begin
+  -- Poser une validation (ou la changer) : réservé à un formateur.
   if new.validated_by is not null
      and (tg_op = 'INSERT' or new.validated_by is distinct from old.validated_by)
   then
@@ -228,6 +229,16 @@ begin
       new.validated_by := auth.uid();
     end if;
     new.validated_at := now();
+  end if;
+
+  -- Retirer une validation existante : également réservé à un formateur.
+  if tg_op = 'UPDATE'
+     and old.validated_by is not null
+     and new.validated_by is null
+     and auth.uid() is not null
+     and not public.is_class_trainer(public.question_class(new.question_id))
+  then
+    raise exception 'Seul un formateur de la classe peut retirer une validation';
   end if;
 
   if new.validated_by is null then

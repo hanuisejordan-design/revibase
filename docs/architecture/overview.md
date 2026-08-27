@@ -166,6 +166,19 @@ Calculé à la lecture, par priorité décroissante :
 - La page question distingue « Réponses » (tentatives de réponse) et
   « Discussion » (échange autour de la question).
 
+## Validation formateur (Phase 7)
+
+- `toggleValidateAction` (`features/answers/actions.ts`), garde
+  `ctx.role === 'trainer'` ; `ValidateButton` visible aux seuls formateurs.
+- Aucune nouvelle brique d'autorisation : la RLS
+  `answers_update_author_or_trainer` + le trigger `enforce_answer_validation`
+  imposent « seul un formateur pose `validated_by` » et forcent
+  `validated_by = auth.uid()` / `validated_at`.
+- Migration 0007 : durcissement du trigger — retirer une validation existante
+  exige aussi d'être formateur (sinon l'auteur de la réponse pouvait la
+  retirer via l'API).
+- Gestion des rôles (promouvoir un membre) reportée (ADR 0011).
+
 ## Flux d'une requête authentifiée
 
 1. `src/proxy.ts` rafraîchit la session Supabase (cookies).
