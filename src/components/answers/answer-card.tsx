@@ -43,6 +43,12 @@ export function AnswerCard({
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <AnswerStatusBadge status={statusOf(answer)} />
         <p className="whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">{answer.body}</p>
+        {answer.voterLabels.length > 0 ? (
+          <p className="text-xs text-zinc-500" title="Personnes ayant donné cette réponse">
+            {answer.voterLabels.length} personne{answer.voterLabels.length > 1 ? "s" : ""} ·{" "}
+            {answer.voterLabels.join(", ")}
+          </p>
+        ) : null}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-500">
           <span>
             {answer.authorName} · {relativeTime(answer.createdAt)}

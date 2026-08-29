@@ -15,6 +15,8 @@ export function CreateAnswerForm({ classId, questionId }: { classId: string; que
     if (state?.ok) ref.current?.reset();
   }, [state]);
 
+  const merged = state?.ok ? state.merged : undefined;
+
   return (
     <form ref={ref} action={formAction} className="flex flex-col gap-2" noValidate>
       <input type="hidden" name="classId" value={classId} />
@@ -37,6 +39,13 @@ export function CreateAnswerForm({ classId, questionId }: { classId: string; que
         <p role="alert" className="text-sm text-red-600 dark:text-red-400">
           {state.formError}
         </p>
+      ) : null}
+      {merged ? (
+        <p className="text-sm text-green-700 dark:text-green-400">
+          Ta réponse rejoignait celle de {merged.authorName} — ton vote a été ajouté.
+        </p>
+      ) : state?.ok ? (
+        <p className="text-sm text-green-700 dark:text-green-400">Réponse publiée.</p>
       ) : null}
       <Button type="submit" disabled={pending} className="w-fit">
         {pending ? "Publication…" : "Publier la réponse"}

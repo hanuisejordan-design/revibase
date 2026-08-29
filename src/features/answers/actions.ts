@@ -7,11 +7,14 @@ import { getUser } from "@/lib/auth/dal";
 import { getClassContext } from "@/features/classes/queries";
 import { parseInput } from "@/lib/validation/helpers";
 import { createAnswerSchema } from "./schema";
+import { isSameAnswer } from "./normalize";
 
 export interface AnswerFormState {
   errors?: Record<string, string>;
   formError?: string;
   ok?: boolean;
+  /** Renseigné quand la réponse a rejoint une réponse existante (vote ajouté). */
+  merged?: { authorName: string };
 }
 
 function revalidateQuestion(classId: string, questionId: string) {
@@ -44,12 +47,47 @@ export async function createAnswerAction(
     .maybeSingle();
   if (!question) return { formError: "Question introuvable." };
 
-  const { error } = await supabase.from("answers").insert({
-    question_id: questionId,
-    author_id: user.id,
-    body: parsed.data.body,
-  });
-  if (error) return { formError: "Publication impossible. Réessaie." };
+  // Doublon exact ? On ne recrée pas la réponse : on ajoute un vote à celle
+  // qui existe déjà (cf. ADR 0014). Comparaison stricte, pas de correction
+  // des fautes.
+  const { data: existing } = await supabase
+    .from("answers")
+    .select("id, body, author:profiles!answers_author_id_fkey(display_name)")
+    .eq("question_id", questionId);
+
+  const rows = (existing ?? []) as unknown as Array<{
+    id: string;
+    body: string;
+    author: { display_name: string } | null;
+  }>;
+  const match = rows.find((r) => isSameAnswer(r.body, parsed.data.body));
+
+  if (match) {
+    await supabase
+      .from("answer_votes")
+      .upsert(
+        { answer_id: match.id, user_id: user.id },
+        { onConflict: "answer_id,user_id", ignoreDuplicates: true },
+      );
+    revalidateQuestion(classId, questionId);
+    return { ok: true, merged: { authorName: match.author?.display_name ?? "un autre membre" } };
+  }
+
+  const { data: created, error } = await supabase
+    .from("answers")
+    .insert({ question_id: questionId, author_id: user.id, body: parsed.data.body })
+    .select("id")
+    .single();
+  if (error || !created) return { formError: "Publication impossible. Réessaie." };
+
+  // L'auteur « vote » automatiquement pour sa propre réponse : le compteur
+  // veut dire « nombre de personnes ayant donné cette réponse ».
+  await supabase
+    .from("answer_votes")
+    .upsert(
+      { answer_id: (created as { id: string }).id, user_id: user.id },
+      { onConflict: "answer_id,user_id", ignoreDuplicates: true },
+    );
 
   revalidateQuestion(classId, questionId);
   return { ok: true };

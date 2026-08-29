@@ -209,6 +209,27 @@ Calculé à la lecture, par priorité décroissante :
   rouge/vert pour les QCM, révélation + auto-évaluation pour les ouvertes.
   Le score des QCM est **recalculé côté serveur** dans `submitQuizAction`
   (`question_options.is_correct` d'après `selected_option_id`).
+- Page question : la page d'une QCM / vrai-faux est **interactive**
+  (`QuestionOptionsView`, client) — on choisit une option, retour rouge/vert,
+  « Recommencer ». Rien n'est enregistré. La discussion s'affiche en **bulles**
+  (`CommentList` : à moi = aligné à droite, foncé ; autre = à gauche, clair).
+
+## Répondre avant de voir + fusion des doublons (Phase 12, ADR 0014)
+
+- **Question ouverte** : tant qu'on n'a pas participé (répondu / voté /
+  fusionné), les réponses des autres sont masquées derrière
+  `AnswerReveal` (client) ; le formulaire passe au-dessus. Échappatoire
+  « Voir les N réponses sans répondre ».
+- `normalize.ts` (`normalizeAnswerBody`, `isSameAnswer`, testé) : `trim`,
+  minuscules, espaces réduits, ponctuation de fin retirée — accents et fautes
+  conservés.
+- `createAnswerAction` : correspondance **exacte** avec une réponse existante
+  → pas de doublon, un vote de l'auteur est ajouté (`answer_votes`, upsert
+  ignore-duplicates) et l'UI affiche « ta réponse rejoignait celle de X » ;
+  sinon la réponse est créée **et l'auteur vote automatiquement**.
+- Le compteur = « N personnes ont donné cette réponse » ; `listAnswers`
+  renvoie `voterLabels` (« Toi » en premier), affichés sous la réponse.
+- Aucune migration.
 
 ## Flux d'une requête authentifiée
 

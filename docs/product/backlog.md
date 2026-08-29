@@ -29,25 +29,28 @@ priorise selon les retours de la classe.
   moins il y a de classes créées, moins il y a à migrer.
 - Remplace le report « gestion des rôles » d'ADR 0011.
 
-### Types de question : QCM / vrai-faux / ouverte
+### ✅ Types de question (ouverte / vrai-faux / QCM) — fait (Phase 11, ADR 0013)
 
-- **Pourquoi** : débloque les **quiz auto-corrigés** (score objectif, pas
-  seulement « su / pas su »). Complète l'auto-évaluation (ADR 0003).
-- **Déjà en place** : `questions.kind` (`open` | `mcq`) et la table
-  `question_options` existent depuis la migration 0001 (ADR 0002 §4).
-- **À faire** :
-  - sélecteur de type sur le formulaire « Poser une question »
-    (`open` par défaut ; `true_false` = QCM à 2 options pré-remplies) ;
-  - éditeur d'options pour les QCM (ajouter des choix, cocher le(s) bon(s)) ;
-    migration pour ouvrir la RLS `question_options` à tout membre (comme les
-    chapitres, ADR 0007) ;
-  - page question qui s'affiche selon le type (un QCM n'a pas de « réponses
-    communautaires » — la bonne réponse vient des options ; la discussion
-    reste) ;
-  - quiz : QCM = choix cliquable + correction auto (`quiz_answers.
-selected_answer_id` / `is_correct`, déjà au schéma) ; ouverte =
-    auto-évaluation ; quiz mélangé = score combiné.
-- **Ampleur** : une phase dédiée + petite migration.
+Quiz auto-corrigés + page de QCM interactive (clic → rouge/vert). Discussion
+en bulles au passage.
+
+### Répondre avant de voir + fusion des doublons (#1 + #2) — EN COURS
+
+Retours d'usage. Les deux se conçoivent ensemble (cf. discussion) :
+
+- **Question ouverte** : tant que tu n'as pas répondu, les réponses des autres
+  sont **masquées** (bouton « Voir les N réponses sans répondre » pour
+  déroger — cas révision).
+- **À la validation de ta réponse**, égalité **stricte** (espaces / casse /
+  ponctuation de fin ; **pas** les fautes) avec une réponse existante :
+  - correspond → pas de doublon, ton **vote** est ajouté à celle-ci
+    (« ta réponse rejoignait celle de X ») ;
+  - ne correspond pas → nouvelle réponse **+ ton vote automatique**.
+- Le compteur veut alors dire « **X personnes ont donné cette réponse** »
+  (auteur inclus) ; afficher les **noms** des votants.
+- Pas de détection des quasi-doublons / fautes (peu fiable) — le vote manuel
+  reste l'outil pour ça.
+- **Ampleur** : moyen, pas de migration.
 
 ### Photo attachée à une question
 

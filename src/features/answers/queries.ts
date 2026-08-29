@@ -39,11 +39,33 @@ export const listAnswers = cache(async (questionId: string): Promise<AnswerItem[
     .select("answer_id, user_id")
     .in("answer_id", ids);
 
+  const voteRows = (votes ?? []) as Array<{ answer_id: string; user_id: string }>;
+
+  // Noms des votants (pour « 3 · Toi, Julie, Marc »).
+  const voterIds = [...new Set(voteRows.map((v) => v.user_id))];
+  const nameById = new Map<string, string>();
+  if (voterIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, display_name")
+      .in("id", voterIds);
+    for (const p of (profiles ?? []) as Array<{ id: string; display_name: string }>) {
+      nameById.set(p.id, p.display_name);
+    }
+  }
+
   const voteCount = new Map<string, number>();
   const viewerVoted = new Set<string>();
-  for (const v of (votes ?? []) as Array<{ answer_id: string; user_id: string }>) {
+  const votersByAnswer = new Map<string, string[]>();
+  for (const v of voteRows) {
     voteCount.set(v.answer_id, (voteCount.get(v.answer_id) ?? 0) + 1);
-    if (user && v.user_id === user.id) viewerVoted.add(v.answer_id);
+    const mine = user !== null && v.user_id === user.id;
+    if (mine) viewerVoted.add(v.answer_id);
+    const label = mine ? "Toi" : (nameById.get(v.user_id) ?? "Membre");
+    const list = votersByAnswer.get(v.answer_id) ?? [];
+    if (mine) list.unshift(label);
+    else list.push(label);
+    votersByAnswer.set(v.answer_id, list);
   }
 
   let topId: string | null = null;
@@ -63,6 +85,7 @@ export const listAnswers = cache(async (questionId: string): Promise<AnswerItem[
     createdAt: r.created_at,
     voteCount: voteCount.get(r.id) ?? 0,
     viewerHasVoted: viewerVoted.has(r.id),
+    voterLabels: votersByAnswer.get(r.id) ?? [],
     accepted: r.accepted,
     validated: r.validated_by !== null,
     isTopVoted: r.id === topId && topCount > 0,

@@ -48,3 +48,4 @@ qui remplace l'ancien (et on met à jour le statut de l'ancien).
 | 0011 | [Validation formateur](0011-validation-formateur.md)                       | accepté           |
 | 0012 | [Quiz](0012-quiz.md)                                                       | accepté           |
 | 0013 | [Types de question (ouverte / vrai-faux / QCM)](0013-types-de-question.md) | accepté           |
+| 0014 | [Répondre avant de voir + fusion des doublons](0014-reponse-avant-de-voir-et-fusion-doublons.md) | accepté |

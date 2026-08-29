@@ -11,6 +11,7 @@ import { QUESTION_KIND_LABELS } from "@/constants/app";
 import { DeleteQuestionButton } from "@/components/questions/delete-question-button";
 import { QuestionOptionsView } from "@/components/questions/question-options-view";
 import { AnswerList } from "@/components/answers/answer-list";
+import { AnswerReveal } from "@/components/answers/answer-reveal";
 import { CreateAnswerForm } from "@/components/answers/create-answer-form";
 import { CommentList } from "@/components/discussions/comment-list";
 import { CreateCommentForm } from "@/components/discussions/create-comment-form";
@@ -45,6 +46,35 @@ export default async function QuestionPage({
   ]);
   if (!ctx || !user) notFound();
 
+  // A répondu, ou a déjà voté / fusionné sa réponse : dans tous les cas il a
+  // participé, on ne lui masque plus les réponses des autres.
+  const viewerHasAnswered =
+    isOpen && answers.some((a) => a.authorId === user.id || a.viewerHasVoted);
+
+  const answersBlock = (
+    <section className="flex flex-col gap-3">
+      <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+        {answers.length} réponse{answers.length > 1 ? "s" : ""}
+      </h2>
+      <AnswerReveal hasAnswered={viewerHasAnswered} answerCount={answers.length}>
+        <AnswerList
+          answers={answers}
+          classId={classId}
+          questionId={question.id}
+          viewerId={user.id}
+          viewerIsTrainer={ctx.role === "trainer"}
+          questionAuthorId={question.authorId}
+        />
+      </AnswerReveal>
+    </section>
+  );
+
+  const answerFormBlock = (
+    <section className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
+      <CreateAnswerForm classId={classId} questionId={question.id} />
+    </section>
+  );
+
   return (
     <div className="flex flex-col gap-6">
       <Link href={`/class/${classId}/questions`} className="text-xs text-zinc-500 hover:underline">
@@ -72,24 +102,17 @@ export default async function QuestionPage({
       </article>
 
       {isOpen ? (
-        <>
-          <section className="flex flex-col gap-3">
-            <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
-              {answers.length} réponse{answers.length > 1 ? "s" : ""}
-            </h2>
-            <AnswerList
-              answers={answers}
-              classId={classId}
-              questionId={question.id}
-              viewerId={user.id}
-              viewerIsTrainer={ctx.role === "trainer"}
-              questionAuthorId={question.authorId}
-            />
-          </section>
-          <section className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
-            <CreateAnswerForm classId={classId} questionId={question.id} />
-          </section>
-        </>
+        viewerHasAnswered ? (
+          <>
+            {answersBlock}
+            {answerFormBlock}
+          </>
+        ) : (
+          <>
+            {answerFormBlock}
+            {answersBlock}
+          </>
+        )
       ) : (
         <section className="flex flex-col gap-3">
           <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">Réponse</h2>
