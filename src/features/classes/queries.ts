@@ -15,6 +15,7 @@ type ClassRow = {
   name: string;
   join_code: string;
   created_by: string;
+  group_id: string | null;
 };
 
 /** Toutes les classes dont l'utilisateur courant est membre. */
@@ -27,7 +28,7 @@ export const getMyClasses = cache(async (): Promise<ClassSummary[]> => {
   // La RLS laisse voir TOUS les membres de mes classes : on filtre sur moi.
   const { data: memberships, error } = await supabase
     .from("class_members")
-    .select("role, class_id, classes(id, name, join_code, created_by)")
+    .select("role, class_id, classes(id, name, join_code, created_by, group_id)")
     .eq("user_id", user.id)
     .order("joined_at", { ascending: true });
 
@@ -59,6 +60,7 @@ export const getMyClasses = cache(async (): Promise<ClassSummary[]> => {
       joinCode: r.classes.join_code,
       role: r.role,
       memberCount: counts.get(r.class_id) ?? 1,
+      groupId: r.classes.group_id,
     }));
 });
 
@@ -72,6 +74,21 @@ export const getClassContext = cache(async (classId: string): Promise<ClassConte
 
   const supabase = await createClient();
 
+  // La visibilité est décidée par la RLS de `classes` : ligne `class_members`
+  // OU membre du groupe propriétaire. Pas de ligne => pas d'accès => `null`.
+  const { data: cls } = await supabase
+    .from("classes")
+    .select("id, name, join_code, created_by, group_id, groups(name)")
+    .eq("id", classId)
+    .maybeSingle();
+
+  if (!cls) return null;
+
+  const row = cls as unknown as ClassRow & {
+    groups: { name: string } | { name: string }[] | null;
+  };
+  const group = Array.isArray(row.groups) ? (row.groups[0] ?? null) : row.groups;
+
   const { data: membership } = await supabase
     .from("class_members")
     .select("role")
@@ -79,23 +96,17 @@ export const getClassContext = cache(async (classId: string): Promise<ClassConte
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!membership) return null;
+  const explicitRole = (membership as { role: ClassRole } | null)?.role ?? null;
 
-  const { data: cls } = await supabase
-    .from("classes")
-    .select("id, name, join_code, created_by")
-    .eq("id", classId)
-    .maybeSingle();
-
-  if (!cls) return null;
-
-  const row = cls as ClassRow;
   return {
     id: row.id,
     name: row.name,
     joinCode: row.join_code,
-    role: (membership as { role: ClassRole }).role,
+    role: explicitRole ?? "student",
     isCreator: row.created_by === user.id,
+    isExplicitMember: explicitRole !== null,
+    groupId: row.group_id,
+    groupName: group?.name ?? null,
   };
 });
 

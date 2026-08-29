@@ -19,9 +19,12 @@ export async function createClassAction(
   const parsed = parseInput(createClassSchema, { name: formData.get("name") });
   if (!parsed.success) return { errors: parsed.errors };
 
+  const groupId = String(formData.get("groupId") ?? "").trim() || null;
+
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("create_class", {
     p_name: parsed.data.name,
+    ...(groupId ? { p_group_id: groupId } : {}),
   });
 
   if (error || !data) {
@@ -29,6 +32,7 @@ export async function createClassAction(
   }
 
   revalidatePath("/dashboard");
+  if (groupId) revalidatePath(`/group/${groupId}`);
   redirect(`/class/${data as string}`);
 }
 
