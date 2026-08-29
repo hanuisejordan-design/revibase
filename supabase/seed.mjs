@@ -30,6 +30,8 @@ const db = createClient(url, serviceKey, {
 
 const PASSWORD = "password123";
 const JOIN_CODE = "DEMO2026";
+const GROUP_CODE = "GROUPE2026";
+const JOIN_CODE_2 = "DEMO2027";
 
 const PEOPLE = [
   { key: "trainer", email: "sofia@revibase.test", name: "Sofia (formatrice)", role: "trainer" },
@@ -89,11 +91,30 @@ async function main() {
     return;
   }
 
-  console.log("\nClasse, chapitres et contenu…");
+  console.log("\nGroupe, classes, chapitres et contenu…");
+
+  // Groupe de démo : il chapeaute deux classes.
+  const { data: grp, error: grpErr } = await db
+    .from("groups")
+    .insert({ name: "Centre de formation — Démo", join_code: GROUP_CODE, created_by: ids.trainer })
+    .select("id")
+    .single();
+  if (grpErr) throw grpErr;
+  const groupId = grp.id;
+
+  const { error: gmErr } = await db
+    .from("group_members")
+    .insert(PEOPLE.map((p) => ({ group_id: groupId, user_id: ids[p.key], is_admin: p.key === "trainer" })));
+  if (gmErr) throw gmErr;
 
   const { data: cls, error: clsErr } = await db
     .from("classes")
-    .insert({ name: "Promo Conduite — 2026", join_code: JOIN_CODE, created_by: ids.trainer })
+    .insert({
+      name: "Promo Conduite — 2026",
+      join_code: JOIN_CODE,
+      created_by: ids.trainer,
+      group_id: groupId,
+    })
     .select("id")
     .single();
   if (clsErr) throw clsErr;
@@ -255,8 +276,44 @@ async function main() {
     },
   ]);
 
-  console.log(`\nOK. Classe "Promo Conduite — 2026", code ${JOIN_CODE}.`);
-  console.log(`Connecte-toi avec sofia@revibase.test / ${PASSWORD} (formatrice).`);
+  // Deuxième classe du même groupe : montre le regroupement sur le tableau
+  // de bord. Contenu volontairement léger.
+  const { data: cls2, error: cls2Err } = await db
+    .from("classes")
+    .insert({
+      name: "Sécurité ferroviaire — Module 2",
+      join_code: JOIN_CODE_2,
+      created_by: ids.trainer,
+      group_id: groupId,
+    })
+    .select("id")
+    .single();
+  if (cls2Err) throw cls2Err;
+
+  await db
+    .from("class_members")
+    .insert({ class_id: cls2.id, user_id: ids.trainer, role: "trainer" });
+
+  const { data: chapters2, error: ch2Err } = await db
+    .from("chapters")
+    .insert(
+      ["Freinage", "Incidents"].map((name, position) => ({ class_id: cls2.id, name, position })),
+    )
+    .select("id, name");
+  if (ch2Err) throw ch2Err;
+
+  await db.from("questions").insert({
+    class_id: cls2.id,
+    chapter_id: chapters2.find((c) => c.name === "Freinage").id,
+    author_id: ids.julie,
+    title: "Différence entre freinage de service et freinage d'urgence ?",
+    body: null,
+    kind: "open",
+  });
+
+  console.log(`\nOK. Groupe "Centre de formation — Démo", code ${GROUP_CODE}.`);
+  console.log(`Classes : "Promo Conduite — 2026" (${JOIN_CODE}), "Sécurité ferroviaire — Module 2" (${JOIN_CODE_2}).`);
+  console.log(`Connecte-toi avec sofia@revibase.test / ${PASSWORD} (formatrice, admin du groupe).`);
 }
 
 main().catch((err) => {

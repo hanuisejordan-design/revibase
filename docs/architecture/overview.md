@@ -111,8 +111,30 @@ Calculé à la lecture, par priorité décroissante :
   si l'utilisateur n'est pas membre → `notFound()`. La RLS garantit qu'aucune
   donnée d'une autre classe n'est lisible.
 - `getMyClasses()` filtre sur `user_id = auth.uid()` (la RLS de
-  `class_members` laisse voir tous les co-membres).
+  `class_members` laisse voir tous les co-membres) et expose `groupId`.
+- `getClassContext()` s'appuie sur la RLS de `classes` pour la visibilité
+  (accès direct **ou** via le groupe) et expose `groupId` / `groupName` /
+  `isExplicitMember`.
 - Page `not-found.tsx` en français à la racine.
+
+## Groupes (Phase 13, ADR 0015)
+
+- Un `groupe` chapeaute des classes. Membre du groupe = accès à **toutes**
+  ses classes, sans ligne `class_members`. Migration `0009_groups.sql`.
+- Tables `groups` / `group_members` (`is_admin`), `classes.group_id`
+  nullable. Aides RLS `is_group_member` / `is_group_admin` ;
+  `is_class_member(class_id)` étendu : ligne `class_members` **OU** membre du
+  groupe propriétaire (ajout additif — classe sans groupe inchangée).
+- `src/features/groups/` : `schema`, `types`, `queries` (`getMyGroups`,
+  `getGroupContext`, `getGroupClasses`, `getGroupMembers`), `actions`
+  (`createGroupAction`, `joinGroupAction`, `leaveGroupAction`). RPC
+  `create_group` / `join_group_by_code` ; `create_class` gagne `p_group_id`.
+- Routes `group/new`, `group/join`, `group/[groupId]` (classes + code +
+  membres), `group/[groupId]/class/new` (admin). Le tableau de bord affiche
+  les classes groupées sous leur groupe, puis « Autres classes » ;
+  `class/[classId]/layout` remonte vers le groupe s'il y en a un.
+- Rôle : membre par le groupe = `student` ; « formateur » reste une ligne
+  `class_members`. Admin de groupe ≠ formateur de classe.
 
 ## Chapitres (Phase 3)
 

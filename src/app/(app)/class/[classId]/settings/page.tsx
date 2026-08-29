@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getClassContext, getClassMembers } from "@/features/classes/queries";
 import { listChapters } from "@/features/chapters/queries";
@@ -51,7 +52,20 @@ export default async function ClassSettingsPage({
         </ul>
       </section>
 
-      {!ctx.isCreator ? (
+      {ctx.groupId ? (
+        <section className="border-t border-zinc-200 pt-4 text-sm text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
+          Classe rattachée au groupe{" "}
+          <Link href={`/group/${ctx.groupId}`} className="underline">
+            {ctx.groupName}
+          </Link>
+          .{" "}
+          {!ctx.isExplicitMember
+            ? "Tu y as accès via le groupe — pour partir, quitte le groupe."
+            : null}
+        </section>
+      ) : null}
+
+      {ctx.isExplicitMember && !ctx.isCreator ? (
         <section className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
           <LeaveClassButton classId={ctx.id} />
         </section>

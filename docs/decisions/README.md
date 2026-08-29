@@ -49,3 +49,4 @@ qui remplace l'ancien (et on met à jour le statut de l'ancien).
 | 0012 | [Quiz](0012-quiz.md)                                                       | accepté           |
 | 0013 | [Types de question (ouverte / vrai-faux / QCM)](0013-types-de-question.md) | accepté           |
 | 0014 | [Répondre avant de voir + fusion des doublons](0014-reponse-avant-de-voir-et-fusion-doublons.md) | accepté |
+| 0015 | [Groupes : une couche au-dessus des classes](0015-groupes.md) | accepté |

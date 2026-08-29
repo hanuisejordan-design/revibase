@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getGroupContext, getGroupClasses, getGroupMembers } from "@/features/groups/queries";
 import { InviteCode } from "@/components/classes/invite-code";
-import { RoleBadge } from "@/components/classes/role-badge";
+import { ClassCard } from "@/components/classes/class-card";
 import { LeaveGroupButton } from "@/components/groups/leave-group-button";
 
 export async function generateMetadata({
@@ -57,17 +57,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
           <ul className="grid gap-3 sm:grid-cols-2">
             {classes.map((c) => (
               <li key={c.id}>
-                <Link
-                  href={`/class/${c.id}`}
-                  className="flex flex-col gap-2 rounded-xl border border-zinc-200 p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
-                >
-                  <span className="font-medium">{c.name}</span>
-                  <span className="flex items-center gap-2 text-xs text-zinc-500">
-                    <RoleBadge role={c.role} />
-                    {c.memberCount} membre{c.memberCount > 1 ? "s" : ""} inscrit
-                    {c.memberCount > 1 ? "s" : ""}
-                  </span>
-                </Link>
+                <ClassCard cls={c} />
               </li>
             ))}
           </ul>

@@ -54,10 +54,12 @@ Retours d'usage. Les deux se conçoivent ensemble (cf. discussion) :
 
 ### Regrouper les chapitres (sous-chapitres / modules)
 
-- **Pourquoi** : certains cours ont une structure à 2 niveaux (ex. module
-  « HLT » avec des sections « HLT 2A1 » … « HLT 2A12 »). Une liste plate de
-  15+ chapitres devient confuse et on ne peut pas « réviser tout HLT d'un
-  coup ».
+- **Le cas multi-matières est traité** par les **groupes** (Phase 13,
+  ADR 0015) : « Math », « Français »… = des classes d'un même groupe. Reste
+  ici : la structure à 2 niveaux **à l'intérieur d'une seule classe** (ex.
+  module « HLT » avec des sections « HLT 2A1 » … « HLT 2A12 »).
+- **Pourquoi** : une liste plate de 15+ chapitres devient confuse et on ne
+  peut pas « réviser tout HLT d'un coup ».
 - **Pas urgent** : d'abord voir si la liste plate gêne vraiment en usage
   réel (convention de nommage `HLT 2A1`, `HLT 2A2`… en attendant).
 - **Options, du moins cher au plus cher** :

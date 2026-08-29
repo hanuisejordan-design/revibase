@@ -29,8 +29,11 @@ export default async function ClassLayout({
     <div className="flex flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <Link href="/dashboard" className="text-xs text-zinc-500 hover:underline">
-            ← Mes classes
+          <Link
+            href={ctx.groupId ? `/group/${ctx.groupId}` : "/dashboard"}
+            className="text-xs text-zinc-500 hover:underline"
+          >
+            ← {ctx.groupId ? ctx.groupName : "Mes classes"}
           </Link>
           <h1 className="text-xl font-semibold">{ctx.name}</h1>
         </div>
