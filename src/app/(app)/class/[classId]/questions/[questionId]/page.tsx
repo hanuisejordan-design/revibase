@@ -7,7 +7,9 @@ import { getQuestion } from "@/features/questions/queries";
 import { listAnswers } from "@/features/answers/queries";
 import { listComments } from "@/features/discussions/queries";
 import { relativeTime } from "@/lib/utils/date";
+import { QUESTION_KIND_LABELS } from "@/constants/app";
 import { DeleteQuestionButton } from "@/components/questions/delete-question-button";
+import { QuestionOptionsView } from "@/components/questions/question-options-view";
 import { AnswerList } from "@/components/answers/answer-list";
 import { CreateAnswerForm } from "@/components/answers/create-answer-form";
 import { CommentList } from "@/components/discussions/comment-list";
@@ -33,10 +35,12 @@ export default async function QuestionPage({
   const question = await getQuestion(classId, questionId);
   if (!question) notFound();
 
+  const isOpen = question.kind === "open";
+
   const [ctx, user, answers, comments] = await Promise.all([
     getClassContext(classId),
     getUser(),
-    listAnswers(questionId),
+    isOpen ? listAnswers(questionId) : Promise.resolve([]),
     listComments(questionId),
   ]);
   if (!ctx || !user) notFound();
@@ -48,9 +52,16 @@ export default async function QuestionPage({
       </Link>
 
       <article className="flex flex-col gap-3">
-        <span className="w-fit rounded-full border border-zinc-200 px-2 py-0.5 text-xs text-zinc-500 dark:border-zinc-800">
-          {question.chapterName ?? "Sans chapitre"}
-        </span>
+        <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+          <span className="rounded-full border border-zinc-200 px-2 py-0.5 dark:border-zinc-800">
+            {question.chapterName ?? "Sans chapitre"}
+          </span>
+          {!isOpen ? (
+            <span className="rounded-full bg-zinc-100 px-2 py-0.5 font-medium dark:bg-zinc-800">
+              {QUESTION_KIND_LABELS[question.kind]}
+            </span>
+          ) : null}
+        </div>
         <h1 className="text-2xl font-semibold tracking-tight text-balance">{question.title}</h1>
         <p className="text-sm text-zinc-500">
           Posée par {question.authorName} · {relativeTime(question.createdAt)}
@@ -60,23 +71,31 @@ export default async function QuestionPage({
         ) : null}
       </article>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
-          {answers.length} réponse{answers.length > 1 ? "s" : ""}
-        </h2>
-        <AnswerList
-          answers={answers}
-          classId={classId}
-          questionId={question.id}
-          viewerId={user.id}
-          viewerIsTrainer={ctx.role === "trainer"}
-          questionAuthorId={question.authorId}
-        />
-      </section>
-
-      <section className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
-        <CreateAnswerForm classId={classId} questionId={question.id} />
-      </section>
+      {isOpen ? (
+        <>
+          <section className="flex flex-col gap-3">
+            <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+              {answers.length} réponse{answers.length > 1 ? "s" : ""}
+            </h2>
+            <AnswerList
+              answers={answers}
+              classId={classId}
+              questionId={question.id}
+              viewerId={user.id}
+              viewerIsTrainer={ctx.role === "trainer"}
+              questionAuthorId={question.authorId}
+            />
+          </section>
+          <section className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
+            <CreateAnswerForm classId={classId} questionId={question.id} />
+          </section>
+        </>
+      ) : (
+        <section className="flex flex-col gap-3">
+          <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">Réponse</h2>
+          <QuestionOptionsView options={question.options} />
+        </section>
+      )}
 
       <section className="flex flex-col gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
         <div className="flex flex-col gap-1">
@@ -84,7 +103,7 @@ export default async function QuestionPage({
             Discussion ({comments.length})
           </h2>
           <p className="text-xs text-zinc-500">
-            Pour échanger autour de la question. Les tentatives de réponse vont dans « Réponses ».
+            Pour échanger autour de la question (formulation, cas limites, « pourquoi »…).
           </p>
         </div>
         <CommentList

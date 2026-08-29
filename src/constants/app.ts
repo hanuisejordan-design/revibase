@@ -12,11 +12,24 @@ export const CLASS_ROLES = ["student", "trainer"] as const;
 export type ClassRole = (typeof CLASS_ROLES)[number];
 
 /**
- * Nature d'une question. `open` = réponse rédigée (cas courant au MVP).
- * `mcq` = choix multiples, prévu pour la Phase 8 (non actif au MVP).
+ * Nature d'une question :
+ * - `open`        : réponse rédigée (réponses communautaires, votes, validation) ;
+ * - `true_false`  : la bonne réponse est Vrai ou Faux ;
+ * - `mcq`         : choix multiples (une seule bonne réponse au MVP).
+ * `true_false` et `mcq` sont stockés dans `question_options`.
  */
-export const QUESTION_KINDS = ["open", "mcq"] as const;
+export const QUESTION_KINDS = ["open", "true_false", "mcq"] as const;
 export type QuestionKind = (typeof QUESTION_KINDS)[number];
+
+export const QUESTION_KIND_LABELS: Record<QuestionKind, string> = {
+  open: "Question ouverte",
+  true_false: "Vrai ou faux",
+  mcq: "QCM",
+};
+
+/** Nombre d'options pour un QCM. */
+export const MCQ_MIN_OPTIONS = 2;
+export const MCQ_MAX_OPTIONS = 6;
 
 /**
  * Statut d'affichage d'une réponse, par priorité décroissante. Il est

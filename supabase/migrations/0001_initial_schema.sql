@@ -144,7 +144,7 @@ create table public.questions (
   class_id   uuid not null references public.classes (id) on delete cascade,
   chapter_id uuid references public.chapters (id) on delete set null,
   author_id  uuid not null references public.profiles (id) on delete cascade,
-  kind       text not null default 'open' check (kind in ('open', 'mcq')),
+  kind       text not null default 'open' check (kind in ('open', 'true_false', 'mcq')),
   title      text not null check (char_length(title) between 1 and 300),
   body       text check (body is null or char_length(body) <= 5000),
   created_at timestamptz not null default now(),
@@ -334,8 +334,9 @@ create table public.quiz_answers (
   id                 uuid primary key default gen_random_uuid(),
   attempt_id         uuid not null references public.quiz_attempts (id) on delete cascade,
   quiz_question_id   uuid not null references public.quiz_questions (id) on delete cascade,
-  knew_it            boolean,                                              -- mode auto-évaluation
-  selected_answer_id uuid references public.answers (id) on delete set null, -- mode mcq (futur)
+  knew_it            boolean,                                              -- auto-évaluation (questions ouvertes)
+  selected_answer_id uuid references public.answers (id) on delete set null,
+  selected_option_id uuid references public.question_options (id) on delete set null, -- QCM / vrai-faux
   is_correct         boolean,
   unique (attempt_id, quiz_question_id)
 );
@@ -581,10 +582,16 @@ create policy "questions_delete_author_or_trainer" on public.questions
 create policy "question_options_select_member" on public.question_options
   for select using (public.is_class_member(public.question_class(question_id)));
 
-create policy "question_options_write_trainer" on public.question_options
-  for all
-  using (public.is_class_trainer(public.question_class(question_id)))
-  with check (public.is_class_trainer(public.question_class(question_id)));
+-- Gérables par tout membre de la classe (comme les chapitres, ADR 0007).
+create policy "question_options_insert_member" on public.question_options
+  for insert with check (public.is_class_member(public.question_class(question_id)));
+
+create policy "question_options_update_member" on public.question_options
+  for update using (public.is_class_member(public.question_class(question_id)))
+  with check (public.is_class_member(public.question_class(question_id)));
+
+create policy "question_options_delete_member" on public.question_options
+  for delete using (public.is_class_member(public.question_class(question_id)));
 
 -- ---- answers ------------------------------------------------------
 create policy "answers_select_member" on public.answers

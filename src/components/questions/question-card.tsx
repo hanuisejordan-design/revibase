@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { QuestionListItem } from "@/features/questions/types";
 import { relativeTime } from "@/lib/utils/date";
+import { QUESTION_KIND_LABELS } from "@/constants/app";
 import { QuestionStatusBadge } from "./question-status-badge";
 
 export function QuestionCard({
@@ -10,6 +11,8 @@ export function QuestionCard({
   classId: string;
   question: QuestionListItem;
 }) {
+  const isOpen = question.kind === "open";
+
   return (
     <Link
       href={`/class/${classId}/questions/${question.id}`}
@@ -20,14 +23,24 @@ export function QuestionCard({
         <span className="rounded-full border border-zinc-200 px-2 py-0.5 dark:border-zinc-800">
           {question.chapterName ?? "Sans chapitre"}
         </span>
-        <span>
-          {question.answerCount} réponse{question.answerCount > 1 ? "s" : ""}
-        </span>
-        <span>·</span>
+        {isOpen ? (
+          <>
+            <span>
+              {question.answerCount} réponse{question.answerCount > 1 ? "s" : ""}
+            </span>
+            <span>·</span>
+          </>
+        ) : null}
         <span>
           {question.commentCount} commentaire{question.commentCount > 1 ? "s" : ""}
         </span>
-        <QuestionStatusBadge status={question.status} />
+        {isOpen ? (
+          <QuestionStatusBadge status={question.status} />
+        ) : (
+          <span className="rounded-full bg-zinc-100 px-2 py-0.5 font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+            {QUESTION_KIND_LABELS[question.kind]}
+          </span>
+        )}
         <span className="ml-auto">
           {question.authorName} · {relativeTime(question.createdAt)}
         </span>

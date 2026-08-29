@@ -3,13 +3,18 @@ import "server-only";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
+import type { QuestionKind } from "@/constants/app";
 import type { QuestionSort } from "./schema";
-import type { QuestionDetail, QuestionListItem, QuestionStatus } from "./types";
+import type { QuestionDetail, QuestionListItem, QuestionOption, QuestionStatus } from "./types";
+
+const QUESTION_SELECT =
+  "id, title, body, kind, chapter_id, author_id, created_at, updated_at, chapters(name), profiles(display_name)";
 
 type QuestionRow = {
   id: string;
   title: string;
   body: string | null;
+  kind: QuestionKind;
   chapter_id: string | null;
   author_id: string;
   created_at: string;
@@ -58,6 +63,7 @@ function toListItem(
   return {
     id: row.id,
     title: row.title,
+    kind: row.kind,
     chapterId: row.chapter_id,
     chapterName: row.chapters?.name ?? null,
     authorName: row.profiles?.display_name ?? "Membre",
@@ -78,9 +84,7 @@ export const listQuestions = cache(
 
     let query = supabase
       .from("questions")
-      .select(
-        "id, title, body, chapter_id, author_id, created_at, updated_at, chapters(name), profiles(display_name)",
-      )
+      .select(QUESTION_SELECT)
       .eq("class_id", classId)
       .is("deleted_at", null)
       .order("created_at", { ascending: false });
@@ -105,7 +109,7 @@ export const listQuestions = cache(
     );
 
     if (opts.sort === "unanswered") {
-      items = items.filter((q) => q.answerCount === 0);
+      items = items.filter((q) => q.kind === "open" && q.answerCount === 0);
     } else if (opts.sort === "popular") {
       items = [...items].sort((a, b) => b.answerCount - a.answerCount);
     }
@@ -127,9 +131,7 @@ export const getQuestion = cache(
 
     const { data, error } = await supabase
       .from("questions")
-      .select(
-        "id, title, body, chapter_id, author_id, created_at, updated_at, chapters(name), profiles(display_name)",
-      )
+      .select(QUESTION_SELECT)
       .eq("id", questionId)
       .eq("class_id", classId)
       .is("deleted_at", null)
@@ -140,10 +142,24 @@ export const getQuestion = cache(
     const row = data as unknown as QuestionRow;
     const meta = (await enrich(supabase, [row.id])).get(row.id)!;
 
+    let options: QuestionOption[] = [];
+    if (row.kind !== "open") {
+      const { data: opts } = await supabase
+        .from("question_options")
+        .select("id, body, is_correct, position")
+        .eq("question_id", row.id)
+        .order("position", { ascending: true });
+      options = (
+        (opts ?? []) as Array<{ id: string; body: string; is_correct: boolean; position: number }>
+      ).map((o) => ({ id: o.id, body: o.body, isCorrect: o.is_correct, position: o.position }));
+    }
+
     return {
       id: row.id,
       title: row.title,
       body: row.body,
+      kind: row.kind,
+      options,
       chapterId: row.chapter_id,
       chapterName: row.chapters?.name ?? null,
       authorId: row.author_id,

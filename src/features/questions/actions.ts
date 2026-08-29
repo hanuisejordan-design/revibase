@@ -22,10 +22,19 @@ export async function createQuestionAction(
   const ctx = await getClassContext(classId);
   if (!ctx) return { formError: "Tu dois être membre de la classe." };
 
+  let rawOptions: unknown = [];
+  try {
+    rawOptions = JSON.parse(String(formData.get("optionsJson") ?? "[]"));
+  } catch {
+    rawOptions = [];
+  }
+
   const parsed = parseInput(createQuestionSchema, {
     title: String(formData.get("title") ?? ""),
     body: String(formData.get("body") ?? ""),
     chapterId: String(formData.get("chapterId") ?? ""),
+    kind: String(formData.get("kind") ?? "open"),
+    options: rawOptions,
   });
   if (!parsed.success) return { errors: parsed.errors };
 
@@ -35,15 +44,13 @@ export async function createQuestionAction(
   const supabase = await createClient();
 
   // Le chapitre choisi doit appartenir à cette classe.
-  if (parsed.data.chapterId) {
-    const { data: chapter } = await supabase
-      .from("chapters")
-      .select("id")
-      .eq("id", parsed.data.chapterId)
-      .eq("class_id", classId)
-      .maybeSingle();
-    if (!chapter) return { errors: { chapterId: "Chapitre inconnu pour cette classe." } };
-  }
+  const { data: chapter } = await supabase
+    .from("chapters")
+    .select("id")
+    .eq("id", parsed.data.chapterId)
+    .eq("class_id", classId)
+    .maybeSingle();
+  if (!chapter) return { errors: { chapterId: "Chapitre inconnu pour cette classe." } };
 
   const { data, error } = await supabase
     .from("questions")
@@ -53,6 +60,7 @@ export async function createQuestionAction(
       author_id: user.id,
       title: parsed.data.title,
       body: parsed.data.body,
+      kind: parsed.data.kind,
     })
     .select("id")
     .single();
@@ -61,9 +69,27 @@ export async function createQuestionAction(
     return { formError: "Publication impossible. Réessaie dans un instant." };
   }
 
+  const questionId = data.id as string;
+
+  if (parsed.data.kind !== "open") {
+    const { error: optErr } = await supabase.from("question_options").insert(
+      parsed.data.options.map((o, position) => ({
+        question_id: questionId,
+        body: o.body,
+        is_correct: o.isCorrect,
+        position,
+      })),
+    );
+    if (optErr) {
+      // Pas de transaction inter-requêtes : on annule la question orpheline.
+      await supabase.from("questions").delete().eq("id", questionId);
+      return { formError: "Publication impossible. Réessaie dans un instant." };
+    }
+  }
+
   revalidatePath(`/class/${classId}`);
   revalidatePath(`/class/${classId}/questions`);
-  redirect(`/class/${classId}/questions/${data.id as string}`);
+  redirect(`/class/${classId}/questions/${questionId}`);
 }
 
 /** Suppression douce, réservée à l'auteur (ou à un formateur). */
