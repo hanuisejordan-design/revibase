@@ -5,6 +5,23 @@ priorise selon les retours de la classe.
 
 ## Prochaines fonctionnalités (demandées)
 
+### Renommer les niveaux + refonte du tableau de bord (Phase 15, la prochaine)
+
+- **Vocabulaire, pas structure.** Les 3 niveaux (groupe → classe → chapitre)
+  sont les bons ; on les rebaptise pour coller au langage courant :
+  - « groupe » → **« classe »** (la promo, avec code d'invitation, membres) ;
+  - « classe » → **« cours »** (Maths, Français…) ;
+  - « chapitre » → inchangé.
+- **Tableau de bord** : l'action principale n'est **pas** « créer un cours »
+  mais **rejoindre / créer une classe** ; les cours se créent dedans. Revoir
+  la hiérarchie des boutons (comme au tout début du projet).
+- **Portée à décider** : juste les libellés + routes (`/group`→`/class`,
+  `/class`→`/course`), ou aussi renommer tables / colonnes / RPC / RLS en
+  base. Le renommage SQL est mécanique (RENAME = métadonnée, pas de réécriture
+  de données) mais touche beaucoup de fichiers ; plus propre pour un projet
+  d'apprentissage.
+- **Ampleur** : moyenne (libellés + routes) à grande (base incluse).
+
 ### Rôles : séparer « admin de la classe » et « formateur »
 
 - **Problème** : aujourd'hui, créer une classe = devenir `formateur`
@@ -34,23 +51,15 @@ priorise selon les retours de la classe.
 Quiz auto-corrigés + page de QCM interactive (clic → rouge/vert). Discussion
 en bulles au passage.
 
-### Répondre avant de voir + fusion des doublons (#1 + #2) — EN COURS
+### ✅ Répondre avant de voir + fusion des doublons — fait (Phase 12, ADR 0014)
 
-Retours d'usage. Les deux se conçoivent ensemble (cf. discussion) :
+Réponses ouvertes masquées tant qu'on n'a pas participé ; doublons **exacts**
+fusionnés en vote ; vote **anonyme** (pastille « 👍 N »).
 
-- **Question ouverte** : tant que tu n'as pas répondu, les réponses des autres
-  sont **masquées** (bouton « Voir les N réponses sans répondre » pour
-  déroger — cas révision).
-- **À la validation de ta réponse**, égalité **stricte** (espaces / casse /
-  ponctuation de fin ; **pas** les fautes) avec une réponse existante :
-  - correspond → pas de doublon, ton **vote** est ajouté à celle-ci
-    (« ta réponse rejoignait celle de X ») ;
-  - ne correspond pas → nouvelle réponse **+ ton vote automatique**.
-- Le compteur veut alors dire « **X personnes ont donné cette réponse** »
-  (auteur inclus) ; afficher les **noms** des votants.
-- Pas de détection des quasi-doublons / fautes (peu fiable) — le vote manuel
-  reste l'outil pour ça.
-- **Ampleur** : moyen, pas de migration.
+### ✅ Photo attachée à une question — fait (Phase 14, ADR 0016)
+
+Une image par question, bucket Storage privé, URL signées, redimensionnement
+navigateur. Reste : nettoyage des images orphelines (cf. reports).
 
 ### Regrouper les chapitres (sous-chapitres / modules)
 
@@ -75,15 +84,6 @@ Retours d'usage. Les deux se conçoivent ensemble (cf. discussion) :
 - **Ampleur** : (2) petite + migration ; (3) moyenne + migration + form
   question + filtre questions + générateur de quiz + seed.
 
-### Photo attachée à une question
-
-- **Pourquoi** : le domaine est très visuel (signaux, matériel). Poser une
-  question à partir d'une image.
-- **À faire** : activer **Supabase Storage** (bucket + règles d'accès par
-  classe), champ image sur `questions` (ou table `question_attachments` pour
-  plusieurs), upload depuis le formulaire, affichage sur la carte + la page.
-- **Ampleur** : moyen, indépendant du reste.
-
 ## Reports connus (dette assumée)
 
 | Sujet                                           | Référence               | Note                                                                                               |
@@ -97,3 +97,4 @@ Retours d'usage. Les deux se conçoivent ensemble (cf. discussion) :
 | États de chargement / erreurs soignés           | Phase 10                | `loading.tsx`, messages d'erreur, empty states                                                     |
 | Tests d'intégration (permissions inter-classes) | brief §27               | Aujourd'hui : tests unitaires des schémas seulement                                                |
 | Nom du produit / domaine                        | —                       | « Revibase » est provisoire                                                                        |
+| Images de question orphelines                   | ADR 0016                | Upload avant « Publier » réussi puis onglet fermé → fichier sans question. Nettoyage périodique à prévoir |

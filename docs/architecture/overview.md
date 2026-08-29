@@ -257,6 +257,22 @@ Calculé à la lecture, par priorité décroissante :
   si soutenue), positif uniquement + phrase d'aide dans `AnswerList`.
 - Aucune migration.
 
+## Photo sur une question (Phase 14, ADR 0016)
+
+- `questions.image_path` (une image) ; bucket Storage **privé**
+  `question-images`, chemin `{class_id}/{uuid}.jpg`. Policies
+  `storage.objects` = membre de la classe (via `storage.foldername`).
+  Migration `0010_question_images.sql`.
+- Upload **côté client, à la publication** : `lib/images/downscale.ts`
+  (canvas → JPEG ~1600 px) puis `supabase.storage.upload` ; le formulaire
+  passe seulement le chemin à `createQuestionAction`, qui vérifie le préfixe
+  `{classId}/` et nettoie l'image si l'insert échoue.
+- Affichage par **URL signée** (~1 h) générée dans `queries` :
+  `signImages()` (`createSignedUrls` en lot) pour `listQuestions` /
+  `getQuestion` ; `getRunnerData` signe aussi. Rendu : vignette sur
+  `QuestionCard`, image cliquable sur la page détail, image dans le
+  `QuizRunner`.
+
 ## Flux d'une requête authentifiée
 
 1. `src/proxy.ts` rafraîchit la session Supabase (cookies).
