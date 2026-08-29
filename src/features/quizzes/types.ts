@@ -17,6 +17,8 @@ export interface QuizQuestionCard {
   title: string;
   body: string | null;
   chapterName: string | null;
+  /** URL signée de la photo attachée, ou `null`. */
+  imageUrl: string | null;
   /** Questions ouvertes : auto-évaluation. */
   referenceAnswer: string | null;
   referenceKind: ReferenceKind;

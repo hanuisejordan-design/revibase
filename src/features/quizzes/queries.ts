@@ -103,7 +103,7 @@ export const getRunnerData = cache(
     const supabase = await createClient();
     const { data: qqs } = await supabase
       .from("quiz_questions")
-      .select("id, position, question_id, questions(title, body, kind, chapters(name))")
+      .select("id, position, question_id, questions(title, body, kind, image_path, chapters(name))")
       .eq("quiz_id", attempt.quiz_id)
       .order("position", { ascending: true });
 
@@ -115,6 +115,7 @@ export const getRunnerData = cache(
         title: string;
         body: string | null;
         kind: QuestionKind;
+        image_path: string | null;
         chapters: { name: string } | null;
       } | null;
     }>;
@@ -122,13 +123,27 @@ export const getRunnerData = cache(
     const openIds = rows.filter((r) => r.questions?.kind === "open").map((r) => r.question_id);
     const choiceIds = rows.filter((r) => r.questions?.kind !== "open").map((r) => r.question_id);
 
-    const [refs, optionsByQuestion] = await Promise.all([
+    const imagePaths = [
+      ...new Set(
+        rows.map((r) => r.questions?.image_path).filter((p): p is string => Boolean(p)),
+      ),
+    ];
+    const imageUrls = new Map<string, string>();
+
+    const [refs, optionsByQuestion, signed] = await Promise.all([
       referenceAnswers(supabase, openIds),
       loadOptions(supabase, choiceIds),
+      imagePaths.length > 0
+        ? supabase.storage.from("question-images").createSignedUrls(imagePaths, 60 * 60)
+        : Promise.resolve({ data: [] as Array<{ path?: string; signedUrl?: string; error?: unknown }> }),
     ]);
+    for (const item of signed.data ?? []) {
+      if (item.path && item.signedUrl && !item.error) imageUrls.set(item.path, item.signedUrl);
+    }
 
     const questions: QuizQuestionCard[] = rows.map((r) => {
       const kind = r.questions?.kind ?? "open";
+      const imgPath = r.questions?.image_path ?? null;
       return {
         quizQuestionId: r.id,
         questionId: r.question_id,
@@ -137,6 +152,7 @@ export const getRunnerData = cache(
         title: r.questions?.title ?? "Question supprimée",
         body: r.questions?.body ?? null,
         chapterName: r.questions?.chapters?.name ?? null,
+        imageUrl: imgPath ? (imageUrls.get(imgPath) ?? null) : null,
         referenceAnswer: kind === "open" ? (refs.get(r.question_id)?.text ?? null) : null,
         referenceKind: kind === "open" ? (refs.get(r.question_id)?.kind ?? null) : null,
         options: kind === "open" ? [] : (optionsByQuestion.get(r.question_id) ?? []),

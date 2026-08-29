@@ -8,7 +8,10 @@ import type { QuestionSort } from "./schema";
 import type { QuestionDetail, QuestionListItem, QuestionOption, QuestionStatus } from "./types";
 
 const QUESTION_SELECT =
-  "id, title, body, kind, chapter_id, author_id, created_at, updated_at, chapters(name), profiles(display_name)";
+  "id, title, body, kind, chapter_id, author_id, created_at, updated_at, image_path, chapters(name), profiles(display_name)";
+
+const IMAGE_BUCKET = "question-images";
+const IMAGE_URL_TTL = 60 * 60; // 1 h
 
 type QuestionRow = {
   id: string;
@@ -19,9 +22,26 @@ type QuestionRow = {
   author_id: string;
   created_at: string;
   updated_at: string;
+  image_path: string | null;
   chapters: { name: string } | null;
   profiles: { display_name: string } | null;
 };
+
+/** URL signées (1 h) pour un lot de chemins d'images. */
+async function signImages(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  paths: Array<string | null>,
+): Promise<Map<string, string>> {
+  const unique = [...new Set(paths.filter((p): p is string => !!p))];
+  const map = new Map<string, string>();
+  if (unique.length === 0) return map;
+
+  const { data } = await supabase.storage.from(IMAGE_BUCKET).createSignedUrls(unique, IMAGE_URL_TTL);
+  for (const item of data ?? []) {
+    if (item.path && item.signedUrl && !item.error) map.set(item.path, item.signedUrl);
+  }
+  return map;
+}
 
 /** Compte réponses / commentaires et détecte une réponse validée, par question. */
 async function enrich(
@@ -59,6 +79,7 @@ async function enrich(
 function toListItem(
   row: QuestionRow,
   meta: { answerCount: number; commentCount: number; status: QuestionStatus },
+  imageUrl: string | null,
 ): QuestionListItem {
   return {
     id: row.id,
@@ -68,6 +89,7 @@ function toListItem(
     chapterName: row.chapters?.name ?? null,
     authorName: row.profiles?.display_name ?? "Membre",
     createdAt: row.created_at,
+    imageUrl,
     ...meta,
   };
 }
@@ -99,13 +121,23 @@ export const listQuestions = cache(
     if (error || !data) return [];
 
     const rows = data as unknown as QuestionRow[];
-    const meta = await enrich(
-      supabase,
-      rows.map((r) => r.id),
-    );
+    const [meta, images] = await Promise.all([
+      enrich(
+        supabase,
+        rows.map((r) => r.id),
+      ),
+      signImages(
+        supabase,
+        rows.map((r) => r.image_path),
+      ),
+    ]);
 
     let items = rows.map((r) =>
-      toListItem(r, meta.get(r.id) ?? { answerCount: 0, commentCount: 0, status: "unanswered" }),
+      toListItem(
+        r,
+        meta.get(r.id) ?? { answerCount: 0, commentCount: 0, status: "unanswered" },
+        r.image_path ? (images.get(r.image_path) ?? null) : null,
+      ),
     );
 
     if (opts.sort === "unanswered") {
@@ -141,6 +173,9 @@ export const getQuestion = cache(
 
     const row = data as unknown as QuestionRow;
     const meta = (await enrich(supabase, [row.id])).get(row.id)!;
+    const imageUrl = row.image_path
+      ? ((await signImages(supabase, [row.image_path])).get(row.image_path) ?? null)
+      : null;
 
     let options: QuestionOption[] = [];
     if (row.kind !== "open") {
@@ -169,6 +204,7 @@ export const getQuestion = cache(
       answerCount: meta.answerCount,
       commentCount: meta.commentCount,
       isAuthor: user?.id === row.author_id,
+      imageUrl,
     };
   },
 );

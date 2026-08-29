@@ -85,6 +85,14 @@ export function QuizRunner({
             {current.body}
           </p>
         ) : null}
+        {current.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={current.imageUrl}
+            alt="Photo de la question"
+            className="max-h-72 rounded-lg border border-zinc-200 object-contain dark:border-zinc-800"
+          />
+        ) : null}
       </div>
 
       {current.kind === "open" ? (

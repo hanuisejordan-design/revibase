@@ -22,6 +22,8 @@ export interface QuestionListItem {
   answerCount: number;
   commentCount: number;
   status: QuestionStatus;
+  /** URL signée de la photo attachée, ou `null`. */
+  imageUrl: string | null;
 }
 
 /** Détail complet d'une question (page dédiée). */
@@ -40,4 +42,6 @@ export interface QuestionDetail {
   answerCount: number;
   commentCount: number;
   isAuthor: boolean;
+  /** URL signée de la photo attachée, ou `null`. */
+  imageUrl: string | null;
 }

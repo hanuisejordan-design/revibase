@@ -99,6 +99,21 @@ export default async function QuestionPage({
         {question.body ? (
           <p className="whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">{question.body}</p>
         ) : null}
+        {question.imageUrl ? (
+          <a
+            href={question.imageUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-fit"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={question.imageUrl}
+              alt="Photo de la question"
+              className="max-h-[28rem] rounded-lg border border-zinc-200 object-contain dark:border-zinc-800"
+            />
+          </a>
+        ) : null}
       </article>
 
       {isOpen ? (

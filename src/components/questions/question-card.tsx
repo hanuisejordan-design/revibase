@@ -18,6 +18,14 @@ export function QuestionCard({
       href={`/class/${classId}/questions/${question.id}`}
       className="flex flex-col gap-2 rounded-xl border border-zinc-200 p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
     >
+      {question.imageUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={question.imageUrl}
+          alt=""
+          className="mb-1 max-h-40 w-full rounded-lg border border-zinc-200 object-cover dark:border-zinc-800"
+        />
+      ) : null}
       <h3 className="font-medium">{question.title}</h3>
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500">
         <span className="rounded-full border border-zinc-200 px-2 py-0.5 dark:border-zinc-800">
