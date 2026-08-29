@@ -89,6 +89,7 @@ export async function createQuestionAction(
 
   revalidatePath(`/class/${classId}`);
   revalidatePath(`/class/${classId}/questions`);
+  revalidatePath(`/class/${classId}/questions/${questionId}`);
   redirect(`/class/${classId}/questions/${questionId}`);
 }
 
