@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { startTransition, useActionState, useState } from "react";
 import { createQuestionAction, type QuestionFormState } from "@/features/questions/actions";
 import type { ChapterEntry } from "@/features/chapters/queries";
 import {
@@ -9,9 +9,14 @@ import {
   QUESTION_KIND_LABELS,
   type QuestionKind,
 } from "@/constants/app";
+import { createClient } from "@/lib/supabase/client";
+import { downscaleImage } from "@/lib/images/downscale";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { QuestionImageField } from "./question-image-field";
+
+const IMAGE_BUCKET = "question-images";
 
 type McqOption = { body: string; correct: boolean };
 
@@ -38,6 +43,36 @@ export function CreateQuestionForm({
     { body: "", correct: false },
     { body: "", correct: false },
   ]);
+  const [image, setImage] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+
+    if (image) {
+      setUploading(true);
+      setUploadError(null);
+      try {
+        const blob = await downscaleImage(image);
+        const supabase = createClient();
+        const path = `${classId}/${crypto.randomUUID()}.jpg`;
+        const { error } = await supabase.storage
+          .from(IMAGE_BUCKET)
+          .upload(path, blob, { contentType: "image/jpeg", upsert: false });
+        if (error) throw error;
+        formData.set("imagePath", path);
+      } catch {
+        setUploading(false);
+        setUploadError("Envoi de la photo impossible. Réessaie, ou publie sans photo.");
+        return;
+      }
+      setUploading(false);
+    }
+
+    startTransition(() => formAction(formData));
+  }
 
   let optionsPayload: { body: string; isCorrect: boolean }[] = [];
   if (kind === "true_false") {
@@ -50,7 +85,7 @@ export function CreateQuestionForm({
   }
 
   return (
-    <form action={formAction} className="flex flex-col gap-4" noValidate>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
       <input type="hidden" name="classId" value={classId} />
       <input type="hidden" name="kind" value={kind} />
       <input type="hidden" name="optionsJson" value={JSON.stringify(optionsPayload)} />
@@ -184,14 +219,21 @@ export function CreateQuestionForm({
         />
       </Field>
 
+      <QuestionImageField file={image} onChange={setImage} disabled={pending || uploading} />
+
+      {uploadError ? (
+        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+          {uploadError}
+        </p>
+      ) : null}
       {state?.formError ? (
         <p role="alert" className="text-sm text-red-600 dark:text-red-400">
           {state.formError}
         </p>
       ) : null}
 
-      <Button type="submit" disabled={pending}>
-        {pending ? "Publication…" : "Publier"}
+      <Button type="submit" disabled={pending || uploading}>
+        {uploading ? "Envoi de la photo…" : pending ? "Publication…" : "Publier"}
       </Button>
     </form>
   );

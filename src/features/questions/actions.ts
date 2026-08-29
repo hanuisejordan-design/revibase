@@ -38,6 +38,14 @@ export async function createQuestionAction(
   });
   if (!parsed.success) return { errors: parsed.errors };
 
+  // L'image a déjà été téléversée côté client dans `{classId}/…`. On ne garde
+  // le chemin que s'il est bien préfixé par cette classe.
+  const rawImagePath = String(formData.get("imagePath") ?? "").trim();
+  const imagePath =
+    rawImagePath.startsWith(`${classId}/`) && !rawImagePath.includes("..")
+      ? rawImagePath
+      : null;
+
   const user = await getUser();
   if (!user) return { formError: "Session expirée. Reconnecte-toi." };
 
@@ -61,11 +69,13 @@ export async function createQuestionAction(
       title: parsed.data.title,
       body: parsed.data.body,
       kind: parsed.data.kind,
+      image_path: imagePath,
     })
     .select("id")
     .single();
 
   if (error || !data) {
+    if (imagePath) await supabase.storage.from("question-images").remove([imagePath]);
     return { formError: "Publication impossible. Réessaie dans un instant." };
   }
 
@@ -83,6 +93,7 @@ export async function createQuestionAction(
     if (optErr) {
       // Pas de transaction inter-requêtes : on annule la question orpheline.
       await supabase.from("questions").delete().eq("id", questionId);
+      if (imagePath) await supabase.storage.from("question-images").remove([imagePath]);
       return { formError: "Publication impossible. Réessaie dans un instant." };
     }
   }
