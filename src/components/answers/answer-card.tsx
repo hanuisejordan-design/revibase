@@ -36,7 +36,7 @@ export function AnswerCard({
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <AnswerStatusBadge status={statusOf(answer)} />
         <p className="whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">{answer.body}</p>
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <div>
           <VoteButton
             classId={classId}
             questionId={questionId}
@@ -44,11 +44,6 @@ export function AnswerCard({
             count={answer.voteCount}
             active={answer.viewerHasVoted}
           />
-          {answer.voterLabels.length > 0 ? (
-            <span className="text-xs text-zinc-500">
-              donnerai{answer.voteCount > 1 ? "ent" : "t"} ça · {answer.voterLabels.join(", ")}
-            </span>
-          ) : null}
         </div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-500">
           <span>

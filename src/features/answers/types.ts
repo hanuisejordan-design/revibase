@@ -7,14 +7,10 @@ export interface AnswerItem {
   authorId: string;
   authorName: string;
   createdAt: string;
+  /** Nombre de personnes qui donneraient cette réponse (vote anonyme). */
   voteCount: number;
   /** L'utilisateur courant a-t-il voté pour cette réponse ? */
   viewerHasVoted: boolean;
-  /**
-   * Noms des personnes ayant donné / voté cette réponse, « Toi » en premier
-   * le cas échéant. Sert à afficher « 3 · Toi, Julie, Marc ».
-   */
-  voterLabels: string[];
   /** Retenue par l'auteur de la question. */
   accepted: boolean;
   /** Validée par un formateur. */

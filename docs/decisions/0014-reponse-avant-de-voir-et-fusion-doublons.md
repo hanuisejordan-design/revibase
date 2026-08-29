@@ -41,17 +41,22 @@ Retours d'usage sur les questions **ouvertes** :
 - **Pas de correspondance** → la réponse est créée **et l'auteur vote
   automatiquement** pour elle.
 - Le compteur de votes se lit donc désormais « **N personnes donneraient cette
-  réponse** » (auteur inclus) ; les **noms** des votants sont affichés
-  (« 👍 3 personnes donneraient cette réponse · Toi, Julie, Marc »).
+  réponse** » (auteur inclus).
+- **Vote anonyme** : on n'affiche **que le total**, pas les noms des votants.
+  Un vote est un signal léger (pas une contribution signée comme une réponse
+  ou un commentaire) ; exposer qui a soutenu quoi — ou n'a *pas* soutenu la
+  réponse d'un camarade — crée une pression sociale et un effet de meute dans
+  une petite classe. `listAnswers` ne renvoie que `voteCount` +
+  `viewerHasVoted`, jamais l'identité des votants.
 - **Affordance du vote** : le `▲` est remplacé par une **petite pastille 👍**
   — « 👍 N » quand il y a des soutiens, « 👍 Moi aussi » sinon ; pleine quand
-  on l'a soutenue (re-clic pour retirer) —, suivie des noms en légende et
-  d'une phrase d'aide au-dessus de la liste. Objectif : qu'on comprenne qu'on
-  peut soutenir la réponse d'un autre même en ayant posté la sienne, et que
-  le compteur monte aussi tout seul (auto-vote, fusion). Positif uniquement :
-  pas de « pouce bas » — un 👎 sur la réponse sincère d'un camarade, dans une
-  petite classe, refroidit la participation ; une réponse fausse se traite
-  par la discussion et la validation formateur.
+  on l'a soutenue (re-clic pour retirer) —, avec une phrase d'aide au-dessus
+  de la liste. Objectif : qu'on comprenne qu'on peut soutenir la réponse d'un
+  autre même en ayant posté la sienne, et que le compteur monte aussi tout
+  seul (auto-vote, fusion). Positif uniquement : pas de « pouce bas » — un 👎
+  sur la réponse sincère d'un camarade, dans une petite classe, refroidit la
+  participation ; une réponse fausse se traite par la discussion et la
+  validation formateur.
 - `normalize.ts` est isolé et testé unitairement.
 
 ## Alternatives écartées

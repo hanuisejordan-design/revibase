@@ -228,11 +228,11 @@ Calculé à la lecture, par priorité décroissante :
   → pas de doublon, un vote de l'auteur est ajouté (`answer_votes`, upsert
   ignore-duplicates) et l'UI affiche « ta réponse rejoignait celle de X » ;
   sinon la réponse est créée **et l'auteur vote automatiquement**.
-- Le compteur = « N personnes donneraient cette réponse » ; `listAnswers`
-  renvoie `voterLabels` (« Toi » en premier), affichés sous la réponse.
+- Le compteur = « N personnes donneraient cette réponse ». **Vote anonyme** :
+  `listAnswers` ne renvoie que `voteCount` + `viewerHasVoted`, pas les noms
+  des votants.
 - `VoteButton` = **pastille 👍 compacte** (« 👍 N » / « 👍 Moi aussi », pleine
-  si soutenue), noms en légende, positif uniquement + phrase d'aide dans
-  `AnswerList`.
+  si soutenue), positif uniquement + phrase d'aide dans `AnswerList`.
 - Aucune migration.
 
 ## Flux d'une requête authentifiée
