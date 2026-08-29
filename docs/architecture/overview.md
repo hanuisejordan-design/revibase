@@ -195,6 +195,21 @@ Calculé à la lecture, par priorité décroissante :
 - Score = nombre de « je savais » ; questions à revoir = « à revoir ».
 - Aucune migration (tables `quiz*` et RLS déjà dans 0001).
 
+## Types de question (Phase 11)
+
+- `questions.kind` : `open` | `true_false` | `mcq` ; `true_false` / `mcq`
+  utilisent `question_options` (`is_correct`, `position`), gérables par tout
+  membre (migration 0008).
+- Formulaire : sélecteur de type + éditeur d'options (une seule bonne
+  réponse). `createQuestionAction` insère question + options (rollback si
+  échec).
+- Page question : `open` → réponses/votes/validation ; `true_false` / `mcq` →
+  options (bonne en vert) ; Discussion dans les deux cas.
+- Quiz : `QuizRunner` branche par type — options cliquables + retour
+  rouge/vert pour les QCM, révélation + auto-évaluation pour les ouvertes.
+  Le score des QCM est **recalculé côté serveur** dans `submitQuizAction`
+  (`question_options.is_correct` d'après `selected_option_id`).
+
 ## Flux d'une requête authentifiée
 
 1. `src/proxy.ts` rafraîchit la session Supabase (cookies).

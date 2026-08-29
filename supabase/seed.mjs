@@ -123,6 +123,7 @@ async function main() {
         author_id: ids.thomas,
         title: "Que signifie un carré violet ?",
         body: "Je le confonds avec le carré. Quelle conduite à tenir ?",
+        kind: "open",
       },
       {
         class_id: classId,
@@ -130,6 +131,7 @@ async function main() {
         author_id: ids.julie,
         title: "Différence entre un sémaphore et un carré ?",
         body: null,
+        kind: "open",
       },
       {
         class_id: classId,
@@ -137,6 +139,7 @@ async function main() {
         author_id: ids.marc,
         title: "Quand demande-t-on une autorisation de franchissement ?",
         body: "Je n'arrive pas à retenir la liste.",
+        kind: "open",
       },
       {
         class_id: classId,
@@ -144,12 +147,63 @@ async function main() {
         author_id: ids.julie,
         title: "Ordre des actions en cas de heurt d'obstacle ?",
         body: "Protéger, alerter, … ?",
+        kind: "open",
+      },
+      {
+        class_id: classId,
+        chapter_id: chapterId["Signalisation"],
+        author_id: ids.marc,
+        title: "Un carré violet arrête un train en marche normale.",
+        body: null,
+        kind: "true_false",
+      },
+      {
+        class_id: classId,
+        chapter_id: chapterId["Réglementation"],
+        author_id: ids.thomas,
+        title: "Vitesse maximale en marche à vue ?",
+        body: null,
+        kind: "mcq",
       },
     ])
     .select("id, title");
   if (qErr) throw qErr;
 
   const q = Object.fromEntries(questions.map((row) => [row.title, row.id]));
+
+  const { error: optErr } = await db.from("question_options").insert([
+    {
+      question_id: q["Un carré violet arrête un train en marche normale."],
+      body: "Vrai",
+      is_correct: false,
+      position: 0,
+    },
+    {
+      question_id: q["Un carré violet arrête un train en marche normale."],
+      body: "Faux",
+      is_correct: true,
+      position: 1,
+    },
+    {
+      question_id: q["Vitesse maximale en marche à vue ?"],
+      body: "10 km/h",
+      is_correct: false,
+      position: 0,
+    },
+    {
+      question_id: q["Vitesse maximale en marche à vue ?"],
+      body: "30 km/h",
+      is_correct: true,
+      position: 1,
+    },
+    {
+      question_id: q["Vitesse maximale en marche à vue ?"],
+      body: "60 km/h",
+      is_correct: false,
+      position: 2,
+    },
+  ]);
+  if (optErr) throw optErr;
 
   const { data: answers, error: ansErr } = await db
     .from("answers")

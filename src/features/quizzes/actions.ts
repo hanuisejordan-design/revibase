@@ -131,20 +131,42 @@ export async function submitQuizAction(formData: FormData): Promise<void> {
     redirect(`/class/${classId}/quiz/${attemptId}`);
   }
 
-  await supabase.from("quiz_answers").upsert(
-    results.map((r) => ({
+  // Correction : les QCM / vrai-faux sont notés côté serveur d'après l'option
+  // choisie ; les questions ouvertes d'après l'auto-évaluation déclarée.
+  const optionIds = results
+    .map((r) => r.selectedOptionId)
+    .filter((id): id is string => Boolean(id));
+  const correctOptions = new Set<string>();
+  if (optionIds.length > 0) {
+    const { data: opts } = await supabase
+      .from("question_options")
+      .select("id, is_correct")
+      .in("id", optionIds);
+    for (const o of (opts ?? []) as Array<{ id: string; is_correct: boolean }>) {
+      if (o.is_correct) correctOptions.add(o.id);
+    }
+  }
+
+  const graded = results.map((r) => {
+    const isChoice = Boolean(r.selectedOptionId);
+    const isCorrect = isChoice
+      ? correctOptions.has(r.selectedOptionId as string)
+      : r.knewIt === true;
+    return {
       attempt_id: attemptId,
       quiz_question_id: r.quizQuestionId,
-      knew_it: r.knewIt,
-      is_correct: r.knewIt,
-    })),
-    { onConflict: "attempt_id,quiz_question_id" },
-  );
+      knew_it: isChoice ? null : (r.knewIt ?? null),
+      selected_option_id: r.selectedOptionId ?? null,
+      is_correct: isCorrect,
+    };
+  });
 
-  const score = results.filter((r) => r.knewIt).length;
+  await supabase.from("quiz_answers").upsert(graded, { onConflict: "attempt_id,quiz_question_id" });
+
+  const score = graded.filter((g) => g.is_correct).length;
   await supabase
     .from("quiz_attempts")
-    .update({ score, total: results.length, completed_at: new Date().toISOString() })
+    .update({ score, total: graded.length, completed_at: new Date().toISOString() })
     .eq("id", attemptId);
 
   revalidatePath(`/class/${classId}/quiz`);

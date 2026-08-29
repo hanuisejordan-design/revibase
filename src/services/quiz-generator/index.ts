@@ -15,8 +15,9 @@ function shuffle<T>(items: T[]): T[] {
 
 /**
  * Choisit jusqu'à `count` questions de la classe (filtrées par chapitre si
- * fourni). Les questions ayant au moins une réponse (donc une « réponse de
- * référence » possible) sont priorisées, puis on complète au hasard.
+ * fourni). On priorise les questions « prêtes pour un quiz » : les QCM /
+ * vrai-faux (corrigés automatiquement) et les questions ouvertes ayant au
+ * moins une réponse de référence. On complète au hasard avec le reste.
  */
 export async function selectQuizQuestions(
   supabase: Supabase,
@@ -26,27 +27,31 @@ export async function selectQuizQuestions(
 ): Promise<string[]> {
   let query = supabase
     .from("questions")
-    .select("id")
+    .select("id, kind")
     .eq("class_id", classId)
     .is("deleted_at", null);
 
   if (chapterId) query = query.eq("chapter_id", chapterId);
 
   const { data: questions } = await query;
-  const allIds = ((questions ?? []) as Array<{ id: string }>).map((q) => q.id);
-  if (allIds.length === 0) return [];
+  const rows = (questions ?? []) as Array<{ id: string; kind: string }>;
+  if (rows.length === 0) return [];
 
+  const openIds = rows.filter((q) => q.kind === "open").map((q) => q.id);
   const { data: answered } = await supabase
     .from("answers")
     .select("question_id")
-    .in("question_id", allIds);
-
+    .in("question_id", openIds.length > 0 ? openIds : ["00000000-0000-0000-0000-000000000000"]);
   const answeredSet = new Set(
     ((answered ?? []) as Array<{ question_id: string }>).map((a) => a.question_id),
   );
 
-  const withRef = shuffle(allIds.filter((id) => answeredSet.has(id)));
-  const withoutRef = shuffle(allIds.filter((id) => !answeredSet.has(id)));
+  const ready = shuffle(
+    rows.filter((q) => q.kind !== "open" || answeredSet.has(q.id)).map((q) => q.id),
+  );
+  const rest = shuffle(
+    rows.filter((q) => q.kind === "open" && !answeredSet.has(q.id)).map((q) => q.id),
+  );
 
-  return [...withRef, ...withoutRef].slice(0, count);
+  return [...ready, ...rest].slice(0, count);
 }

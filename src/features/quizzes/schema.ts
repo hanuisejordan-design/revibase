@@ -23,7 +23,10 @@ export const submitQuizSchema = z.object({
     .array(
       z.object({
         quizQuestionId: z.string().uuid(),
-        knewIt: z.boolean(),
+        // Questions ouvertes : auto-évaluation.
+        knewIt: z.boolean().nullish(),
+        // QCM / vrai-faux : option choisie (corrigée côté serveur).
+        selectedOptionId: z.string().uuid().nullish(),
       }),
     )
     .min(1),

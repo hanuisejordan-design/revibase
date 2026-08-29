@@ -20,8 +20,9 @@ export default async function QuizPage({ params }: { params: Promise<{ classId: 
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold">Faire un quiz</h2>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          L&apos;app tire des questions de la classe. Pour chacune : réfléchis, révèle la réponse de
-          référence, puis dis si tu la savais.
+          L&apos;app tire des questions de la classe. Les QCM et vrai/faux sont corrigés
+          automatiquement ; pour les questions ouvertes, tu révèles la réponse de référence et tu
+          dis si tu la savais.
         </p>
         <CreateQuizForm classId={classId} chapters={chapters} />
       </section>

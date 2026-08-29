@@ -3,8 +3,10 @@ import "server-only";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
+import type { QuestionKind } from "@/constants/app";
 import type {
   AttemptSummary,
+  QuizOption,
   QuizQuestionCard,
   QuizResult,
   QuizRunnerData,
@@ -101,7 +103,7 @@ export const getRunnerData = cache(
     const supabase = await createClient();
     const { data: qqs } = await supabase
       .from("quiz_questions")
-      .select("id, position, question_id, questions(title, body, chapters(name))")
+      .select("id, position, question_id, questions(title, body, kind, chapters(name))")
       .eq("quiz_id", attempt.quiz_id)
       .order("position", { ascending: true });
 
@@ -109,28 +111,67 @@ export const getRunnerData = cache(
       id: string;
       position: number;
       question_id: string;
-      questions: { title: string; body: string | null; chapters: { name: string } | null } | null;
+      questions: {
+        title: string;
+        body: string | null;
+        kind: QuestionKind;
+        chapters: { name: string } | null;
+      } | null;
     }>;
 
-    const refs = await referenceAnswers(
-      supabase,
-      rows.map((r) => r.question_id),
-    );
+    const openIds = rows.filter((r) => r.questions?.kind === "open").map((r) => r.question_id);
+    const choiceIds = rows.filter((r) => r.questions?.kind !== "open").map((r) => r.question_id);
 
-    const questions: QuizQuestionCard[] = rows.map((r) => ({
-      quizQuestionId: r.id,
-      questionId: r.question_id,
-      position: r.position,
-      title: r.questions?.title ?? "Question supprimée",
-      body: r.questions?.body ?? null,
-      chapterName: r.questions?.chapters?.name ?? null,
-      referenceAnswer: refs.get(r.question_id)?.text ?? null,
-      referenceKind: refs.get(r.question_id)?.kind ?? null,
-    }));
+    const [refs, optionsByQuestion] = await Promise.all([
+      referenceAnswers(supabase, openIds),
+      loadOptions(supabase, choiceIds),
+    ]);
+
+    const questions: QuizQuestionCard[] = rows.map((r) => {
+      const kind = r.questions?.kind ?? "open";
+      return {
+        quizQuestionId: r.id,
+        questionId: r.question_id,
+        position: r.position,
+        kind,
+        title: r.questions?.title ?? "Question supprimée",
+        body: r.questions?.body ?? null,
+        chapterName: r.questions?.chapters?.name ?? null,
+        referenceAnswer: kind === "open" ? (refs.get(r.question_id)?.text ?? null) : null,
+        referenceKind: kind === "open" ? (refs.get(r.question_id)?.kind ?? null) : null,
+        options: kind === "open" ? [] : (optionsByQuestion.get(r.question_id) ?? []),
+      };
+    });
 
     return { attemptId, questions };
   },
 );
+
+async function loadOptions(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  questionIds: string[],
+): Promise<Map<string, QuizOption[]>> {
+  const out = new Map<string, QuizOption[]>();
+  if (questionIds.length === 0) return out;
+
+  const { data } = await supabase
+    .from("question_options")
+    .select("id, question_id, body, is_correct, position")
+    .in("question_id", questionIds)
+    .order("position", { ascending: true });
+
+  for (const o of (data ?? []) as Array<{
+    id: string;
+    question_id: string;
+    body: string;
+    is_correct: boolean;
+  }>) {
+    const list = out.get(o.question_id) ?? [];
+    list.push({ id: o.id, body: o.body, isCorrect: o.is_correct });
+    out.set(o.question_id, list);
+  }
+  return out;
+}
 
 /** Résultat d'une tentative terminée. */
 export const getResult = cache(
@@ -144,7 +185,7 @@ export const getResult = cache(
       .from("quiz_answers")
       .select("quiz_questions(question_id, questions(title))")
       .eq("attempt_id", attemptId)
-      .eq("knew_it", false);
+      .eq("is_correct", false);
 
     const toReview = (
       (wrong ?? []) as unknown as Array<{

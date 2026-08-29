@@ -1,15 +1,27 @@
+import type { QuestionKind } from "@/constants/app";
+
 export type ReferenceKind = "validated" | "accepted" | "community" | null;
 
-/** Une question telle que présentée pendant le quiz (auto-évaluation). */
+export interface QuizOption {
+  id: string;
+  body: string;
+  isCorrect: boolean;
+}
+
+/** Une question telle que présentée pendant le quiz. */
 export interface QuizQuestionCard {
   quizQuestionId: string;
   questionId: string;
   position: number;
+  kind: QuestionKind;
   title: string;
   body: string | null;
   chapterName: string | null;
+  /** Questions ouvertes : auto-évaluation. */
   referenceAnswer: string | null;
   referenceKind: ReferenceKind;
+  /** QCM / vrai-faux : options (corrigées automatiquement). */
+  options: QuizOption[];
 }
 
 export interface QuizRunnerData {
