@@ -22,6 +22,30 @@ priorise selon les retours de la classe.
   d'apprentissage.
 - **Ampleur** : moyenne (libellés + routes) à grande (base incluse).
 
+### Résumés par cours
+
+- **Idée** : dans chaque cours (= « classe » aujourd'hui), un espace où les
+  membres déposent leurs **résumés / fiches** du cours, consultables par tous.
+  À côté de « Questions » et « Quiz ».
+- **Modèle probable** : table `summaries` (`class_id`, `chapter_id` nullable,
+  `author_id`, `title`, `description` nullable, `body` markdown nullable,
+  timestamps) + pièces jointes (`summary_files` : `file_path`, `file_name`,
+  `mime`) via un bucket Storage privé, mêmes policies « membre de la classe »
+  que les photos (ADR 0016).
+- **À décider** : surtout des **fichiers** déposés (PDF, photos de notes
+  manuscrites, docx) — probable vu le domaine — ou aussi du **texte rédigé
+  dans l'app** (markdown, éditable, cherchable) ? Pari : fichiers d'abord,
+  markdown en v2.
+- **UI** : onglet « Résumés » dans la nav du cours ; liste groupée par
+  chapitre ; ajout (tout membre) ; suppression (auteur ou formateur) ;
+  aperçu inline PDF/image + lien de téléchargement (URL signée).
+- **Interactions** : minimal en v1 (pas de vote/commentaire) ; « 👍 utile »
+  éventuellement plus tard.
+- **Ampleur** : moyenne (nouvelle table + bucket + migration + module
+  `features/summaries` + onglet + pages). Pas de lien avec les quiz.
+- Se fait bien **après** le renommage (Phase 15) pour parler de « résumés du
+  cours » directement.
+
 ### Rôles : séparer « admin de la classe » et « formateur »
 
 - **Problème** : aujourd'hui, créer une classe = devenir `formateur`
