@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-export function CreateClassForm() {
+export function CreateClassForm({ groupId }: { groupId?: string }) {
   const [state, formAction, pending] = useActionState<ClassFormState | undefined, FormData>(
     createClassAction,
     undefined,
@@ -14,6 +14,7 @@ export function CreateClassForm() {
 
   return (
     <form action={formAction} className="flex flex-col gap-4" noValidate>
+      {groupId ? <input type="hidden" name="groupId" value={groupId} /> : null}
       <Field label="Nom de la classe" htmlFor="name" error={state?.errors?.name}>
         <Input id="name" name="name" required autoFocus placeholder="ex. Promo Conduite 2026" />
       </Field>

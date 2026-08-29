@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 
-export function InviteCode({ code }: { code: string }) {
+export function InviteCode({
+  code,
+  hint = "Partage ce code pour que tes camarades rejoignent la classe.",
+}: {
+  code: string;
+  hint?: string;
+}) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -32,9 +38,7 @@ export function InviteCode({ code }: { code: string }) {
           {copied ? "Copié ✓" : "Copier"}
         </button>
       </div>
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">
-        Partage ce code pour que tes camarades rejoignent la classe.
-      </p>
+      <p className="text-sm text-zinc-600 dark:text-zinc-400">{hint}</p>
     </div>
   );
 }
