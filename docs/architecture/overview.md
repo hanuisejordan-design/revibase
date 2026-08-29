@@ -230,8 +230,9 @@ Calculé à la lecture, par priorité décroissante :
   sinon la réponse est créée **et l'auteur vote automatiquement**.
 - Le compteur = « N personnes donneraient cette réponse » ; `listAnswers`
   renvoie `voterLabels` (« Toi » en premier), affichés sous la réponse.
-- `VoteButton` = **👍 libellé** (« Moi aussi je donnerais ça » / « ✓ Tu donnes
-  cette réponse »), positif uniquement + phrase d'aide dans `AnswerList`.
+- `VoteButton` = **pastille 👍 compacte** (« 👍 N » / « 👍 Moi aussi », pleine
+  si soutenue), noms en légende, positif uniquement + phrase d'aide dans
+  `AnswerList`.
 - Aucune migration.
 
 ## Flux d'une requête authentifiée

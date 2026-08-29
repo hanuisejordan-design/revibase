@@ -43,14 +43,15 @@ Retours d'usage sur les questions **ouvertes** :
 - Le compteur de votes se lit donc désormais « **N personnes donneraient cette
   réponse** » (auteur inclus) ; les **noms** des votants sont affichés
   (« 👍 3 personnes donneraient cette réponse · Toi, Julie, Marc »).
-- **Affordance du vote** : le `▲` est remplacé par un **👍 libellé en clair**
-  — « Moi aussi je donnerais ça » / « ✓ Tu donnes cette réponse » (re-clic
-  pour retirer) —, plus une phrase d'aide au-dessus de la liste. Objectif :
-  qu'on comprenne qu'on peut soutenir la réponse d'un autre même en ayant
-  posté la sienne, et que le compteur monte aussi tout seul (auto-vote,
-  fusion). Positif uniquement : pas de « pouce bas » — un 👎 sur la réponse
-  sincère d'un camarade, dans une petite classe, refroidit la participation ;
-  une réponse fausse se traite par la discussion et la validation formateur.
+- **Affordance du vote** : le `▲` est remplacé par une **petite pastille 👍**
+  — « 👍 N » quand il y a des soutiens, « 👍 Moi aussi » sinon ; pleine quand
+  on l'a soutenue (re-clic pour retirer) —, suivie des noms en légende et
+  d'une phrase d'aide au-dessus de la liste. Objectif : qu'on comprenne qu'on
+  peut soutenir la réponse d'un autre même en ayant posté la sienne, et que
+  le compteur monte aussi tout seul (auto-vote, fusion). Positif uniquement :
+  pas de « pouce bas » — un 👎 sur la réponse sincère d'un camarade, dans une
+  petite classe, refroidit la participation ; une réponse fausse se traite
+  par la discussion et la validation formateur.
 - `normalize.ts` est isolé et testé unitairement.
 
 ## Alternatives écartées

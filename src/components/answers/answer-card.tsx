@@ -31,24 +31,24 @@ export function AnswerCard({
   const canModerate = answer.authorId === viewerId || viewerIsTrainer;
   const canAccept = viewerId === questionAuthorId;
 
-  const many = answer.voteCount > 1;
-  const voteLine = `👍 ${answer.voteCount} personne${many ? "s" : ""} donnerai${
-    many ? "ent" : "t"
-  } cette réponse${answer.voterLabels.length > 0 ? ` · ${answer.voterLabels.join(", ")}` : ""}`;
-
   return (
     <li className="flex flex-col gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <AnswerStatusBadge status={statusOf(answer)} />
         <p className="whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">{answer.body}</p>
-        {answer.voteCount > 0 ? <p className="text-xs text-zinc-500">{voteLine}</p> : null}
-        <div>
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <VoteButton
             classId={classId}
             questionId={questionId}
             answerId={answer.id}
+            count={answer.voteCount}
             active={answer.viewerHasVoted}
           />
+          {answer.voterLabels.length > 0 ? (
+            <span className="text-xs text-zinc-500">
+              donnerai{answer.voteCount > 1 ? "ent" : "t"} ça · {answer.voterLabels.join(", ")}
+            </span>
+          ) : null}
         </div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-500">
           <span>
