@@ -210,9 +210,10 @@ Calculé à la lecture, par priorité décroissante :
   Le score des QCM est **recalculé côté serveur** dans `submitQuizAction`
   (`question_options.is_correct` d'après `selected_option_id`).
 - Page question : la page d'une QCM / vrai-faux est **interactive**
-  (`QuestionOptionsView`, client) — on choisit une option, retour rouge/vert,
-  « Recommencer ». Rien n'est enregistré. La discussion s'affiche en **bulles**
-  (`CommentList` : à moi = aligné à droite, foncé ; autre = à gauche, clair).
+  (`QuestionOptionsView`, client) — on choisit une option, retour rouge/vert.
+  Rien n'est enregistré (l'entraînement répété se fait en mode quiz). La
+  discussion s'affiche en **bulles** (`CommentList` : à moi = aligné à droite,
+  foncé ; autre = à gauche, clair).
 
 ## Répondre avant de voir + fusion des doublons (Phase 12, ADR 0014)
 
@@ -227,8 +228,10 @@ Calculé à la lecture, par priorité décroissante :
   → pas de doublon, un vote de l'auteur est ajouté (`answer_votes`, upsert
   ignore-duplicates) et l'UI affiche « ta réponse rejoignait celle de X » ;
   sinon la réponse est créée **et l'auteur vote automatiquement**.
-- Le compteur = « N personnes ont donné cette réponse » ; `listAnswers`
+- Le compteur = « N personnes donneraient cette réponse » ; `listAnswers`
   renvoie `voterLabels` (« Toi » en premier), affichés sous la réponse.
+- `VoteButton` = **👍 libellé** (« Moi aussi je donnerais ça » / « ✓ Tu donnes
+  cette réponse »), positif uniquement + phrase d'aide dans `AnswerList`.
 - Aucune migration.
 
 ## Flux d'une requête authentifiée

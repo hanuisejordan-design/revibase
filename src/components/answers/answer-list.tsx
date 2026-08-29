@@ -25,18 +25,24 @@ export function AnswerList({
   }
 
   return (
-    <ul className="flex flex-col gap-3">
-      {answers.map((answer) => (
-        <AnswerCard
-          key={answer.id}
-          answer={answer}
-          classId={classId}
-          questionId={questionId}
-          viewerId={viewerId}
-          viewerIsTrainer={viewerIsTrainer}
-          questionAuthorId={questionAuthorId}
-        />
-      ))}
-    </ul>
+    <>
+      <p className="text-xs text-zinc-500">
+        👍 = « je donnerais cette réponse aussi ». Ta réponse est déjà comptée ; tu peux
+        aussi soutenir celle d&apos;un autre.
+      </p>
+      <ul className="mt-3 flex flex-col gap-3">
+        {answers.map((answer) => (
+          <AnswerCard
+            key={answer.id}
+            answer={answer}
+            classId={classId}
+            questionId={questionId}
+            viewerId={viewerId}
+            viewerIsTrainer={viewerIsTrainer}
+            questionAuthorId={questionAuthorId}
+          />
+        ))}
+      </ul>
+    </>
   );
 }

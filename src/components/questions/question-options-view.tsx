@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils/cn";
 
 /**
  * QCM / vrai-faux sur la page d'une question : on choisit une option, puis on
- * voit si c'est juste (vert / rouge). « Recommencer » réinitialise. Rien n'est
- * enregistré — c'est un outil de révision, on peut le refaire.
+ * voit si c'est juste (vert / rouge). Rien n'est enregistré — l'entraînement
+ * répété se fait en mode quiz.
  */
 export function QuestionOptionsView({ options }: { options: QuestionOption[] }) {
   const [picked, setPicked] = useState<string | null>(null);
@@ -52,16 +52,6 @@ export function QuestionOptionsView({ options }: { options: QuestionOption[] }) 
           );
         })}
       </ul>
-
-      {answered ? (
-        <button
-          type="button"
-          onClick={() => setPicked(null)}
-          className="w-fit text-sm text-zinc-600 underline hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-        >
-          Recommencer
-        </button>
-      ) : null}
     </div>
   );
 }

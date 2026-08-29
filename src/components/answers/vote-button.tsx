@@ -3,17 +3,20 @@
 import { toggleVoteAction } from "@/features/answers/actions";
 import { cn } from "@/lib/utils/cn";
 
+/**
+ * « 👍 » = « je donnerais cette réponse aussi ». On peut soutenir la réponse
+ * d'un autre même si on a posté la sienne ; sa propre réponse est déjà
+ * comptée automatiquement. Positif seulement, pas de « pouce bas ».
+ */
 export function VoteButton({
   classId,
   questionId,
   answerId,
-  count,
   active,
 }: {
   classId: string;
   questionId: string;
   answerId: string;
-  count: number;
   active: boolean;
 }) {
   return (
@@ -25,14 +28,14 @@ export function VoteButton({
         type="submit"
         aria-pressed={active}
         className={cn(
-          "flex min-w-[3rem] flex-col items-center rounded-lg border px-2 py-1 text-sm transition-colors",
+          "inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm transition-colors",
           active
             ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
             : "border-zinc-300 hover:border-zinc-500 dark:border-zinc-700 dark:hover:border-zinc-500",
         )}
       >
-        <span aria-hidden>▲</span>
-        <span className="font-medium">{count}</span>
+        <span aria-hidden>{active ? "✓" : "👍"}</span>
+        {active ? "Tu donnes cette réponse" : "Moi aussi je donnerais ça"}
       </button>
     </form>
   );
