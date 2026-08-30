@@ -5,7 +5,7 @@ import { listChapters } from "@/features/chapters/queries";
 import { ChapterListEditor } from "@/components/chapters/chapter-list-editor";
 import { AddChapterForm } from "@/components/chapters/add-chapter-form";
 import { InviteCode } from "@/components/courses/invite-code";
-import { RoleBadge } from "@/components/courses/role-badge";
+import { CourseMemberManager } from "@/components/courses/course-member-manager";
 import { LeaveCourseButton } from "@/components/courses/leave-course-button";
 
 export default async function ClassSettingsPage({
@@ -42,14 +42,14 @@ export default async function ClassSettingsPage({
         <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
           Participants ({members.length})
         </h2>
-        <ul className="flex flex-col gap-1 text-sm">
-          {members.map((m) => (
-            <li key={m.userId} className="flex items-center gap-2">
-              <span>{m.displayName}</span>
-              <RoleBadge role={m.role} />
-            </li>
-          ))}
-        </ul>
+        {ctx.isAdmin ? (
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            <strong>Admin</strong> : gère le cours (code, membres, rôles). <strong>Formateur</strong>{" "}
+            : peut valider une réponse. Un cours sans formateur n&apos;a simplement pas de réponses
+            « validées ».
+          </p>
+        ) : null}
+        <CourseMemberManager courseId={courseId} members={members} canManage={ctx.isAdmin} />
       </section>
 
       {ctx.classId ? (

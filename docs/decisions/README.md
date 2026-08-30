@@ -53,3 +53,4 @@ qui remplace l'ancien (et on met à jour le statut de l'ancien).
 | 0016 | [Photo attachée à une question](0016-photo-question.md) | accepté |
 | 0017 | [Renommage groupe → classe → cours](0017-renommage-groupe-classe-cours.md) | accepté |
 | 0018 | [Résumés par cours](0018-resumes-par-cours.md) | accepté |
+| 0019 | [Rôles d'un cours : admin ≠ formateur](0019-roles-cours-admin-formateur.md) | accepté |

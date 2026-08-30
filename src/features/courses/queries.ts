@@ -28,7 +28,7 @@ export const getMyCourses = cache(async (): Promise<CourseSummary[]> => {
   // La RLS laisse voir TOUS les membres de mes cours : on filtre sur moi.
   const { data: memberships, error } = await supabase
     .from("course_members")
-    .select("role, course_id, courses(id, name, join_code, created_by, class_id)")
+    .select("role, is_admin, course_id, courses(id, name, join_code, created_by, class_id)")
     .eq("user_id", user.id)
     .order("joined_at", { ascending: true });
 
@@ -36,6 +36,7 @@ export const getMyCourses = cache(async (): Promise<CourseSummary[]> => {
 
   const rows = memberships as unknown as Array<{
     role: CourseRole;
+    is_admin: boolean;
     course_id: string;
     courses: CourseRow | null;
   }>;
@@ -59,6 +60,7 @@ export const getMyCourses = cache(async (): Promise<CourseSummary[]> => {
       name: r.courses.name,
       joinCode: r.courses.join_code,
       role: r.role,
+      isAdmin: r.is_admin,
       memberCount: counts.get(r.course_id) ?? 1,
       classId: r.courses.class_id,
     }));
@@ -91,20 +93,21 @@ export const getCourseContext = cache(async (courseId: string): Promise<CourseCo
 
   const { data: membership } = await supabase
     .from("course_members")
-    .select("role")
+    .select("role, is_admin")
     .eq("course_id", courseId)
     .eq("user_id", user.id)
     .maybeSingle();
 
-  const explicitRole = (membership as { role: CourseRole } | null)?.role ?? null;
+  const m = membership as { role: CourseRole; is_admin: boolean } | null;
 
   return {
     id: row.id,
     name: row.name,
     joinCode: row.join_code,
-    role: explicitRole ?? "student",
+    role: m?.role ?? "student",
     isCreator: row.created_by === user.id,
-    isExplicitMember: explicitRole !== null,
+    isAdmin: m?.is_admin ?? false,
+    isExplicitMember: m !== null,
     classId: row.class_id,
     classLabel: parentClass?.name ?? null,
   };
@@ -116,7 +119,7 @@ export const getCourseMembers = cache(async (courseId: string): Promise<CourseMe
 
   const { data, error } = await supabase
     .from("course_members")
-    .select("user_id, role, joined_at, profiles(display_name)")
+    .select("user_id, role, is_admin, joined_at, profiles(display_name)")
     .eq("course_id", courseId)
     .order("joined_at", { ascending: true });
 
@@ -126,6 +129,7 @@ export const getCourseMembers = cache(async (courseId: string): Promise<CourseMe
     data as unknown as Array<{
       user_id: string;
       role: CourseRole;
+      is_admin: boolean;
       joined_at: string;
       profiles: { display_name: string } | null;
     }>
@@ -133,6 +137,7 @@ export const getCourseMembers = cache(async (courseId: string): Promise<CourseMe
     userId: m.user_id,
     displayName: m.profiles?.display_name ?? "Membre",
     role: m.role,
+    isAdmin: m.is_admin,
     joinedAt: m.joined_at,
   }));
 });

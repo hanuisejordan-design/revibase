@@ -29,25 +29,11 @@ Suites (arbitrées avec l'utilisateur) :
 - **Plusieurs fichiers par résumé** (`summary_files`) : *peut-être utile*
   (doc scanné multi-pages, PDF + annexes). Pas prioritaire.
 
-### Rôles du cours : séparer « admin » et « formateur » — EN COURS (Phase 18)
+### ✅ Rôles du cours : admin ≠ formateur — fait (Phase 18, ADR 0019)
 
-- **Problème** : créer un cours = devenir `trainer` d'office. Or le créateur
-  est souvent juste l'élève qui a monté le cours, pas un enseignant.
-- **Modèle** : sur `course_members`, deux choses indépendantes —
-  - `is_admin` (booléen) : **gestion** du cours (code d'invitation, membres,
-    attribution des rôles). Le créateur l'a ; un admin peut en nommer d'autres.
-  - `role` (`student` / `trainer`) : purement **pédagogique**. `trainer`
-    (= « formateur ») est **attribué par un admin**. Validation d'une réponse
-    = `trainer`. Un cours sans formateur n'a simplement pas de réponses
-    « validées » — état communautaire honnête.
-- Le niveau **classe** a déjà `class_members.is_admin` ; pas de « formateur »
-  au niveau classe (c'est par cours).
-- **À faire** : migration (colonne `course_members.is_admin` ; backfill
-  `is_admin = true` pour les `trainer` actuels ; `create_course` pose
-  `is_admin = true, role = 'student'` ; `is_course_admin()` ; policy UPDATE
-  sur `course_members` pour l'attribution) ; UI membres dans les paramètres
-  du cours (cases « admin » / « formateur ») ; badges ; `getCourseContext`
-  renvoie `isAdmin`.
+`course_members.is_admin` (gestion) séparé de `role` student/trainer
+(pédagogie, valide les réponses). Créateur = admin, plus formateur d'office ;
+un admin attribue « formateur ». Migration `0014`.
 
 ### Supprimer un cours / une classe — hésitant, reporté
 
@@ -87,7 +73,6 @@ navigateur. Reste : nettoyage des images orphelines (cf. reports).
 | ----------------------------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------- |
 | Responsive mobile à peaufiner                   | brief §17, Phase 10     | Cible n°1 ; à faire avant adoption large par la classe                                             |
 | Notifications                                   | Phase 9                 | Socle en place (`notifications`, `services/notifications/`) ; UI à construire si le besoin ressort |
-| Gestion des rôles (admin ≠ formateur)           | voir plus haut          | Créateur = admin ; formateur = rôle attribué. Aujourd'hui : créateur = formateur d'office          |
 | Recherche plein-texte                           | ADR 0002, 0008          | Aujourd'hui : `ILIKE` sur le titre uniquement                                                      |
 | Édition d'une question                          | ADR 0008                | Aujourd'hui : création + suppression douce ; pas de modification                                   |
 | Types Supabase générés                          | `src/types/database.ts` | Remplacer les types écrits à la main par `supabase gen types`                                      |

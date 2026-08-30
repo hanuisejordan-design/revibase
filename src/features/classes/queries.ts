@@ -16,38 +16,53 @@ type CourseRow = {
   class_id: string;
 };
 
-/** Compte les membres explicites et repère le rôle de l'utilisateur courant. */
+/** Compte les membres explicites et repère le rôle / admin de l'utilisateur. */
 async function courseMemberInfo(
   supabase: Awaited<ReturnType<typeof createClient>>,
   courseIds: string[],
   userId: string,
-): Promise<{ counts: Map<string, number>; myRole: Map<string, CourseRole> }> {
+): Promise<{
+  counts: Map<string, number>;
+  myRole: Map<string, CourseRole>;
+  myAdmin: Set<string>;
+}> {
   const counts = new Map<string, number>();
   const myRole = new Map<string, CourseRole>();
-  if (courseIds.length === 0) return { counts, myRole };
+  const myAdmin = new Set<string>();
+  if (courseIds.length === 0) return { counts, myRole, myAdmin };
 
   const { data } = await supabase
     .from("course_members")
-    .select("course_id, user_id, role")
+    .select("course_id, user_id, role, is_admin")
     .in("course_id", courseIds);
 
-  for (const m of (data ?? []) as Array<{ course_id: string; user_id: string; role: CourseRole }>) {
+  for (const m of (data ?? []) as Array<{
+    course_id: string;
+    user_id: string;
+    role: CourseRole;
+    is_admin: boolean;
+  }>) {
     counts.set(m.course_id, (counts.get(m.course_id) ?? 0) + 1);
-    if (m.user_id === userId) myRole.set(m.course_id, m.role);
+    if (m.user_id === userId) {
+      myRole.set(m.course_id, m.role);
+      if (m.is_admin) myAdmin.add(m.course_id);
+    }
   }
-  return { counts, myRole };
+  return { counts, myRole, myAdmin };
 }
 
 function toCourseSummary(
   c: CourseRow,
   counts: Map<string, number>,
   myRole: Map<string, CourseRole>,
+  myAdmin: Set<string>,
 ): CourseSummary {
   return {
     id: c.id,
     name: c.name,
     joinCode: c.join_code,
     role: myRole.get(c.id) ?? "student",
+    isAdmin: myAdmin.has(c.id),
     memberCount: counts.get(c.id) ?? 0,
     classId: c.class_id,
   };
@@ -86,7 +101,7 @@ export const getMyClasses = cache(async (): Promise<ClassSummary[]> => {
   ]);
 
   const courses = (coursesData ?? []) as CourseRow[];
-  const { counts, myRole } = await courseMemberInfo(
+  const { counts, myRole, myAdmin } = await courseMemberInfo(
     supabase,
     courses.map((c) => c.id),
     user.id,
@@ -107,7 +122,7 @@ export const getMyClasses = cache(async (): Promise<ClassSummary[]> => {
       memberCount: memberCount.get(r.class_id) ?? 1,
       courses: courses
         .filter((c) => c.class_id === r.class_id)
-        .map((c) => toCourseSummary(c, counts, myRole)),
+        .map((c) => toCourseSummary(c, counts, myRole, myAdmin)),
     }));
 });
 
@@ -158,13 +173,13 @@ export const getClassCourses = cache(async (classId: string): Promise<CourseSumm
     .order("created_at", { ascending: true });
 
   const courses = (data ?? []) as CourseRow[];
-  const { counts, myRole } = await courseMemberInfo(
+  const { counts, myRole, myAdmin } = await courseMemberInfo(
     supabase,
     courses.map((c) => c.id),
     user.id,
   );
 
-  return courses.map((c) => toCourseSummary(c, counts, myRole));
+  return courses.map((c) => toCourseSummary(c, counts, myRole, myAdmin));
 });
 
 /** Membres de la classe, triés par date d'arrivée. */

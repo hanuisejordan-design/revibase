@@ -215,7 +215,21 @@ Calculé à la lecture, par priorité décroissante :
 - Migration 0007 : durcissement du trigger — retirer une validation existante
   exige aussi d'être formateur (sinon l'auteur de la réponse pouvait la
   retirer via l'API).
-- Gestion des rôles (promouvoir un membre) reportée (ADR 0011).
+
+### Rôles d'un cours (Phase 18, ADR 0019)
+
+- `course_members` porte deux choses **indépendantes** : `is_admin`
+  (gestion : code, membres, attribution des rôles) et `role`
+  (`student` / `trainer` — `trainer` = valide les réponses). Migration
+  `0014` : colonne `is_admin`, backfill des `trainer` actuels,
+  `create_course` pose `is_admin = true, role = 'student'` (créateur = admin,
+  plus formateur d'office).
+- `is_course_admin()` + policy `UPDATE` sur `course_members` réservée aux
+  admins ; `setCourseAdminAction` / `setCourseTrainerAction` (refus de
+  retirer le dernier admin). UI : `CourseMemberManager` dans les paramètres
+  du cours. `getCourseContext` renvoie `isAdmin`.
+- La **classe** garde `class_members.is_admin` ; pas de formateur au niveau
+  classe.
 
 ## Quiz (Phase 8)
 

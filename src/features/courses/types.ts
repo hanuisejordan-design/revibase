@@ -6,6 +6,8 @@ export interface CourseSummary {
   name: string;
   joinCode: string;
   role: CourseRole;
+  /** L'utilisateur courant administre-t-il ce cours ? */
+  isAdmin: boolean;
   memberCount: number;
   /** Classe (promo) propriétaire, ou `null` si le cours est autonome. */
   classId: string | null;
@@ -19,6 +21,8 @@ export interface CourseContext {
   role: CourseRole;
   /** L'utilisateur courant est-il le créateur du cours ? */
   isCreator: boolean;
+  /** L'utilisateur courant administre-t-il le cours ? */
+  isAdmin: boolean;
   /** A-t-il une ligne `course_members` (par opposition à l'accès via la classe) ? */
   isExplicitMember: boolean;
   /** Classe propriétaire du cours, le cas échéant. */
@@ -31,5 +35,6 @@ export interface CourseMemberEntry {
   userId: string;
   displayName: string;
   role: CourseRole;
+  isAdmin: boolean;
   joinedAt: string;
 }

@@ -70,3 +70,69 @@ export async function leaveCourseAction(formData: FormData): Promise<void> {
   revalidatePath("/dashboard");
   redirect("/dashboard");
 }
+
+/** Gestion des rôles d'un membre du cours — réservé à un admin du cours. */
+async function courseAdminGuard(courseId: string) {
+  const user = await getUser();
+  if (!user) redirect("/login");
+  const supabase = await createClient();
+  const { data: me } = await supabase
+    .from("course_members")
+    .select("is_admin")
+    .eq("course_id", courseId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (!(me as { is_admin: boolean } | null)?.is_admin) {
+    redirect(`/course/${courseId}/settings`);
+  }
+  return { user, supabase };
+}
+
+/** Donne / retire le statut d'admin à un membre du cours. */
+export async function setCourseAdminAction(formData: FormData): Promise<void> {
+  const courseId = String(formData.get("courseId") ?? "");
+  const userId = String(formData.get("userId") ?? "");
+  const value = String(formData.get("value") ?? "") === "1";
+  if (!courseId || !userId) redirect("/dashboard");
+
+  const { supabase } = await courseAdminGuard(courseId);
+
+  // On ne retire jamais le dernier admin.
+  if (!value) {
+    const { count } = await supabase
+      .from("course_members")
+      .select("user_id", { count: "exact", head: true })
+      .eq("course_id", courseId)
+      .eq("is_admin", true);
+    if ((count ?? 0) <= 1) redirect(`/course/${courseId}/settings`);
+  }
+
+  await supabase
+    .from("course_members")
+    .update({ is_admin: value })
+    .eq("course_id", courseId)
+    .eq("user_id", userId);
+
+  revalidatePath(`/course/${courseId}/settings`);
+  redirect(`/course/${courseId}/settings`);
+}
+
+/** Donne / retire le rôle formateur à un membre du cours. */
+export async function setCourseTrainerAction(formData: FormData): Promise<void> {
+  const courseId = String(formData.get("courseId") ?? "");
+  const userId = String(formData.get("userId") ?? "");
+  const value = String(formData.get("value") ?? "") === "1";
+  if (!courseId || !userId) redirect("/dashboard");
+
+  const { supabase } = await courseAdminGuard(courseId);
+
+  await supabase
+    .from("course_members")
+    .update({ role: value ? "trainer" : "student" })
+    .eq("course_id", courseId)
+    .eq("user_id", userId);
+
+  revalidatePath(`/course/${courseId}/settings`);
+  revalidatePath(`/course/${courseId}`);
+  redirect(`/course/${courseId}/settings`);
+}
