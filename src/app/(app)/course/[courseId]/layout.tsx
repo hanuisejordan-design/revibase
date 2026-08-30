@@ -57,6 +57,12 @@ export default async function CourseLayout({
             Quiz
           </Link>
           <Link
+            href={`/course/${courseId}/summaries`}
+            className="text-zinc-600 hover:underline dark:text-zinc-400"
+          >
+            Résumés
+          </Link>
+          <Link
             href={`/course/${courseId}/settings`}
             className="text-zinc-600 hover:underline dark:text-zinc-400"
           >
