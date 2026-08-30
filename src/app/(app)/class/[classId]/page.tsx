@@ -18,6 +18,13 @@ export default async function ClassCoursesPage({
 
   return (
     <div className="flex flex-col gap-6">
+      <section className="flex flex-col gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
+        <InviteCode
+          code={ctx.joinCode}
+          hint="Partage ce code pour faire entrer quelqu'un : il aura accès à tous les cours de la classe."
+        />
+      </section>
+
       {ctx.isAdmin ? (
         <div className="flex flex-wrap gap-3">
           <Link
@@ -28,13 +35,6 @@ export default async function ClassCoursesPage({
           </Link>
         </div>
       ) : null}
-
-      <section className="flex flex-col gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-        <InviteCode
-          code={ctx.joinCode}
-          hint="Partage ce code pour faire entrer quelqu'un : il aura accès à tous les cours de la classe."
-        />
-      </section>
 
       <section className="flex flex-col gap-3">
         <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
