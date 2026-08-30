@@ -77,9 +77,6 @@ export default async function DashboardPage() {
           <Link href="/course/new" className={secondaryLink}>
             Créer un cours personnel
           </Link>
-          <Link href="/course/join" className={secondaryLink}>
-            Rejoindre un cours
-          </Link>
         </div>
       </div>
     </div>
