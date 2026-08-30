@@ -1,7 +1,11 @@
 "use client";
 
 import { startTransition, useActionState, useState } from "react";
-import { createQuestionAction, type QuestionFormState } from "@/features/questions/actions";
+import {
+  createQuestionAction,
+  updateQuestionAction,
+  type QuestionFormState,
+} from "@/features/questions/actions";
 import type { ChapterEntry } from "@/features/chapters/queries";
 import {
   MCQ_MAX_OPTIONS,
@@ -20,30 +24,59 @@ const IMAGE_BUCKET = "question-images";
 
 type McqOption = { body: string; correct: boolean };
 
+export type QuestionFormInitial = {
+  questionId: string;
+  kind: QuestionKind;
+  title: string;
+  body: string | null;
+  chapterId: string | null;
+  options: { body: string; isCorrect: boolean }[];
+  imageUrl: string | null;
+};
+
 const inputCls =
   "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950";
 
-export function CreateQuestionForm({
+function initialOptions(initial?: QuestionFormInitial): McqOption[] {
+  if (initial && initial.kind === "mcq" && initial.options.length > 0) {
+    return initial.options.map((o) => ({ body: o.body, correct: o.isCorrect }));
+  }
+  return [
+    { body: "", correct: false },
+    { body: "", correct: false },
+  ];
+}
+
+function initialTf(initial?: QuestionFormInitial): "true" | "false" | "" {
+  if (!initial || initial.kind !== "true_false") return "";
+  const correct = initial.options.find((o) => o.isCorrect);
+  if (correct?.body === "Vrai") return "true";
+  if (correct?.body === "Faux") return "false";
+  return "";
+}
+
+export function QuestionForm({
   courseId,
   chapters,
   defaultChapterId,
+  initial,
 }: {
   courseId: string;
   chapters: ChapterEntry[];
   defaultChapterId?: string;
+  initial?: QuestionFormInitial;
 }) {
+  const isEdit = Boolean(initial);
   const [state, formAction, pending] = useActionState<QuestionFormState | undefined, FormData>(
-    createQuestionAction,
+    isEdit ? updateQuestionAction : createQuestionAction,
     undefined,
   );
 
-  const [kind, setKind] = useState<QuestionKind>("open");
-  const [tf, setTf] = useState<"true" | "false" | "">("");
-  const [options, setOptions] = useState<McqOption[]>([
-    { body: "", correct: false },
-    { body: "", correct: false },
-  ]);
+  const [kind, setKind] = useState<QuestionKind>(initial?.kind ?? "open");
+  const [tf, setTf] = useState<"true" | "false" | "">(initialTf(initial));
+  const [options, setOptions] = useState<McqOption[]>(initialOptions(initial));
   const [image, setImage] = useState<File | null>(null);
+  const [removeImage, setRemoveImage] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -69,6 +102,8 @@ export function CreateQuestionForm({
         return;
       }
       setUploading(false);
+    } else if (removeImage) {
+      formData.set("removeImage", "1");
     }
 
     startTransition(() => formAction(formData));
@@ -89,27 +124,35 @@ export function CreateQuestionForm({
       <input type="hidden" name="courseId" value={courseId} />
       <input type="hidden" name="kind" value={kind} />
       <input type="hidden" name="optionsJson" value={JSON.stringify(optionsPayload)} />
+      {initial ? <input type="hidden" name="questionId" value={initial.questionId} /> : null}
 
       <Field label="Type" htmlFor="kind-select">
-        <select
-          id="kind-select"
-          value={kind}
-          onChange={(e) => setKind(e.target.value as QuestionKind)}
-          className={inputCls}
-        >
-          {QUESTION_KINDS.map((k) => (
-            <option key={k} value={k}>
-              {QUESTION_KIND_LABELS[k]}
-            </option>
-          ))}
-        </select>
+        {isEdit ? (
+          <p id="kind-select" className="text-sm text-zinc-600 dark:text-zinc-400">
+            {QUESTION_KIND_LABELS[kind]}{" "}
+            <span className="text-zinc-400">(non modifiable)</span>
+          </p>
+        ) : (
+          <select
+            id="kind-select"
+            value={kind}
+            onChange={(e) => setKind(e.target.value as QuestionKind)}
+            className={inputCls}
+          >
+            {QUESTION_KINDS.map((k) => (
+              <option key={k} value={k}>
+                {QUESTION_KIND_LABELS[k]}
+              </option>
+            ))}
+          </select>
+        )}
       </Field>
 
       <Field label="Chapitre" htmlFor="chapterId" error={state?.errors?.chapterId}>
         <select
           id="chapterId"
           name="chapterId"
-          defaultValue={defaultChapterId ?? ""}
+          defaultValue={initial?.chapterId ?? defaultChapterId ?? ""}
           className={inputCls}
         >
           <option value="" disabled>
@@ -133,6 +176,7 @@ export function CreateQuestionForm({
           name="title"
           required
           autoFocus
+          defaultValue={initial?.title ?? ""}
           placeholder={
             kind === "true_false"
               ? "Une phrase à juger vraie ou fausse"
@@ -214,12 +258,20 @@ export function CreateQuestionForm({
           id="body"
           name="body"
           rows={4}
+          defaultValue={initial?.body ?? ""}
           placeholder="Le contexte, une précision sur la situation…"
           className={inputCls}
         />
       </Field>
 
-      <QuestionImageField file={image} onChange={setImage} disabled={pending || uploading} />
+      <QuestionImageField
+        file={image}
+        onChange={setImage}
+        existingUrl={initial?.imageUrl ?? null}
+        removed={removeImage}
+        onRemovedChange={setRemoveImage}
+        disabled={pending || uploading}
+      />
 
       {uploadError ? (
         <p role="alert" className="text-sm text-red-600 dark:text-red-400">
@@ -233,7 +285,15 @@ export function CreateQuestionForm({
       ) : null}
 
       <Button type="submit" disabled={pending || uploading}>
-        {uploading ? "Envoi de la photo…" : pending ? "Publication…" : "Publier"}
+        {uploading
+          ? "Envoi de la photo…"
+          : pending
+            ? isEdit
+              ? "Enregistrement…"
+              : "Publication…"
+            : isEdit
+              ? "Enregistrer"
+              : "Publier"}
       </Button>
     </form>
   );

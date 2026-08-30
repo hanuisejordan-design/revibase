@@ -154,8 +154,14 @@ export default async function QuestionPage({
         <CreateCommentForm courseId={courseId} questionId={question.id} />
       </section>
 
-      {question.isAuthor ? (
-        <div className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
+      {question.isAuthor || ctx.role === "trainer" ? (
+        <div className="flex items-center gap-4 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+          <Link
+            href={`/course/${courseId}/questions/${question.id}/edit`}
+            className="text-sm text-zinc-600 underline hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+          >
+            Modifier
+          </Link>
           <DeleteQuestionButton courseId={courseId} questionId={question.id} />
         </div>
       ) : null}

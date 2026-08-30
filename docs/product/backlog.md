@@ -35,6 +35,11 @@ Suites (arbitrées avec l'utilisateur) :
 (pédagogie, valide les réponses). Créateur = admin, plus formateur d'office ;
 un admin attribue « formateur ». Migration `0014`.
 
+### ✅ Éditer une question — fait (Phase 19, ADR 0020)
+
+Modifier titre / contexte / chapitre / options / photo (auteur ou formateur).
+Type non modifiable. Pas de migration (RLS déjà en place).
+
 ### Quiz au niveau de la classe
 
 - **Idée** : un bouton « Faire un quiz » sur la page de la classe (à côté de
@@ -88,7 +93,6 @@ navigateur. Reste : nettoyage des images orphelines (cf. reports).
 | Responsive mobile à peaufiner                   | brief §17, Phase 10     | Cible n°1 ; à faire avant adoption large par la classe                                             |
 | Notifications                                   | Phase 9                 | Socle en place (`notifications`, `services/notifications/`) ; UI à construire si le besoin ressort |
 | Recherche plein-texte                           | ADR 0002, 0008          | Aujourd'hui : `ILIKE` sur le titre uniquement                                                      |
-| Édition d'une question                          | ADR 0008                | Aujourd'hui : création + suppression douce ; pas de modification                                   |
 | Types Supabase générés                          | `src/types/database.ts` | Remplacer les types écrits à la main par `supabase gen types`                                      |
 | États de chargement / erreurs soignés           | Phase 10                | `loading.tsx`, messages d'erreur, empty states                                                     |
 | Tests d'intégration (permissions inter-classes) | brief §27               | Aujourd'hui : tests unitaires des schémas seulement                                                |

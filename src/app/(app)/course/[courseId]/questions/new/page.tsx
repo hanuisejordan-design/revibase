@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCourseContext } from "@/features/courses/queries";
 import { listChapters } from "@/features/chapters/queries";
-import { CreateQuestionForm } from "@/components/questions/create-question-form";
+import { QuestionForm } from "@/components/questions/question-form";
 
 export const metadata: Metadata = { title: "Poser une question" };
 
@@ -48,7 +48,7 @@ export default async function NewQuestionPage({
           </Link>
         </div>
       ) : (
-        <CreateQuestionForm
+        <QuestionForm
           courseId={courseId}
           chapters={chapters}
           defaultChapterId={first(sp.chapter)}

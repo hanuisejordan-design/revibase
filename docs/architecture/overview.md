@@ -169,10 +169,13 @@ Calculé à la lecture, par priorité décroissante :
 
 - `src/features/questions/` : `schema.ts`, `types.ts`, `queries.ts`
   (`listQuestions`, `getRecentQuestions`, `getQuestion`), `actions.ts`
-  (`createQuestionAction`, `deleteQuestionAction`).
-- Routes : `class/[classId]/questions` (liste — filtre chapitre, recherche
+  (`createQuestionAction`, `updateQuestionAction`, `deleteQuestionAction`).
+- Routes : `course/[courseId]/questions` (liste — filtre chapitre, recherche
   `ILIKE` titre, tri récent/sans réponse/populaire, tout via `searchParams`),
-  `.../questions/new` (formulaire), `.../questions/[questionId]` (détail).
+  `.../questions/new` (formulaire), `.../questions/[questionId]` (détail),
+  `.../questions/[questionId]/edit` (**Phase 19, ADR 0020** — auteur ou
+  formateur ; `QuestionForm` avec prop `initial` ; titre / contexte /
+  chapitre / options / photo modifiables, **type figé**).
 - Statut d'une question = `validated` / `answered` / `unanswered`, calculé
   depuis `answers` (2 requêtes de comptage par lot d'ids).
 - **Suppression douce** (`deleted_at`) par l'auteur ou un formateur ; les
