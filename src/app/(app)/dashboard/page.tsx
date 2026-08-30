@@ -52,7 +52,7 @@ export default async function DashboardPage() {
       {standaloneCourses.length > 0 ? (
         <section className="flex flex-col gap-3">
           <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
-            {classes.length > 0 ? "Autres cours" : "Mes cours"}
+            Mes cours personnels
           </h2>
           <ul className="grid gap-3 sm:grid-cols-2">
             {standaloneCourses.map((c) => (
@@ -73,16 +73,14 @@ export default async function DashboardPage() {
             Créer une classe
           </Link>
         </div>
-        <p className="text-xs text-zinc-500">
-          Juste besoin d&apos;un espace de révision seul, sans classe ?{" "}
-          <Link href="/course/join" className="underline">
-            Rejoindre un cours
-          </Link>{" "}
-          ·{" "}
-          <Link href="/course/new" className="underline">
-            en créer un
+        <div className="flex flex-wrap gap-3">
+          <Link href="/course/new" className={secondaryLink}>
+            Créer un cours personnel
           </Link>
-        </p>
+          <Link href="/course/join" className={secondaryLink}>
+            Rejoindre un cours
+          </Link>
+        </div>
       </div>
     </div>
   );
