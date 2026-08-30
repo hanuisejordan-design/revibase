@@ -143,11 +143,13 @@ Calculé à la lecture, par priorité décroissante :
   `class/[classId]/layout` remonte vers le groupe s'il y en a un.
 - Rôle : membre par le groupe = `student` ; « formateur » reste une ligne
   `class_members`. Admin de groupe ≠ formateur de classe.
-- Nav (après renommage Phase 15) : une **classe** a `class/[classId]/layout`
-  avec `Cours · Paramètres` (liste des cours d'un côté, code d'invitation +
-  membres dans `settings`), comme un **cours** a
-  `Accueil · Questions · Quiz · Résumés · Paramètres`. L'accueil d'un cours
-  ne garde que « Poser une question » (le reste est dans la nav).
+- Nav (après Phase 15/16) : **pas de barre d'onglets**. Le layout d'une
+  classe / d'un cours affiche un fil d'Ariane (`← parent`), le **nom
+  cliquable** (retour à l'accueil de la classe / du cours) et un simple lien
+  **Paramètres**. Les sections se rejoignent par des **boutons** sur
+  l'accueil : cours → « Poser une question » + « Toutes les questions » +
+  « Faire un quiz » + « Résumés » ; classe → « Créer un cours ». Code
+  d'invitation + membres sont dans `settings`.
 
 ## Chapitres (Phase 3)
 

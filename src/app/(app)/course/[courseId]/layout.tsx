@@ -35,40 +35,16 @@ export default async function CourseLayout({
           >
             ← {ctx.classId ? ctx.classLabel : "Mes cours"}
           </Link>
-          <h1 className="text-xl font-semibold">{ctx.name}</h1>
+          <Link href={`/course/${courseId}`} className="text-xl font-semibold hover:underline">
+            {ctx.name}
+          </Link>
         </div>
-        <nav className="flex gap-3 pt-1 text-sm">
-          <Link
-            href={`/course/${courseId}`}
-            className="text-zinc-600 hover:underline dark:text-zinc-400"
-          >
-            Accueil
-          </Link>
-          <Link
-            href={`/course/${courseId}/questions`}
-            className="text-zinc-600 hover:underline dark:text-zinc-400"
-          >
-            Questions
-          </Link>
-          <Link
-            href={`/course/${courseId}/quiz`}
-            className="text-zinc-600 hover:underline dark:text-zinc-400"
-          >
-            Quiz
-          </Link>
-          <Link
-            href={`/course/${courseId}/summaries`}
-            className="text-zinc-600 hover:underline dark:text-zinc-400"
-          >
-            Résumés
-          </Link>
-          <Link
-            href={`/course/${courseId}/settings`}
-            className="text-zinc-600 hover:underline dark:text-zinc-400"
-          >
-            Paramètres
-          </Link>
-        </nav>
+        <Link
+          href={`/course/${courseId}/settings`}
+          className="pt-1 text-sm text-zinc-600 hover:underline dark:text-zinc-400"
+        >
+          Paramètres
+        </Link>
       </div>
       {children}
     </div>

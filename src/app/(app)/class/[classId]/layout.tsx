@@ -32,22 +32,16 @@ export default async function ClassLayout({
           <Link href="/dashboard" className="text-xs text-zinc-500 hover:underline">
             ← Tableau de bord
           </Link>
-          <h1 className="text-xl font-semibold">{ctx.name}</h1>
+          <Link href={`/class/${classId}`} className="text-xl font-semibold hover:underline">
+            {ctx.name}
+          </Link>
         </div>
-        <nav className="flex gap-3 pt-1 text-sm">
-          <Link
-            href={`/class/${classId}`}
-            className="text-zinc-600 hover:underline dark:text-zinc-400"
-          >
-            Cours
-          </Link>
-          <Link
-            href={`/class/${classId}/settings`}
-            className="text-zinc-600 hover:underline dark:text-zinc-400"
-          >
-            Paramètres
-          </Link>
-        </nav>
+        <Link
+          href={`/class/${classId}/settings`}
+          className="pt-1 text-sm text-zinc-600 hover:underline dark:text-zinc-400"
+        >
+          Paramètres
+        </Link>
       </div>
       {children}
     </div>

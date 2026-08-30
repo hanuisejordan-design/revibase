@@ -16,36 +16,39 @@ export default async function ClassCoursesPage({
   const courses = await getClassCourses(classId);
 
   return (
-    <section className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-6">
+      {ctx.isAdmin ? (
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href={`/class/${classId}/course/new`}
+            className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          >
+            Créer un cours
+          </Link>
+        </div>
+      ) : null}
+
+      <section className="flex flex-col gap-3">
         <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
           Cours ({courses.length})
         </h2>
-        {ctx.isAdmin ? (
-          <Link
-            href={`/class/${classId}/course/new`}
-            className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
-          >
-            + Créer un cours
-          </Link>
-        ) : null}
-      </div>
 
-      {courses.length > 0 ? (
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {courses.map((c) => (
-            <li key={c.id}>
-              <CourseCard course={c} />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-sm text-zinc-500">
-          {ctx.isAdmin
-            ? "Aucun cours pour l'instant. Crée le premier."
-            : "Aucun cours pour l'instant."}
-        </p>
-      )}
-    </section>
+        {courses.length > 0 ? (
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {courses.map((c) => (
+              <li key={c.id}>
+                <CourseCard course={c} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-zinc-500">
+            {ctx.isAdmin
+              ? "Aucun cours pour l'instant. Crée le premier."
+              : "Aucun cours pour l'instant."}
+          </p>
+        )}
+      </section>
+    </div>
   );
 }
