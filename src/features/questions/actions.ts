@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
-import { getClassContext } from "@/features/classes/queries";
+import { getCourseContext } from "@/features/courses/queries";
 import { parseInput } from "@/lib/validation/helpers";
 import { createQuestionSchema } from "./schema";
 
@@ -17,9 +17,9 @@ export async function createQuestionAction(
   _prev: QuestionFormState | undefined,
   formData: FormData,
 ): Promise<QuestionFormState> {
-  const classId = String(formData.get("classId") ?? "");
+  const courseId = String(formData.get("courseId") ?? "");
 
-  const ctx = await getClassContext(classId);
+  const ctx = await getCourseContext(courseId);
   if (!ctx) return { formError: "Tu dois être membre de la classe." };
 
   let rawOptions: unknown = [];
@@ -38,11 +38,11 @@ export async function createQuestionAction(
   });
   if (!parsed.success) return { errors: parsed.errors };
 
-  // L'image a déjà été téléversée côté client dans `{classId}/…`. On ne garde
+  // L'image a déjà été téléversée côté client dans `{courseId}/…`. On ne garde
   // le chemin que s'il est bien préfixé par cette classe.
   const rawImagePath = String(formData.get("imagePath") ?? "").trim();
   const imagePath =
-    rawImagePath.startsWith(`${classId}/`) && !rawImagePath.includes("..")
+    rawImagePath.startsWith(`${courseId}/`) && !rawImagePath.includes("..")
       ? rawImagePath
       : null;
 
@@ -56,14 +56,14 @@ export async function createQuestionAction(
     .from("chapters")
     .select("id")
     .eq("id", parsed.data.chapterId)
-    .eq("class_id", classId)
+    .eq("course_id", courseId)
     .maybeSingle();
   if (!chapter) return { errors: { chapterId: "Chapitre inconnu pour cette classe." } };
 
   const { data, error } = await supabase
     .from("questions")
     .insert({
-      class_id: classId,
+      course_id: courseId,
       chapter_id: parsed.data.chapterId,
       author_id: user.id,
       title: parsed.data.title,
@@ -98,18 +98,18 @@ export async function createQuestionAction(
     }
   }
 
-  revalidatePath(`/class/${classId}`);
-  revalidatePath(`/class/${classId}/questions`);
-  revalidatePath(`/class/${classId}/questions/${questionId}`);
-  redirect(`/class/${classId}/questions/${questionId}`);
+  revalidatePath(`/course/${courseId}`);
+  revalidatePath(`/course/${courseId}/questions`);
+  revalidatePath(`/course/${courseId}/questions/${questionId}`);
+  redirect(`/course/${courseId}/questions/${questionId}`);
 }
 
 /** Suppression douce, réservée à l'auteur (ou à un formateur). */
 export async function deleteQuestionAction(formData: FormData): Promise<void> {
-  const classId = String(formData.get("classId") ?? "");
+  const courseId = String(formData.get("courseId") ?? "");
   const questionId = String(formData.get("questionId") ?? "");
 
-  const [user, ctx] = await Promise.all([getUser(), getClassContext(classId)]);
+  const [user, ctx] = await Promise.all([getUser(), getCourseContext(courseId)]);
   if (!user || !ctx) redirect("/dashboard");
 
   const supabase = await createClient();
@@ -117,21 +117,21 @@ export async function deleteQuestionAction(formData: FormData): Promise<void> {
     .from("questions")
     .select("author_id")
     .eq("id", questionId)
-    .eq("class_id", classId)
+    .eq("course_id", courseId)
     .maybeSingle();
 
   const authorId = (question as { author_id: string } | null)?.author_id;
   if (!authorId || (authorId !== user.id && ctx.role !== "trainer")) {
-    redirect(`/class/${classId}/questions/${questionId}`);
+    redirect(`/course/${courseId}/questions/${questionId}`);
   }
 
   await supabase
     .from("questions")
     .update({ deleted_at: new Date().toISOString() })
     .eq("id", questionId)
-    .eq("class_id", classId);
+    .eq("course_id", courseId);
 
-  revalidatePath(`/class/${classId}`);
-  revalidatePath(`/class/${classId}/questions`);
-  redirect(`/class/${classId}/questions`);
+  revalidatePath(`/course/${courseId}`);
+  revalidatePath(`/course/${courseId}/questions`);
+  redirect(`/course/${courseId}/questions`);
 }

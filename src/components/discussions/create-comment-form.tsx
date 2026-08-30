@@ -5,10 +5,10 @@ import { createCommentAction, type CommentFormState } from "@/features/discussio
 import { Button } from "@/components/ui/button";
 
 export function CreateCommentForm({
-  classId,
+  courseId,
   questionId,
 }: {
-  classId: string;
+  courseId: string;
   questionId: string;
 }) {
   const [state, formAction, pending] = useActionState<CommentFormState | undefined, FormData>(
@@ -23,7 +23,7 @@ export function CreateCommentForm({
 
   return (
     <form ref={ref} action={formAction} className="flex flex-col gap-2" noValidate>
-      <input type="hidden" name="classId" value={classId} />
+      <input type="hidden" name="courseId" value={courseId} />
       <input type="hidden" name="questionId" value={questionId} />
       <textarea
         name="body"

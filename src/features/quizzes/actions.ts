@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
-import { getClassContext } from "@/features/classes/queries";
+import { getCourseContext } from "@/features/courses/queries";
 import { parseInput } from "@/lib/validation/helpers";
 import { selectQuizQuestions } from "@/services/quiz-generator";
 import { createQuizSchema, submitQuizSchema } from "./schema";
@@ -32,9 +32,9 @@ export async function createQuizAction(
   _prev: QuizFormState | undefined,
   formData: FormData,
 ): Promise<QuizFormState> {
-  const classId = String(formData.get("classId") ?? "");
+  const courseId = String(formData.get("courseId") ?? "");
 
-  const [user, ctx] = await Promise.all([getUser(), getClassContext(classId)]);
+  const [user, ctx] = await Promise.all([getUser(), getCourseContext(courseId)]);
   if (!user || !ctx) return { formError: "Tu dois être membre de la classe." };
 
   const parsed = parseInput(createQuizSchema, {
@@ -50,14 +50,14 @@ export async function createQuizAction(
       .from("chapters")
       .select("id")
       .eq("id", parsed.data.chapterId)
-      .eq("class_id", classId)
+      .eq("course_id", courseId)
       .maybeSingle();
     if (!chapter) return { errors: { chapterId: "Chapitre inconnu pour cette classe." } };
   }
 
   const questionIds = await selectQuizQuestions(
     supabase,
-    classId,
+    courseId,
     parsed.data.chapterId,
     parsed.data.count,
   );
@@ -68,7 +68,7 @@ export async function createQuizAction(
   const { data: quiz, error: quizErr } = await supabase
     .from("quizzes")
     .insert({
-      class_id: classId,
+      course_id: courseId,
       created_by: user.id,
       chapter_id: parsed.data.chapterId,
       requested_count: parsed.data.count,
@@ -88,12 +88,12 @@ export async function createQuizAction(
 
   const attemptId = await startAttemptOnQuiz(supabase, quiz.id as string, user.id);
 
-  revalidatePath(`/class/${classId}/quiz`);
-  redirect(`/class/${classId}/quiz/${attemptId}`);
+  revalidatePath(`/course/${courseId}/quiz`);
+  redirect(`/course/${courseId}/quiz/${attemptId}`);
 }
 
 export async function submitQuizAction(formData: FormData): Promise<void> {
-  const classId = String(formData.get("classId") ?? "");
+  const courseId = String(formData.get("courseId") ?? "");
   const attemptId = String(formData.get("attemptId") ?? "");
 
   const user = await getUser();
@@ -103,32 +103,32 @@ export async function submitQuizAction(formData: FormData): Promise<void> {
   try {
     parsedResults = JSON.parse(String(formData.get("results") ?? "[]"));
   } catch {
-    redirect(`/class/${classId}/quiz/${attemptId}`);
+    redirect(`/course/${courseId}/quiz/${attemptId}`);
   }
 
   const parsed = parseInput(submitQuizSchema, { results: parsedResults });
-  if (!parsed.success) redirect(`/class/${classId}/quiz/${attemptId}`);
+  if (!parsed.success) redirect(`/course/${courseId}/quiz/${attemptId}`);
   const results = parsed.success ? parsed.data.results : [];
 
   const supabase = await createClient();
 
   const { data: attempt } = await supabase
     .from("quiz_attempts")
-    .select("id, user_id, completed_at, quizzes(class_id)")
+    .select("id, user_id, completed_at, quizzes(course_id)")
     .eq("id", attemptId)
     .maybeSingle();
 
   const row = attempt as unknown as {
     user_id: string;
     completed_at: string | null;
-    quizzes: { class_id: string } | null;
+    quizzes: { course_id: string } | null;
   } | null;
 
-  if (!row || row.user_id !== user.id || row.quizzes?.class_id !== classId) {
-    redirect(`/class/${classId}/quiz`);
+  if (!row || row.user_id !== user.id || row.quizzes?.course_id !== courseId) {
+    redirect(`/course/${courseId}/quiz`);
   }
   if (row && row.completed_at) {
-    redirect(`/class/${classId}/quiz/${attemptId}`);
+    redirect(`/course/${courseId}/quiz/${attemptId}`);
   }
 
   // Correction : les QCM / vrai-faux sont notés côté serveur d'après l'option
@@ -169,12 +169,12 @@ export async function submitQuizAction(formData: FormData): Promise<void> {
     .update({ score, total: graded.length, completed_at: new Date().toISOString() })
     .eq("id", attemptId);
 
-  revalidatePath(`/class/${classId}/quiz`);
-  redirect(`/class/${classId}/quiz/${attemptId}`);
+  revalidatePath(`/course/${courseId}/quiz`);
+  redirect(`/course/${courseId}/quiz/${attemptId}`);
 }
 
 export async function retakeQuizAction(formData: FormData): Promise<void> {
-  const classId = String(formData.get("classId") ?? "");
+  const courseId = String(formData.get("courseId") ?? "");
   const quizId = String(formData.get("quizId") ?? "");
 
   const user = await getUser();
@@ -183,14 +183,14 @@ export async function retakeQuizAction(formData: FormData): Promise<void> {
   const supabase = await createClient();
   const { data: quiz } = await supabase
     .from("quizzes")
-    .select("id, class_id")
+    .select("id, course_id")
     .eq("id", quizId)
     .maybeSingle();
 
-  if (!quiz || (quiz as { class_id: string }).class_id !== classId) {
-    redirect(`/class/${classId}/quiz`);
+  if (!quiz || (quiz as { course_id: string }).course_id !== courseId) {
+    redirect(`/course/${courseId}/quiz`);
   }
 
   const attemptId = await startAttemptOnQuiz(supabase, quizId, user.id);
-  redirect(`/class/${classId}/quiz/${attemptId}`);
+  redirect(`/course/${courseId}/quiz/${attemptId}`);
 }

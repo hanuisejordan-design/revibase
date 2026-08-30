@@ -3,10 +3,10 @@
 import { deleteQuestionAction } from "@/features/questions/actions";
 
 export function DeleteQuestionButton({
-  classId,
+  courseId,
   questionId,
 }: {
-  classId: string;
+  courseId: string;
   questionId: string;
 }) {
   return (
@@ -18,7 +18,7 @@ export function DeleteQuestionButton({
         }
       }}
     >
-      <input type="hidden" name="classId" value={classId} />
+      <input type="hidden" name="courseId" value={courseId} />
       <input type="hidden" name="questionId" value={questionId} />
       <button
         type="submit"

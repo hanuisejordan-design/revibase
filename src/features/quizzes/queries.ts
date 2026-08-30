@@ -21,7 +21,7 @@ type AttemptRow = {
   total: number | null;
   started_at: string;
   completed_at: string | null;
-  quizzes: { class_id: string; chapter_id: string | null } | null;
+  quizzes: { course_id: string; chapter_id: string | null } | null;
 };
 
 async function loadAttempt(attemptId: string): Promise<AttemptRow | null> {
@@ -29,7 +29,7 @@ async function loadAttempt(attemptId: string): Promise<AttemptRow | null> {
   const { data } = await supabase
     .from("quiz_attempts")
     .select(
-      "id, quiz_id, user_id, score, total, started_at, completed_at, quizzes(class_id, chapter_id)",
+      "id, quiz_id, user_id, score, total, started_at, completed_at, quizzes(course_id, chapter_id)",
     )
     .eq("id", attemptId)
     .maybeSingle();
@@ -94,10 +94,10 @@ async function referenceAnswers(
 
 /** Données pour passer un quiz (tentative non terminée). */
 export const getRunnerData = cache(
-  async (classId: string, attemptId: string): Promise<QuizRunnerData | null> => {
+  async (courseId: string, attemptId: string): Promise<QuizRunnerData | null> => {
     const [user, attempt] = await Promise.all([getUser(), loadAttempt(attemptId)]);
     if (!user || !attempt || attempt.user_id !== user.id) return null;
-    if (attempt.quizzes?.class_id !== classId) return null;
+    if (attempt.quizzes?.course_id !== courseId) return null;
     if (attempt.completed_at) return null;
 
     const supabase = await createClient();
@@ -191,10 +191,10 @@ async function loadOptions(
 
 /** Résultat d'une tentative terminée. */
 export const getResult = cache(
-  async (classId: string, attemptId: string): Promise<QuizResult | null> => {
+  async (courseId: string, attemptId: string): Promise<QuizResult | null> => {
     const [user, attempt] = await Promise.all([getUser(), loadAttempt(attemptId)]);
     if (!user || !attempt || attempt.user_id !== user.id) return null;
-    if (attempt.quizzes?.class_id !== classId || !attempt.completed_at) return null;
+    if (attempt.quizzes?.course_id !== courseId || !attempt.completed_at) return null;
 
     const supabase = await createClient();
     const { data: wrong } = await supabase
@@ -239,16 +239,16 @@ export const getResult = cache(
 );
 
 /** Tentatives récentes de l'utilisateur dans cette classe. */
-export const listMyAttempts = cache(async (classId: string): Promise<AttemptSummary[]> => {
+export const listMyAttempts = cache(async (courseId: string): Promise<AttemptSummary[]> => {
   const user = await getUser();
   if (!user) return [];
 
   const supabase = await createClient();
   const { data } = await supabase
     .from("quiz_attempts")
-    .select("id, score, total, started_at, completed_at, quizzes!inner(class_id, chapter_id)")
+    .select("id, score, total, started_at, completed_at, quizzes!inner(course_id, chapter_id)")
     .eq("user_id", user.id)
-    .eq("quizzes.class_id", classId)
+    .eq("quizzes.course_id", courseId)
     .order("started_at", { ascending: false })
     .limit(10);
 

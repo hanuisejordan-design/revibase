@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getClassContext } from "@/features/classes/queries";
+import { getCourseContext } from "@/features/courses/queries";
 import { parseInput } from "@/lib/validation/helpers";
 import { chapterNameSchema } from "./schema";
 
@@ -13,22 +13,22 @@ export interface ChapterFormState {
 }
 
 /** Renvoie `true` si l'utilisateur courant est membre de la classe. */
-async function isMemberOf(classId: string): Promise<boolean> {
-  const ctx = await getClassContext(classId);
+async function isMemberOf(courseId: string): Promise<boolean> {
+  const ctx = await getCourseContext(courseId);
   return ctx !== null;
 }
 
-function revalidateClass(classId: string) {
-  revalidatePath(`/class/${classId}`);
-  revalidatePath(`/class/${classId}/settings`);
+function revalidateClass(courseId: string) {
+  revalidatePath(`/course/${courseId}`);
+  revalidatePath(`/course/${courseId}/settings`);
 }
 
 export async function createChapterAction(
   _prev: ChapterFormState | undefined,
   formData: FormData,
 ): Promise<ChapterFormState> {
-  const classId = String(formData.get("classId") ?? "");
-  if (!(await isMemberOf(classId))) {
+  const courseId = String(formData.get("courseId") ?? "");
+  if (!(await isMemberOf(courseId))) {
     return { formError: "Tu dois être membre de la classe." };
   }
 
@@ -40,7 +40,7 @@ export async function createChapterAction(
   const { data: last } = await supabase
     .from("chapters")
     .select("position")
-    .eq("class_id", classId)
+    .eq("course_id", courseId)
     .order("position", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -49,7 +49,7 @@ export async function createChapterAction(
 
   const { error } = await supabase
     .from("chapters")
-    .insert({ class_id: classId, name: parsed.data.name, position });
+    .insert({ course_id: courseId, name: parsed.data.name, position });
 
   if (error) {
     return {
@@ -60,7 +60,7 @@ export async function createChapterAction(
     };
   }
 
-  revalidateClass(classId);
+  revalidateClass(courseId);
   return { ok: true };
 }
 
@@ -68,9 +68,9 @@ export async function renameChapterAction(
   _prev: ChapterFormState | undefined,
   formData: FormData,
 ): Promise<ChapterFormState> {
-  const classId = String(formData.get("classId") ?? "");
+  const courseId = String(formData.get("courseId") ?? "");
   const chapterId = String(formData.get("chapterId") ?? "");
-  if (!(await isMemberOf(classId))) {
+  if (!(await isMemberOf(courseId))) {
     return { formError: "Tu dois être membre de la classe." };
   }
 
@@ -82,7 +82,7 @@ export async function renameChapterAction(
     .from("chapters")
     .update({ name: parsed.data.name })
     .eq("id", chapterId)
-    .eq("class_id", classId);
+    .eq("course_id", courseId);
 
   if (error) {
     return {
@@ -91,32 +91,32 @@ export async function renameChapterAction(
     };
   }
 
-  revalidateClass(classId);
+  revalidateClass(courseId);
   return { ok: true };
 }
 
 export async function deleteChapterAction(formData: FormData): Promise<void> {
-  const classId = String(formData.get("classId") ?? "");
+  const courseId = String(formData.get("courseId") ?? "");
   const chapterId = String(formData.get("chapterId") ?? "");
-  if (!(await isMemberOf(classId))) return;
+  if (!(await isMemberOf(courseId))) return;
 
   const supabase = await createClient();
-  await supabase.from("chapters").delete().eq("id", chapterId).eq("class_id", classId);
+  await supabase.from("chapters").delete().eq("id", chapterId).eq("course_id", courseId);
 
-  revalidateClass(classId);
+  revalidateClass(courseId);
 }
 
 export async function moveChapterAction(formData: FormData): Promise<void> {
-  const classId = String(formData.get("classId") ?? "");
+  const courseId = String(formData.get("courseId") ?? "");
   const chapterId = String(formData.get("chapterId") ?? "");
   const direction = formData.get("direction") === "up" ? "up" : "down";
-  if (!(await isMemberOf(classId))) return;
+  if (!(await isMemberOf(courseId))) return;
 
   const supabase = await createClient();
   const { data } = await supabase
     .from("chapters")
     .select("id, position")
-    .eq("class_id", classId)
+    .eq("course_id", courseId)
     .order("position", { ascending: true });
 
   const list = (data ?? []) as Array<{ id: string; position: number }>;
@@ -129,5 +129,5 @@ export async function moveChapterAction(formData: FormData): Promise<void> {
   await supabase.from("chapters").update({ position: b.position }).eq("id", a.id);
   await supabase.from("chapters").update({ position: a.position }).eq("id", b.id);
 
-  revalidateClass(classId);
+  revalidateClass(courseId);
 }

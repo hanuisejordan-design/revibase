@@ -5,7 +5,7 @@ import { createChapterAction, type ChapterFormState } from "@/features/chapters/
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function AddChapterForm({ classId }: { classId: string }) {
+export function AddChapterForm({ courseId }: { courseId: string }) {
   const [state, formAction, pending] = useActionState<ChapterFormState | undefined, FormData>(
     createChapterAction,
     undefined,
@@ -19,7 +19,7 @@ export function AddChapterForm({ classId }: { classId: string }) {
   return (
     <form ref={ref} action={formAction} className="flex flex-col gap-2" noValidate>
       <div className="flex items-start gap-2">
-        <input type="hidden" name="classId" value={classId} />
+        <input type="hidden" name="courseId" value={courseId} />
         <Input name="name" placeholder="Nouveau chapitre" required className="max-w-xs" />
         <Button type="submit" variant="secondary" disabled={pending}>
           {pending ? "…" : "Ajouter"}

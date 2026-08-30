@@ -4,19 +4,19 @@ import { toggleValidateAction } from "@/features/answers/actions";
 import { cn } from "@/lib/utils/cn";
 
 export function ValidateButton({
-  classId,
+  courseId,
   questionId,
   answerId,
   validated,
 }: {
-  classId: string;
+  courseId: string;
   questionId: string;
   answerId: string;
   validated: boolean;
 }) {
   return (
     <form action={toggleValidateAction}>
-      <input type="hidden" name="classId" value={classId} />
+      <input type="hidden" name="courseId" value={courseId} />
       <input type="hidden" name="questionId" value={questionId} />
       <input type="hidden" name="answerId" value={answerId} />
       <button

@@ -9,10 +9,10 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
 export function CreateQuizForm({
-  classId,
+  courseId,
   chapters,
 }: {
-  classId: string;
+  courseId: string;
   chapters: ChapterEntry[];
 }) {
   const [state, formAction, pending] = useActionState<QuizFormState | undefined, FormData>(
@@ -22,7 +22,7 @@ export function CreateQuizForm({
 
   return (
     <form action={formAction} className="flex flex-col gap-4" noValidate>
-      <input type="hidden" name="classId" value={classId} />
+      <input type="hidden" name="courseId" value={courseId} />
 
       <Field label="Chapitre" htmlFor="chapterId" error={state?.errors?.chapterId}>
         <select

@@ -3,11 +3,11 @@
 import { deleteAnswerAction } from "@/features/answers/actions";
 
 export function DeleteAnswerButton({
-  classId,
+  courseId,
   questionId,
   answerId,
 }: {
-  classId: string;
+  courseId: string;
   questionId: string;
   answerId: string;
 }) {
@@ -18,7 +18,7 @@ export function DeleteAnswerButton({
         if (!confirm("Supprimer cette réponse ?")) e.preventDefault();
       }}
     >
-      <input type="hidden" name="classId" value={classId} />
+      <input type="hidden" name="courseId" value={courseId} />
       <input type="hidden" name="questionId" value={questionId} />
       <input type="hidden" name="answerId" value={answerId} />
       <button

@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 
 function IconButton({
   action,
-  classId,
+  courseId,
   chapterId,
   direction,
   disabled,
@@ -20,7 +20,7 @@ function IconButton({
   children,
 }: {
   action: (formData: FormData) => void | Promise<void>;
-  classId: string;
+  courseId: string;
   chapterId: string;
   direction?: "up" | "down";
   disabled?: boolean;
@@ -29,7 +29,7 @@ function IconButton({
 }) {
   return (
     <form action={action}>
-      <input type="hidden" name="classId" value={classId} />
+      <input type="hidden" name="courseId" value={courseId} />
       <input type="hidden" name="chapterId" value={chapterId} />
       {direction ? <input type="hidden" name="direction" value={direction} /> : null}
       <button
@@ -46,12 +46,12 @@ function IconButton({
 
 function ChapterRow({
   chapter,
-  classId,
+  courseId,
   isFirst,
   isLast,
 }: {
   chapter: ChapterEntry;
-  classId: string;
+  courseId: string;
   isFirst: boolean;
   isLast: boolean;
 }) {
@@ -66,7 +66,7 @@ function ChapterRow({
         <div className="flex flex-col">
           <IconButton
             action={moveChapterAction}
-            classId={classId}
+            courseId={courseId}
             chapterId={chapter.id}
             direction="up"
             disabled={isFirst}
@@ -76,7 +76,7 @@ function ChapterRow({
           </IconButton>
           <IconButton
             action={moveChapterAction}
-            classId={classId}
+            courseId={courseId}
             chapterId={chapter.id}
             direction="down"
             disabled={isLast}
@@ -87,7 +87,7 @@ function ChapterRow({
         </div>
 
         <form action={renameAction} className="flex flex-1 items-center gap-2" noValidate>
-          <input type="hidden" name="classId" value={classId} />
+          <input type="hidden" name="courseId" value={courseId} />
           <input type="hidden" name="chapterId" value={chapter.id} />
           <Input name="name" defaultValue={chapter.name} required className="flex-1" />
           <button
@@ -111,7 +111,7 @@ function ChapterRow({
             }
           }}
         >
-          <input type="hidden" name="classId" value={classId} />
+          <input type="hidden" name="courseId" value={courseId} />
           <input type="hidden" name="chapterId" value={chapter.id} />
           <button
             type="submit"
@@ -135,10 +135,10 @@ function ChapterRow({
 }
 
 export function ChapterListEditor({
-  classId,
+  courseId,
   chapters,
 }: {
-  classId: string;
+  courseId: string;
   chapters: ChapterEntry[];
 }) {
   if (chapters.length === 0) {
@@ -151,7 +151,7 @@ export function ChapterListEditor({
         <ChapterRow
           key={chapter.id}
           chapter={chapter}
-          classId={classId}
+          courseId={courseId}
           isFirst={i === 0}
           isLast={i === chapters.length - 1}
         />

@@ -5,13 +5,13 @@ import { DeleteCommentButton } from "./delete-comment-button";
 
 export function CommentList({
   comments,
-  classId,
+  courseId,
   questionId,
   viewerId,
   viewerIsTrainer,
 }: {
   comments: CommentItem[];
-  classId: string;
+  courseId: string;
   questionId: string;
   viewerId: string;
   viewerIsTrainer: boolean;
@@ -36,7 +36,7 @@ export function CommentList({
               <span>{relativeTime(comment.createdAt)}</span>
               {mine || viewerIsTrainer ? (
                 <DeleteCommentButton
-                  classId={classId}
+                  courseId={courseId}
                   questionId={questionId}
                   commentId={comment.id}
                 />

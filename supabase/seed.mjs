@@ -81,7 +81,7 @@ async function main() {
   }
 
   const { data: already } = await db
-    .from("classes")
+    .from("courses")
     .select("id")
     .eq("join_code", JOIN_CODE)
     .maybeSingle();
@@ -108,7 +108,7 @@ async function main() {
   if (gmErr) throw gmErr;
 
   const { data: cls, error: clsErr } = await db
-    .from("classes")
+    .from("courses")
     .insert({
       name: "Promo Conduite — 2026",
       join_code: JOIN_CODE,
@@ -118,17 +118,17 @@ async function main() {
     .select("id")
     .single();
   if (clsErr) throw clsErr;
-  const classId = cls.id;
+  const courseId = cls.id;
 
   const { error: memErr } = await db
-    .from("class_members")
-    .insert(PEOPLE.map((p) => ({ class_id: classId, user_id: ids[p.key], role: p.role })));
+    .from("course_members")
+    .insert(PEOPLE.map((p) => ({ course_id: courseId, user_id: ids[p.key], role: p.role })));
   if (memErr) throw memErr;
 
   const chapterNames = ["Signalisation", "Réglementation", "Matériel", "Sécurité"];
   const { data: chapters, error: chErr } = await db
     .from("chapters")
-    .insert(chapterNames.map((name, position) => ({ class_id: classId, name, position })))
+    .insert(chapterNames.map((name, position) => ({ course_id: courseId, name, position })))
     .select("id, name");
   if (chErr) throw chErr;
   const chapterId = Object.fromEntries(chapters.map((c) => [c.name, c.id]));
@@ -139,7 +139,7 @@ async function main() {
     .from("questions")
     .insert([
       {
-        class_id: classId,
+        course_id: courseId,
         chapter_id: chapterId["Signalisation"],
         author_id: ids.thomas,
         title: "Que signifie un carré violet ?",
@@ -147,7 +147,7 @@ async function main() {
         kind: "open",
       },
       {
-        class_id: classId,
+        course_id: courseId,
         chapter_id: chapterId["Signalisation"],
         author_id: ids.julie,
         title: "Différence entre un sémaphore et un carré ?",
@@ -155,7 +155,7 @@ async function main() {
         kind: "open",
       },
       {
-        class_id: classId,
+        course_id: courseId,
         chapter_id: chapterId["Réglementation"],
         author_id: ids.marc,
         title: "Quand demande-t-on une autorisation de franchissement ?",
@@ -163,7 +163,7 @@ async function main() {
         kind: "open",
       },
       {
-        class_id: classId,
+        course_id: courseId,
         chapter_id: chapterId["Sécurité"],
         author_id: ids.julie,
         title: "Ordre des actions en cas de heurt d'obstacle ?",
@@ -171,7 +171,7 @@ async function main() {
         kind: "open",
       },
       {
-        class_id: classId,
+        course_id: courseId,
         chapter_id: chapterId["Signalisation"],
         author_id: ids.marc,
         title: "Un carré violet arrête un train en marche normale.",
@@ -179,7 +179,7 @@ async function main() {
         kind: "true_false",
       },
       {
-        class_id: classId,
+        course_id: courseId,
         chapter_id: chapterId["Réglementation"],
         author_id: ids.thomas,
         title: "Vitesse maximale en marche à vue ?",
@@ -279,7 +279,7 @@ async function main() {
   // Deuxième classe du même groupe : montre le regroupement sur le tableau
   // de bord. Contenu volontairement léger.
   const { data: cls2, error: cls2Err } = await db
-    .from("classes")
+    .from("courses")
     .insert({
       name: "Sécurité ferroviaire — Module 2",
       join_code: JOIN_CODE_2,
@@ -291,19 +291,19 @@ async function main() {
   if (cls2Err) throw cls2Err;
 
   await db
-    .from("class_members")
-    .insert({ class_id: cls2.id, user_id: ids.trainer, role: "trainer" });
+    .from("course_members")
+    .insert({ course_id: cls2.id, user_id: ids.trainer, role: "trainer" });
 
   const { data: chapters2, error: ch2Err } = await db
     .from("chapters")
     .insert(
-      ["Freinage", "Incidents"].map((name, position) => ({ class_id: cls2.id, name, position })),
+      ["Freinage", "Incidents"].map((name, position) => ({ course_id: cls2.id, name, position })),
     )
     .select("id, name");
   if (ch2Err) throw ch2Err;
 
   await db.from("questions").insert({
-    class_id: cls2.id,
+    course_id: cls2.id,
     chapter_id: chapters2.find((c) => c.name === "Freinage").id,
     author_id: ids.julie,
     title: "Différence entre freinage de service et freinage d'urgence ?",

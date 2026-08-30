@@ -24,11 +24,11 @@ const inputCls =
   "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950";
 
 export function CreateQuestionForm({
-  classId,
+  courseId,
   chapters,
   defaultChapterId,
 }: {
-  classId: string;
+  courseId: string;
   chapters: ChapterEntry[];
   defaultChapterId?: string;
 }) {
@@ -57,7 +57,7 @@ export function CreateQuestionForm({
       try {
         const blob = await downscaleImage(image);
         const supabase = createClient();
-        const path = `${classId}/${crypto.randomUUID()}.jpg`;
+        const path = `${courseId}/${crypto.randomUUID()}.jpg`;
         const { error } = await supabase.storage
           .from(IMAGE_BUCKET)
           .upload(path, blob, { contentType: "image/jpeg", upsert: false });
@@ -86,7 +86,7 @@ export function CreateQuestionForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-      <input type="hidden" name="classId" value={classId} />
+      <input type="hidden" name="courseId" value={courseId} />
       <input type="hidden" name="kind" value={kind} />
       <input type="hidden" name="optionsJson" value={JSON.stringify(optionsPayload)} />
 

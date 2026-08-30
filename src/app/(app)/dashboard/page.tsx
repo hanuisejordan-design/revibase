@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/dal";
-import { getMyClasses } from "@/features/classes/queries";
+import { getMyCourses } from "@/features/courses/queries";
 import { getMyGroups } from "@/features/groups/queries";
-import { ClassCard } from "@/components/classes/class-card";
+import { CourseCard } from "@/components/courses/course-card";
 
 export const metadata: Metadata = { title: "Tableau de bord" };
 
@@ -14,7 +14,7 @@ const secondaryLink =
 
 export default async function DashboardPage() {
   const user = await requireUser();
-  const [groups, allClasses] = await Promise.all([getMyGroups(), getMyClasses()]);
+  const [groups, allClasses] = await Promise.all([getMyGroups(), getMyCourses()]);
 
   // Les classes affichées sous un groupe ne sont pas répétées dans « Autres ».
   const groupedClassIds = new Set(groups.flatMap((g) => g.classes.map((c) => c.id)));
@@ -44,7 +44,7 @@ export default async function DashboardPage() {
             </Link>
             {g.isAdmin ? (
               <Link
-                href={`/group/${g.id}/class/new`}
+                href={`/group/${g.id}/course/new`}
                 className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
               >
                 + Classe
@@ -55,7 +55,7 @@ export default async function DashboardPage() {
             <ul className="grid gap-3 sm:grid-cols-2">
               {g.classes.map((c) => (
                 <li key={c.id}>
-                  <ClassCard cls={c} />
+                  <CourseCard cls={c} />
                 </li>
               ))}
             </ul>
@@ -77,7 +77,7 @@ export default async function DashboardPage() {
           <ul className="grid gap-3 sm:grid-cols-2">
             {standaloneClasses.map((c) => (
               <li key={c.id}>
-                <ClassCard cls={c} />
+                <CourseCard cls={c} />
               </li>
             ))}
           </ul>
@@ -86,10 +86,10 @@ export default async function DashboardPage() {
 
       <div className="flex flex-col gap-3 border-t border-zinc-200 pt-6 dark:border-zinc-800">
         <div className="flex flex-wrap gap-3">
-          <Link href="/class/new" className={primaryLink}>
+          <Link href="/course/new" className={primaryLink}>
             Créer une classe
           </Link>
-          <Link href="/class/join" className={secondaryLink}>
+          <Link href="/course/join" className={secondaryLink}>
             Rejoindre une classe
           </Link>
         </div>

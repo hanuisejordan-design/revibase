@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
-import { getClassContext } from "@/features/classes/queries";
+import { getCourseContext } from "@/features/courses/queries";
 import { parseInput } from "@/lib/validation/helpers";
 import { createCommentSchema } from "./schema";
 
@@ -14,20 +14,20 @@ export interface CommentFormState {
   ok?: boolean;
 }
 
-function revalidateQuestion(classId: string, questionId: string) {
-  revalidatePath(`/class/${classId}/questions/${questionId}`);
-  revalidatePath(`/class/${classId}/questions`);
-  revalidatePath(`/class/${classId}`);
+function revalidateQuestion(courseId: string, questionId: string) {
+  revalidatePath(`/course/${courseId}/questions/${questionId}`);
+  revalidatePath(`/course/${courseId}/questions`);
+  revalidatePath(`/course/${courseId}`);
 }
 
 export async function createCommentAction(
   _prev: CommentFormState | undefined,
   formData: FormData,
 ): Promise<CommentFormState> {
-  const classId = String(formData.get("classId") ?? "");
+  const courseId = String(formData.get("courseId") ?? "");
   const questionId = String(formData.get("questionId") ?? "");
 
-  const [user, ctx] = await Promise.all([getUser(), getClassContext(classId)]);
+  const [user, ctx] = await Promise.all([getUser(), getCourseContext(courseId)]);
   if (!user || !ctx) return { formError: "Tu dois être membre de la classe." };
 
   const parsed = parseInput(createCommentSchema, { body: formData.get("body") });
@@ -39,7 +39,7 @@ export async function createCommentAction(
     .from("questions")
     .select("id")
     .eq("id", questionId)
-    .eq("class_id", classId)
+    .eq("course_id", courseId)
     .is("deleted_at", null)
     .maybeSingle();
   if (!question) return { formError: "Question introuvable." };
@@ -51,16 +51,16 @@ export async function createCommentAction(
   });
   if (error) return { formError: "Envoi impossible. Réessaie." };
 
-  revalidateQuestion(classId, questionId);
+  revalidateQuestion(courseId, questionId);
   return { ok: true };
 }
 
 export async function deleteCommentAction(formData: FormData): Promise<void> {
-  const classId = String(formData.get("classId") ?? "");
+  const courseId = String(formData.get("courseId") ?? "");
   const questionId = String(formData.get("questionId") ?? "");
   const commentId = String(formData.get("commentId") ?? "");
 
-  const [user, ctx] = await Promise.all([getUser(), getClassContext(classId)]);
+  const [user, ctx] = await Promise.all([getUser(), getCourseContext(courseId)]);
   if (!user || !ctx) redirect("/login");
 
   const supabase = await createClient();
@@ -73,6 +73,6 @@ export async function deleteCommentAction(formData: FormData): Promise<void> {
   const authorId = (comment as { author_id: string } | null)?.author_id;
   if (authorId && (authorId === user.id || ctx.role === "trainer")) {
     await supabase.from("comments").delete().eq("id", commentId);
-    revalidateQuestion(classId, questionId);
+    revalidateQuestion(courseId, questionId);
   }
 }

@@ -3,7 +3,7 @@ import { retakeQuizAction } from "@/features/quizzes/actions";
 import type { QuizResult } from "@/features/quizzes/types";
 import { Button } from "@/components/ui/button";
 
-export function QuizResultView({ classId, result }: { classId: string; result: QuizResult }) {
+export function QuizResultView({ courseId, result }: { courseId: string; result: QuizResult }) {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col items-center gap-1 rounded-xl border border-zinc-200 p-6 text-center dark:border-zinc-800">
@@ -23,7 +23,7 @@ export function QuizResultView({ classId, result }: { classId: string; result: Q
             {result.toReview.map((q) => (
               <li key={q.questionId}>
                 <Link
-                  href={`/class/${classId}/questions/${q.questionId}`}
+                  href={`/course/${courseId}/questions/${q.questionId}`}
                   className="text-zinc-700 underline hover:text-zinc-900 dark:text-zinc-300"
                 >
                   {q.title}
@@ -40,14 +40,14 @@ export function QuizResultView({ classId, result }: { classId: string; result: Q
 
       <div className="flex flex-wrap gap-3">
         <form action={retakeQuizAction}>
-          <input type="hidden" name="classId" value={classId} />
+          <input type="hidden" name="courseId" value={courseId} />
           <input type="hidden" name="quizId" value={result.quizId} />
           <Button type="submit" variant="secondary">
             Recommencer ce quiz
           </Button>
         </form>
         <Link
-          href={`/class/${classId}/quiz`}
+          href={`/course/${courseId}/quiz`}
           className="inline-flex items-center justify-center rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
         >
           Nouveau quiz

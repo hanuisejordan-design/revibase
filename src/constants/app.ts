@@ -8,8 +8,8 @@ export const APP_TAGLINE = "Les questions de la classe, rangées et réutilisabl
  * Rôle d'un membre AU SEIN d'une classe (et non au niveau du compte).
  * Le créateur d'une classe en devient `trainer`, les autres `student`.
  */
-export const CLASS_ROLES = ["student", "trainer"] as const;
-export type ClassRole = (typeof CLASS_ROLES)[number];
+export const COURSE_ROLES = ["student", "trainer"] as const;
+export type CourseRole = (typeof COURSE_ROLES)[number];
 
 /**
  * Nature d'une question :

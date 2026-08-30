@@ -101,13 +101,13 @@ export interface ListQuestionsOptions {
 }
 
 export const listQuestions = cache(
-  async (classId: string, opts: ListQuestionsOptions = {}): Promise<QuestionListItem[]> => {
+  async (courseId: string, opts: ListQuestionsOptions = {}): Promise<QuestionListItem[]> => {
     const supabase = await createClient();
 
     let query = supabase
       .from("questions")
       .select(QUESTION_SELECT)
-      .eq("class_id", classId)
+      .eq("course_id", courseId)
       .is("deleted_at", null)
       .order("created_at", { ascending: false });
 
@@ -150,14 +150,14 @@ export const listQuestions = cache(
 );
 
 export const getRecentQuestions = cache(
-  async (classId: string, limit = 5): Promise<QuestionListItem[]> => {
-    const all = await listQuestions(classId, { sort: "recent" });
+  async (courseId: string, limit = 5): Promise<QuestionListItem[]> => {
+    const all = await listQuestions(courseId, { sort: "recent" });
     return all.slice(0, limit);
   },
 );
 
 export const getQuestion = cache(
-  async (classId: string, questionId: string): Promise<QuestionDetail | null> => {
+  async (courseId: string, questionId: string): Promise<QuestionDetail | null> => {
     const user = await getUser();
     const supabase = await createClient();
 
@@ -165,7 +165,7 @@ export const getQuestion = cache(
       .from("questions")
       .select(QUESTION_SELECT)
       .eq("id", questionId)
-      .eq("class_id", classId)
+      .eq("course_id", courseId)
       .is("deleted_at", null)
       .maybeSingle();
 

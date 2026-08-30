@@ -15,14 +15,14 @@ function statusOf(answer: AnswerItem): AnswerStatus {
 
 export function AnswerCard({
   answer,
-  classId,
+  courseId,
   questionId,
   viewerId,
   viewerIsTrainer,
   questionAuthorId,
 }: {
   answer: AnswerItem;
-  classId: string;
+  courseId: string;
   questionId: string;
   viewerId: string;
   viewerIsTrainer: boolean;
@@ -38,7 +38,7 @@ export function AnswerCard({
         <p className="whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">{answer.body}</p>
         <div>
           <VoteButton
-            classId={classId}
+            courseId={courseId}
             questionId={questionId}
             answerId={answer.id}
             count={answer.voteCount}
@@ -51,7 +51,7 @@ export function AnswerCard({
           </span>
           {canAccept ? (
             <AcceptButton
-              classId={classId}
+              courseId={courseId}
               questionId={questionId}
               answerId={answer.id}
               accepted={answer.accepted}
@@ -59,14 +59,14 @@ export function AnswerCard({
           ) : null}
           {viewerIsTrainer ? (
             <ValidateButton
-              classId={classId}
+              courseId={courseId}
               questionId={questionId}
               answerId={answer.id}
               validated={answer.validated}
             />
           ) : null}
           {canModerate ? (
-            <DeleteAnswerButton classId={classId} questionId={questionId} answerId={answer.id} />
+            <DeleteAnswerButton courseId={courseId} questionId={questionId} answerId={answer.id} />
           ) : null}
         </div>
       </div>

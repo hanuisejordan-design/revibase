@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
-import { getClassContext } from "@/features/classes/queries";
+import { getCourseContext } from "@/features/courses/queries";
 import { parseInput } from "@/lib/validation/helpers";
 import { createAnswerSchema } from "./schema";
 import { isSameAnswer } from "./normalize";
@@ -17,20 +17,20 @@ export interface AnswerFormState {
   merged?: { authorName: string };
 }
 
-function revalidateQuestion(classId: string, questionId: string) {
-  revalidatePath(`/class/${classId}/questions/${questionId}`);
-  revalidatePath(`/class/${classId}/questions`);
-  revalidatePath(`/class/${classId}`);
+function revalidateQuestion(courseId: string, questionId: string) {
+  revalidatePath(`/course/${courseId}/questions/${questionId}`);
+  revalidatePath(`/course/${courseId}/questions`);
+  revalidatePath(`/course/${courseId}`);
 }
 
 export async function createAnswerAction(
   _prev: AnswerFormState | undefined,
   formData: FormData,
 ): Promise<AnswerFormState> {
-  const classId = String(formData.get("classId") ?? "");
+  const courseId = String(formData.get("courseId") ?? "");
   const questionId = String(formData.get("questionId") ?? "");
 
-  const [user, ctx] = await Promise.all([getUser(), getClassContext(classId)]);
+  const [user, ctx] = await Promise.all([getUser(), getCourseContext(courseId)]);
   if (!user || !ctx) return { formError: "Tu dois être membre de la classe." };
 
   const parsed = parseInput(createAnswerSchema, { body: formData.get("body") });
@@ -42,7 +42,7 @@ export async function createAnswerAction(
     .from("questions")
     .select("id")
     .eq("id", questionId)
-    .eq("class_id", classId)
+    .eq("course_id", courseId)
     .is("deleted_at", null)
     .maybeSingle();
   if (!question) return { formError: "Question introuvable." };
@@ -69,7 +69,7 @@ export async function createAnswerAction(
         { answer_id: match.id, user_id: user.id },
         { onConflict: "answer_id,user_id", ignoreDuplicates: true },
       );
-    revalidateQuestion(classId, questionId);
+    revalidateQuestion(courseId, questionId);
     return { ok: true, merged: { authorName: match.author?.display_name ?? "un autre membre" } };
   }
 
@@ -89,16 +89,16 @@ export async function createAnswerAction(
       { onConflict: "answer_id,user_id", ignoreDuplicates: true },
     );
 
-  revalidateQuestion(classId, questionId);
+  revalidateQuestion(courseId, questionId);
   return { ok: true };
 }
 
 export async function toggleVoteAction(formData: FormData): Promise<void> {
-  const classId = String(formData.get("classId") ?? "");
+  const courseId = String(formData.get("courseId") ?? "");
   const questionId = String(formData.get("questionId") ?? "");
   const answerId = String(formData.get("answerId") ?? "");
 
-  const [user, ctx] = await Promise.all([getUser(), getClassContext(classId)]);
+  const [user, ctx] = await Promise.all([getUser(), getCourseContext(courseId)]);
   if (!user || !ctx) redirect("/login");
 
   const supabase = await createClient();
@@ -118,32 +118,32 @@ export async function toggleVoteAction(formData: FormData): Promise<void> {
     await supabase.from("answer_votes").insert({ answer_id: answerId, user_id: user.id });
   }
 
-  revalidateQuestion(classId, questionId);
+  revalidateQuestion(courseId, questionId);
 }
 
 export async function toggleAcceptAction(formData: FormData): Promise<void> {
-  const classId = String(formData.get("classId") ?? "");
+  const courseId = String(formData.get("courseId") ?? "");
   const questionId = String(formData.get("questionId") ?? "");
   const answerId = String(formData.get("answerId") ?? "");
 
-  const [user, ctx] = await Promise.all([getUser(), getClassContext(classId)]);
+  const [user, ctx] = await Promise.all([getUser(), getCourseContext(courseId)]);
   if (!user || !ctx) redirect("/login");
 
   const supabase = await createClient();
   // Le RPC vérifie que l'appelant est bien l'auteur de la question.
   await supabase.rpc("accept_answer", { p_answer: answerId });
 
-  revalidateQuestion(classId, questionId);
+  revalidateQuestion(courseId, questionId);
 }
 
 /** Validation officielle d'une réponse. Réservée aux formateurs (RLS + trigger). */
 export async function toggleValidateAction(formData: FormData): Promise<void> {
-  const classId = String(formData.get("classId") ?? "");
+  const courseId = String(formData.get("courseId") ?? "");
   const questionId = String(formData.get("questionId") ?? "");
   const answerId = String(formData.get("answerId") ?? "");
 
-  const [user, ctx] = await Promise.all([getUser(), getClassContext(classId)]);
-  if (!user || ctx?.role !== "trainer") redirect(`/class/${classId}/questions/${questionId}`);
+  const [user, ctx] = await Promise.all([getUser(), getCourseContext(courseId)]);
+  if (!user || ctx?.role !== "trainer") redirect(`/course/${courseId}/questions/${questionId}`);
 
   const supabase = await createClient();
   const { data: answer } = await supabase
@@ -160,15 +160,15 @@ export async function toggleValidateAction(formData: FormData): Promise<void> {
     .update({ validated_by: currentlyValidated ? null : user.id })
     .eq("id", answerId);
 
-  revalidateQuestion(classId, questionId);
+  revalidateQuestion(courseId, questionId);
 }
 
 export async function deleteAnswerAction(formData: FormData): Promise<void> {
-  const classId = String(formData.get("classId") ?? "");
+  const courseId = String(formData.get("courseId") ?? "");
   const questionId = String(formData.get("questionId") ?? "");
   const answerId = String(formData.get("answerId") ?? "");
 
-  const [user, ctx] = await Promise.all([getUser(), getClassContext(classId)]);
+  const [user, ctx] = await Promise.all([getUser(), getCourseContext(courseId)]);
   if (!user || !ctx) redirect("/login");
 
   const supabase = await createClient();
@@ -181,6 +181,6 @@ export async function deleteAnswerAction(formData: FormData): Promise<void> {
   const authorId = (answer as { author_id: string } | null)?.author_id;
   if (authorId && (authorId === user.id || ctx.role === "trainer")) {
     await supabase.from("answers").delete().eq("id", answerId);
-    revalidateQuestion(classId, questionId);
+    revalidateQuestion(courseId, questionId);
   }
 }

@@ -4,19 +4,19 @@ import { toggleAcceptAction } from "@/features/answers/actions";
 import { cn } from "@/lib/utils/cn";
 
 export function AcceptButton({
-  classId,
+  courseId,
   questionId,
   answerId,
   accepted,
 }: {
-  classId: string;
+  courseId: string;
   questionId: string;
   answerId: string;
   accepted: boolean;
 }) {
   return (
     <form action={toggleAcceptAction}>
-      <input type="hidden" name="classId" value={classId} />
+      <input type="hidden" name="courseId" value={courseId} />
       <input type="hidden" name="questionId" value={questionId} />
       <input type="hidden" name="answerId" value={answerId} />
       <button

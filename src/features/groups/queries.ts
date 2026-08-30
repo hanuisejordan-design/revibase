@@ -3,8 +3,8 @@ import "server-only";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
-import type { ClassRole } from "@/constants/app";
-import type { ClassSummary } from "@/features/classes/types";
+import type { CourseRole } from "@/constants/app";
+import type { CourseSummary } from "@/features/courses/types";
 import type { GroupContext, GroupMemberEntry, GroupSummary } from "./types";
 
 type GroupRow = { id: string; name: string; join_code: string };
@@ -19,30 +19,30 @@ type GroupClassRow = {
 /** Compte les membres explicites et repère le rôle de l'utilisateur courant. */
 async function classMemberInfo(
   supabase: Awaited<ReturnType<typeof createClient>>,
-  classIds: string[],
+  courseIds: string[],
   userId: string,
-): Promise<{ counts: Map<string, number>; myRole: Map<string, ClassRole> }> {
+): Promise<{ counts: Map<string, number>; myRole: Map<string, CourseRole> }> {
   const counts = new Map<string, number>();
-  const myRole = new Map<string, ClassRole>();
-  if (classIds.length === 0) return { counts, myRole };
+  const myRole = new Map<string, CourseRole>();
+  if (courseIds.length === 0) return { counts, myRole };
 
   const { data } = await supabase
-    .from("class_members")
-    .select("class_id, user_id, role")
-    .in("class_id", classIds);
+    .from("course_members")
+    .select("course_id, user_id, role")
+    .in("course_id", courseIds);
 
-  for (const m of (data ?? []) as Array<{ class_id: string; user_id: string; role: ClassRole }>) {
-    counts.set(m.class_id, (counts.get(m.class_id) ?? 0) + 1);
-    if (m.user_id === userId) myRole.set(m.class_id, m.role);
+  for (const m of (data ?? []) as Array<{ course_id: string; user_id: string; role: CourseRole }>) {
+    counts.set(m.course_id, (counts.get(m.course_id) ?? 0) + 1);
+    if (m.user_id === userId) myRole.set(m.course_id, m.role);
   }
   return { counts, myRole };
 }
 
-function toClassSummary(
+function toCourseSummary(
   c: GroupClassRow,
   counts: Map<string, number>,
-  myRole: Map<string, ClassRole>,
-): ClassSummary {
+  myRole: Map<string, CourseRole>,
+): CourseSummary {
   return {
     id: c.id,
     name: c.name,
@@ -77,7 +77,7 @@ export const getMyGroups = cache(async (): Promise<GroupSummary[]> => {
   const groupIds = rows.map((r) => r.group_id);
 
   const { data: classesData } = await supabase
-    .from("classes")
+    .from("courses")
     .select("id, name, join_code, created_by, group_id")
     .in("group_id", groupIds)
     .order("created_at", { ascending: true });
@@ -98,7 +98,7 @@ export const getMyGroups = cache(async (): Promise<GroupSummary[]> => {
       isAdmin: r.is_admin,
       classes: classes
         .filter((c) => c.group_id === r.group_id)
-        .map((c) => toClassSummary(c, counts, myRole)),
+        .map((c) => toCourseSummary(c, counts, myRole)),
     }));
 });
 
@@ -136,14 +136,14 @@ export const getGroupContext = cache(async (groupId: string): Promise<GroupConte
 });
 
 /** Classes d'un groupe (pour la page du groupe). */
-export const getGroupClasses = cache(async (groupId: string): Promise<ClassSummary[]> => {
+export const getGroupClasses = cache(async (groupId: string): Promise<CourseSummary[]> => {
   const user = await getUser();
   if (!user) return [];
 
   const supabase = await createClient();
 
   const { data } = await supabase
-    .from("classes")
+    .from("courses")
     .select("id, name, join_code, created_by, group_id")
     .eq("group_id", groupId)
     .order("created_at", { ascending: true });
@@ -155,7 +155,7 @@ export const getGroupClasses = cache(async (groupId: string): Promise<ClassSumma
     user.id,
   );
 
-  return classes.map((c) => toClassSummary(c, counts, myRole));
+  return classes.map((c) => toCourseSummary(c, counts, myRole));
 });
 
 /** Membres du groupe, triés par date d'arrivée. */

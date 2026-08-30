@@ -3,11 +3,11 @@
 import { deleteCommentAction } from "@/features/discussions/actions";
 
 export function DeleteCommentButton({
-  classId,
+  courseId,
   questionId,
   commentId,
 }: {
-  classId: string;
+  courseId: string;
   questionId: string;
   commentId: string;
 }) {
@@ -18,7 +18,7 @@ export function DeleteCommentButton({
         if (!confirm("Supprimer ce message ?")) e.preventDefault();
       }}
     >
-      <input type="hidden" name="classId" value={classId} />
+      <input type="hidden" name="courseId" value={courseId} />
       <input type="hidden" name="questionId" value={questionId} />
       <input type="hidden" name="commentId" value={commentId} />
       <button

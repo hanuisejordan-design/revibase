@@ -4,7 +4,7 @@ import { useActionState, useEffect, useRef } from "react";
 import { createAnswerAction, type AnswerFormState } from "@/features/answers/actions";
 import { Button } from "@/components/ui/button";
 
-export function CreateAnswerForm({ classId, questionId }: { classId: string; questionId: string }) {
+export function CreateAnswerForm({ courseId, questionId }: { courseId: string; questionId: string }) {
   const [state, formAction, pending] = useActionState<AnswerFormState | undefined, FormData>(
     createAnswerAction,
     undefined,
@@ -19,7 +19,7 @@ export function CreateAnswerForm({ classId, questionId }: { classId: string; que
 
   return (
     <form ref={ref} action={formAction} className="flex flex-col gap-2" noValidate>
-      <input type="hidden" name="classId" value={classId} />
+      <input type="hidden" name="courseId" value={courseId} />
       <input type="hidden" name="questionId" value={questionId} />
       <label htmlFor="body" className="text-sm font-medium">
         Écrire une réponse

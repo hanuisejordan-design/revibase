@@ -1,4 +1,4 @@
-import type { ClassSummary } from "@/features/classes/types";
+import type { CourseSummary } from "@/features/courses/types";
 
 /** Un groupe tel qu'affiché sur le tableau de bord, avec ses classes. */
 export interface GroupSummary {
@@ -7,7 +7,7 @@ export interface GroupSummary {
   joinCode: string;
   /** L'utilisateur courant administre-t-il ce groupe ? */
   isAdmin: boolean;
-  classes: ClassSummary[];
+  classes: CourseSummary[];
 }
 
 /** Contexte du groupe courant (pages `group/[groupId]`). */

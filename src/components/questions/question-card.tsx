@@ -5,17 +5,17 @@ import { QUESTION_KIND_LABELS } from "@/constants/app";
 import { QuestionStatusBadge } from "./question-status-badge";
 
 export function QuestionCard({
-  classId,
+  courseId,
   question,
 }: {
-  classId: string;
+  courseId: string;
   question: QuestionListItem;
 }) {
   const isOpen = question.kind === "open";
 
   return (
     <Link
-      href={`/class/${classId}/questions/${question.id}`}
+      href={`/course/${courseId}/questions/${question.id}`}
       className="flex flex-col gap-2 rounded-xl border border-zinc-200 p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
     >
       {question.imageUrl ? (

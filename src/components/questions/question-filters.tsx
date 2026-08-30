@@ -47,17 +47,17 @@ function Chip({
 }
 
 export function QuestionFilters({
-  classId,
+  courseId,
   chapters,
   params,
   hasUnchaptered,
 }: {
-  classId: string;
+  courseId: string;
   chapters: ChapterEntry[];
   params: Params;
   hasUnchaptered: boolean;
 }) {
-  const basePath = `/class/${classId}/questions`;
+  const basePath = `/course/${courseId}/questions`;
   const url = (o: Partial<Params>) => basePath + buildQuery(params, o);
 
   return (

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getGroupContext, getGroupClasses, getGroupMembers } from "@/features/groups/queries";
-import { InviteCode } from "@/components/classes/invite-code";
-import { ClassCard } from "@/components/classes/class-card";
+import { InviteCode } from "@/components/courses/invite-code";
+import { CourseCard } from "@/components/courses/course-card";
 import { LeaveGroupButton } from "@/components/groups/leave-group-button";
 
 export async function generateMetadata({
@@ -45,7 +45,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
           <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">Classes</h2>
           {ctx.isAdmin ? (
             <Link
-              href={`/group/${groupId}/class/new`}
+              href={`/group/${groupId}/course/new`}
               className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
             >
               + Créer une classe
@@ -57,7 +57,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
           <ul className="grid gap-3 sm:grid-cols-2">
             {classes.map((c) => (
               <li key={c.id}>
-                <ClassCard cls={c} />
+                <CourseCard cls={c} />
               </li>
             ))}
           </ul>

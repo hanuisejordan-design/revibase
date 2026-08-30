@@ -21,14 +21,14 @@ function shuffle<T>(items: T[]): T[] {
  */
 export async function selectQuizQuestions(
   supabase: Supabase,
-  classId: string,
+  courseId: string,
   chapterId: string | null,
   count: number,
 ): Promise<string[]> {
   let query = supabase
     .from("questions")
     .select("id, kind")
-    .eq("class_id", classId)
+    .eq("course_id", courseId)
     .is("deleted_at", null);
 
   if (chapterId) query = query.eq("chapter_id", chapterId);

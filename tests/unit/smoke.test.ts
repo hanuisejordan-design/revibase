@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cn } from "@/lib/utils/cn";
-import { ANSWER_STATUSES, CLASS_ROLES } from "@/constants/app";
+import { ANSWER_STATUSES, COURSE_ROLES } from "@/constants/app";
 
 describe("smoke", () => {
   it("cn fusionne les classes et résout les conflits Tailwind", () => {
@@ -9,7 +9,7 @@ describe("smoke", () => {
   });
 
   it("les constantes de domaine sont bien définies", () => {
-    expect(CLASS_ROLES).toEqual(["student", "trainer"]);
+    expect(COURSE_ROLES).toEqual(["student", "trainer"]);
     expect(ANSWER_STATUSES[0]).toBe("validated");
   });
 });

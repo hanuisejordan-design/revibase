@@ -3,14 +3,14 @@ import { AnswerCard } from "./answer-card";
 
 export function AnswerList({
   answers,
-  classId,
+  courseId,
   questionId,
   viewerId,
   viewerIsTrainer,
   questionAuthorId,
 }: {
   answers: AnswerItem[];
-  classId: string;
+  courseId: string;
   questionId: string;
   viewerId: string;
   viewerIsTrainer: boolean;
@@ -35,7 +35,7 @@ export function AnswerList({
           <AnswerCard
             key={answer.id}
             answer={answer}
-            classId={classId}
+            courseId={courseId}
             questionId={questionId}
             viewerId={viewerId}
             viewerIsTrainer={viewerIsTrainer}

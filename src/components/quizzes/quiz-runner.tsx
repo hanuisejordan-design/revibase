@@ -19,11 +19,11 @@ type Result = {
 };
 
 export function QuizRunner({
-  classId,
+  courseId,
   attemptId,
   questions,
 }: {
-  classId: string;
+  courseId: string;
   attemptId: string;
   questions: QuizQuestionCard[];
 }) {
@@ -58,7 +58,7 @@ export function QuizRunner({
           {known > 1 ? "s" : ""}.
         </p>
         <form action={submitQuizAction}>
-          <input type="hidden" name="classId" value={classId} />
+          <input type="hidden" name="courseId" value={courseId} />
           <input type="hidden" name="attemptId" value={attemptId} />
           <input type="hidden" name="results" value={JSON.stringify(results)} />
           <Button type="submit">Voir mon score</Button>

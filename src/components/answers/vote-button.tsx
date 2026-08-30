@@ -9,13 +9,13 @@ import { cn } from "@/lib/utils/cn";
  * comptée automatiquement. Positif seulement, pas de « pouce bas ».
  */
 export function VoteButton({
-  classId,
+  courseId,
   questionId,
   answerId,
   count,
   active,
 }: {
-  classId: string;
+  courseId: string;
   questionId: string;
   answerId: string;
   count: number;
@@ -23,7 +23,7 @@ export function VoteButton({
 }) {
   return (
     <form action={toggleVoteAction}>
-      <input type="hidden" name="classId" value={classId} />
+      <input type="hidden" name="courseId" value={courseId} />
       <input type="hidden" name="questionId" value={questionId} />
       <input type="hidden" name="answerId" value={answerId} />
       <button

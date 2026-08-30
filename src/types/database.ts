@@ -9,7 +9,7 @@
  * alignée sur `supabase/migrations/0001_initial_schema.sql`.
  */
 
-import type { ClassRole, QuestionKind, QuizMode } from "@/constants/app";
+import type { CourseRole, QuestionKind, QuizMode } from "@/constants/app";
 
 export type UUID = string;
 export type ISODateString = string;
@@ -30,15 +30,15 @@ export interface ClassRoom {
 
 export interface ClassMember {
   id: UUID;
-  class_id: UUID;
+  course_id: UUID;
   user_id: UUID;
-  role: ClassRole;
+  role: CourseRole;
   joined_at: ISODateString;
 }
 
 export interface Chapter {
   id: UUID;
-  class_id: UUID;
+  course_id: UUID;
   name: string;
   position: number;
   created_at: ISODateString;
@@ -46,7 +46,7 @@ export interface Chapter {
 
 export interface Question {
   id: UUID;
-  class_id: UUID;
+  course_id: UUID;
   chapter_id: UUID | null;
   author_id: UUID;
   kind: QuestionKind;
@@ -95,7 +95,7 @@ export interface QuestionOption {
 
 export interface Quiz {
   id: UUID;
-  class_id: UUID;
+  course_id: UUID;
   created_by: UUID;
   chapter_id: UUID | null;
   requested_count: number;

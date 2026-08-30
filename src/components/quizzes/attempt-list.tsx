@@ -3,10 +3,10 @@ import type { AttemptSummary } from "@/features/quizzes/types";
 import { relativeTime } from "@/lib/utils/date";
 
 export function AttemptList({
-  classId,
+  courseId,
   attempts,
 }: {
-  classId: string;
+  courseId: string;
   attempts: AttemptSummary[];
 }) {
   if (attempts.length === 0) {
@@ -18,7 +18,7 @@ export function AttemptList({
       {attempts.map((a) => (
         <li key={a.id}>
           <Link
-            href={`/class/${classId}/quiz/${a.id}`}
+            href={`/course/${courseId}/quiz/${a.id}`}
             className="flex items-center justify-between gap-3 rounded-lg border border-zinc-200 px-4 py-2 text-sm hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
           >
             <span>
