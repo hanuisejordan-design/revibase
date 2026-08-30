@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getClassContext, getClassCourses } from "@/features/classes/queries";
 import { CourseCard } from "@/components/courses/course-card";
+import { InviteCode } from "@/components/courses/invite-code";
 
 export default async function ClassCoursesPage({
   params,
@@ -27,6 +28,13 @@ export default async function ClassCoursesPage({
           </Link>
         </div>
       ) : null}
+
+      <section className="flex flex-col gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
+        <InviteCode
+          code={ctx.joinCode}
+          hint="Partage ce code pour faire entrer quelqu'un : il aura accès à tous les cours de la classe."
+        />
+      </section>
 
       <section className="flex flex-col gap-3">
         <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">

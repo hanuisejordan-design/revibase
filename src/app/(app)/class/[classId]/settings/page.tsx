@@ -1,6 +1,6 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getClassContext, getClassMembers } from "@/features/classes/queries";
-import { InviteCode } from "@/components/courses/invite-code";
 import { LeaveClassButton } from "@/components/classes/leave-class-button";
 
 export default async function ClassSettingsPage({
@@ -17,12 +17,13 @@ export default async function ClassSettingsPage({
 
   return (
     <div className="flex flex-col gap-8">
-      <section className="flex flex-col gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-        <InviteCode
-          code={ctx.joinCode}
-          hint="Partage ce code : ceux qui rejoignent la classe ont accès à tous ses cours."
-        />
-      </section>
+      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        Le code d&apos;invitation est sur la{" "}
+        <Link href={`/class/${classId}`} className="underline">
+          page de la classe
+        </Link>
+        .
+      </p>
 
       <section className="flex flex-col gap-2">
         <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
