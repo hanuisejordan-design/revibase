@@ -40,7 +40,13 @@ un admin attribue « formateur ». Migration `0014`.
 Modifier titre / contexte / chapitre / options / photo (auteur ou formateur).
 Type non modifiable. Pas de migration (RLS déjà en place).
 
-### Nouvelles questions depuis la dernière visite (territoire « notifs »)
+### Nouvelles questions depuis la dernière visite (parké)
+
+> Le **centre de notifications** (Phase 21, ADR 0021) couvre « on a agi sur
+> ton contenu » (réponse / commentaire / validation). Le « nouvelles
+> questions du cours depuis ma dernière visite » reste à part : c'est un
+> compteur de lecture, pas un événement — d'où `course_reads` plutôt qu'une
+> ligne `notifications` par membre. UI repoussée (« on verra à la fin »).
 
 - **Idée** : savoir ce qui est apparu depuis qu'on est passé.
   - Vignettes (tableau de bord) : badge « N nouvelles questions » par cours,
@@ -108,7 +114,7 @@ navigateur. Reste : nettoyage des images orphelines (cf. reports).
 | Sujet                                           | Référence               | Note                                                                                               |
 | ----------------------------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------- |
 | Responsive mobile à peaufiner                   | brief §17, Phase 10     | Cible n°1 ; à faire avant adoption large par la classe                                             |
-| Notifications                                   | Phase 9                 | Socle en place (`notifications`, `services/notifications/`) ; UI à construire si le besoin ressort |
+| Notifications : pas de temps réel / push               | Phase 21, ADR 0021      | Centre de notifs livré (réponse / commentaire / validation). Compteur rafraîchi à la navigation ; pas de WebSocket ni de push navigateur |
 | Recherche plein-texte                           | ADR 0002, 0008          | Aujourd'hui : `ILIKE` sur le titre uniquement                                                      |
 | Types Supabase générés                          | `src/types/database.ts` | Remplacer les types écrits à la main par `supabase gen types`                                      |
 | États de chargement / erreurs soignés           | Phase 10                | `loading.tsx`, messages d'erreur, empty states                                                     |

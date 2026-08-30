@@ -59,7 +59,7 @@ classes ──< questions >── chapters (nullable)
               └──< question_options               (réservé mcq, Phase 8)
 classes ──< quizzes ──< quiz_questions >── questions
 quizzes ──< quiz_attempts ──< quiz_answers
-profiles ──< notifications                        (socle, pas d'UI au MVP)
+profiles ──< notifications                        (Phase 21 : triggers + UI)
 ```
 
 Détails : [`../decisions/0002-modele-donnees.md`](../decisions/0002-modele-donnees.md).
@@ -342,8 +342,29 @@ Calculé à la lecture, par priorité décroissante :
 5. Les mutations passent par une Server Action → validation Zod → RPC ou
    `insert/update` → la RLS et les triggers refont respecter les règles.
 
-## Notifications
+## Centre de notifications (Phase 21, ADR 0021)
 
-Table `notifications` + `services/notifications` écrivent les événements
-(`answer`, `comment`, `validation`, `new_question`). Aucune UI ni push au MVP :
-seul le socle est en place pour brancher un centre de notifications plus tard.
+- **Écriture = triggers `security definer`** (migration `0016`), pas les
+  Server Actions : impossible à oublier, et ça contourne l'absence voulue de
+  policy INSERT sur `notifications`.
+  - `notify_on_answer` — `AFTER INSERT` sur `answers` → l'auteur de la
+    question (`type = 'answer'`).
+  - `notify_on_comment` — `AFTER INSERT` sur `comments` → l'auteur de la
+    question (`type = 'comment'`).
+  - `notify_on_validation` — `AFTER UPDATE` sur `answers`, quand
+    `validated_by` passe à non-nul → l'auteur de la réponse
+    (`type = 'validation'`).
+  - Jamais de notification à soi-même (`actor_id <> user_id`).
+- `features/notifications/` : `queries.ts` (`listNotifications` — 50
+  dernières, jointure `actor:profiles` + `questions` ; `countUnreadNotifications`
+  — `read_at is null`, pour la cloche), `actions.ts`
+  (`markAllNotificationsReadAction`).
+- **UI** : cloche 🔔 + compteur non-lus dans l'en-tête `(app)`
+  (Server Component, rafraîchi à chaque navigation — ni realtime ni push) →
+  page `/notifications` (liste, ligne teintée si non lue, lien vers la
+  question, « Tout marquer comme lu »). **Ouvrir la page marque tout lu**
+  (`MarkAllRead`, effet client au montage).
+- `services/notifications/` reste vide — la logique est en base + `features/`.
+- Le type `new_question` existe dans l'enum mais n'est pas émis : « nouvelles
+  questions du cours depuis ma dernière visite » sera un compteur
+  `course_reads` (backlog), pas une ligne par membre.
