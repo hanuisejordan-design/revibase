@@ -5,22 +5,11 @@ priorise selon les retours de la classe.
 
 ## Prochaines fonctionnalités (demandées)
 
-### Renommer les niveaux + refonte du tableau de bord (Phase 15, la prochaine)
+### ✅ Renommage groupe → classe → cours + refonte tableau de bord — fait (Phase 15, ADR 0017)
 
-- **Vocabulaire, pas structure.** Les 3 niveaux (groupe → classe → chapitre)
-  sont les bons ; on les rebaptise pour coller au langage courant :
-  - « groupe » → **« classe »** (la promo, avec code d'invitation, membres) ;
-  - « classe » → **« cours »** (Maths, Français…) ;
-  - « chapitre » → inchangé.
-- **Tableau de bord** : l'action principale n'est **pas** « créer un cours »
-  mais **rejoindre / créer une classe** ; les cours se créent dedans. Revoir
-  la hiérarchie des boutons (comme au tout début du projet).
-- **Portée à décider** : juste les libellés + routes (`/group`→`/class`,
-  `/class`→`/course`), ou aussi renommer tables / colonnes / RPC / RLS en
-  base. Le renommage SQL est mécanique (RENAME = métadonnée, pas de réécriture
-  de données) mais touche beaucoup de fichiers ; plus propre pour un projet
-  d'apprentissage.
-- **Ampleur** : moyenne (libellés + routes) à grande (base incluse).
+Vocabulaire aligné (base incluse, migration `0011` en `RENAME`). Tableau de
+bord : action principale = rejoindre / créer une **classe** ; les **cours** se
+créent dedans ; cours autonome possible en secondaire.
 
 ### Résumés par cours
 

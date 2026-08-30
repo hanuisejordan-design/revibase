@@ -56,7 +56,7 @@ export async function joinCourseAction(
   redirect(`/course/${data as string}`);
 }
 
-/** Quitte une classe. Réservé aux membres non créateurs (garde-fou côté UI). */
+/** Quitte un cours. Réservé aux membres non créateurs (garde-fou côté UI). */
 export async function leaveCourseAction(formData: FormData): Promise<void> {
   const courseId = String(formData.get("courseId") ?? "");
   if (!courseId) redirect("/dashboard");

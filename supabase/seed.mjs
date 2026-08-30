@@ -3,7 +3,7 @@
  *
  * Crée des comptes via l'API d'administration Supabase (comptes valides,
  * contrairement à des INSERT SQL bruts dans auth.users), puis insère une
- * classe d'exemple avec chapitres, questions, réponses, votes et commentaires.
+ * cours d'exemple avec chapitres, questions, réponses, votes et commentaires.
  *
  * Prérequis : `.env.local` renseigné (dont SUPABASE_SERVICE_ROLE_KEY).
  * Lancer :
@@ -11,7 +11,7 @@
  *   node --env-file=.env.local supabase/seed.mjs
  *
  * Idempotent : relancer réutilise les comptes existants et ne recrée pas la
- * classe si son code d'invitation existe déjà.
+ * cours si son code d'invitation existe déjà.
  */
 
 import { createClient } from "@supabase/supabase-js";
@@ -30,7 +30,7 @@ const db = createClient(url, serviceKey, {
 
 const PASSWORD = "password123";
 const JOIN_CODE = "DEMO2026";
-const GROUP_CODE = "GROUPE2026";
+const CLASS_CODE = "CLASSE2026";
 const JOIN_CODE_2 = "DEMO2027";
 
 const PEOPLE = [
@@ -87,16 +87,16 @@ async function main() {
     .maybeSingle();
 
   if (already) {
-    console.log(`\nClasse "${JOIN_CODE}" déjà présente — rien à recréer.`);
+    console.log(`\nCours "${JOIN_CODE}" déjà présent — rien à recréer.`);
     return;
   }
 
-  console.log("\nGroupe, classes, chapitres et contenu…");
+  console.log("\nClasse, cours, chapitres et contenu…");
 
-  // Groupe de démo : il chapeaute deux classes.
+  // Classe de démo : elle chapeaute deux cours.
   const { data: grp, error: grpErr } = await db
     .from("classes")
-    .insert({ name: "Centre de formation — Démo", join_code: GROUP_CODE, created_by: ids.trainer })
+    .insert({ name: "Centre de formation — Démo", join_code: CLASS_CODE, created_by: ids.trainer })
     .select("id")
     .single();
   if (grpErr) throw grpErr;
@@ -276,7 +276,7 @@ async function main() {
     },
   ]);
 
-  // Deuxième classe du même groupe : montre le regroupement sur le tableau
+  // Deuxième cours de la même classe : montre le regroupement sur le tableau
   // de bord. Contenu volontairement léger.
   const { data: cls2, error: cls2Err } = await db
     .from("courses")
@@ -311,9 +311,9 @@ async function main() {
     kind: "open",
   });
 
-  console.log(`\nOK. Groupe "Centre de formation — Démo", code ${GROUP_CODE}.`);
-  console.log(`Classes : "Promo Conduite — 2026" (${JOIN_CODE}), "Sécurité ferroviaire — Module 2" (${JOIN_CODE_2}).`);
-  console.log(`Connecte-toi avec sofia@revibase.test / ${PASSWORD} (formatrice, admin du groupe).`);
+  console.log(`\nOK. Classe "Centre de formation — Démo", code ${CLASS_CODE}.`);
+  console.log(`Cours : "Promo Conduite — 2026" (${JOIN_CODE}), "Sécurité ferroviaire — Module 2" (${JOIN_CODE_2}).`);
+  console.log(`Connecte-toi avec sofia@revibase.test / ${PASSWORD} (formatrice, admin de la classe).`);
 }
 
 main().catch((err) => {

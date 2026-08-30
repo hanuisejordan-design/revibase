@@ -51,3 +51,4 @@ qui remplace l'ancien (et on met à jour le statut de l'ancien).
 | 0014 | [Répondre avant de voir + fusion des doublons](0014-reponse-avant-de-voir-et-fusion-doublons.md) | accepté |
 | 0015 | [Groupes : une couche au-dessus des classes](0015-groupes.md) | accepté |
 | 0016 | [Photo attachée à une question](0016-photo-question.md) | accepté |
+| 0017 | [Renommage groupe → classe → cours](0017-renommage-groupe-classe-cours.md) | accepté |

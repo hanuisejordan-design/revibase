@@ -1,5 +1,13 @@
 # Vue d'ensemble de l'architecture
 
+> **Vocabulaire (Phase 15, ADR 0017)** : ce qui est appelé « groupe » dans les
+> sections ci-dessous est désormais une **classe** (table `classes`,
+> `class_members`, routes `/class/*`) ; ce qui est appelé « classe » est
+> désormais un **cours** (table `courses`, `course_members`, routes
+> `/course/*`, colonnes `*.course_id`). Hiérarchie : classe → cours →
+> chapitre → question. Les fonctions RLS suivent : `is_class_member` (niveau
+> classe), `is_course_member` / `is_course_trainer` (niveau cours).
+
 ## Objectif
 
 Structurer et capitaliser les connaissances produites par une classe. Une
