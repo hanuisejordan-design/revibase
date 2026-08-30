@@ -39,12 +39,26 @@ export default async function CourseLayout({
             {ctx.name}
           </Link>
         </div>
-        <Link
-          href={`/course/${courseId}/settings`}
-          className="pt-1 text-sm text-zinc-600 hover:underline dark:text-zinc-400"
-        >
-          Paramètres
-        </Link>
+        <nav className="flex gap-3 pt-1 text-sm">
+          <Link
+            href={`/course/${courseId}/questions`}
+            className="text-zinc-600 hover:underline dark:text-zinc-400"
+          >
+            Questions
+          </Link>
+          <Link
+            href={`/course/${courseId}/summaries`}
+            className="text-zinc-600 hover:underline dark:text-zinc-400"
+          >
+            Résumés
+          </Link>
+          <Link
+            href={`/course/${courseId}/settings`}
+            className="text-zinc-600 hover:underline dark:text-zinc-400"
+          >
+            Paramètres
+          </Link>
+        </nav>
       </div>
       {children}
     </div>

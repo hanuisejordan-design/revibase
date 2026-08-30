@@ -14,7 +14,7 @@ const badgeCls =
   "rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300";
 const meta = "text-xs text-zinc-500";
 
-function Row({ summary, courseId }: { summary: SummaryItem; courseId: string }) {
+export function SummaryRow({ summary, courseId }: { summary: SummaryItem; courseId: string }) {
   const inner = (
     <>
       <span className={badgeCls}>{KIND_LABEL[summary.kind]}</span>
@@ -80,7 +80,7 @@ export function SummaryList({
           <h3 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">{g.label}</h3>
           <ul className="flex flex-col gap-1.5">
             {g.items.map((s) => (
-              <Row key={s.id} summary={s} courseId={courseId} />
+              <SummaryRow key={s.id} summary={s} courseId={courseId} />
             ))}
           </ul>
         </section>
