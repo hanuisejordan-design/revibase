@@ -143,6 +143,11 @@ Calculé à la lecture, par priorité décroissante :
   `class/[classId]/layout` remonte vers le groupe s'il y en a un.
 - Rôle : membre par le groupe = `student` ; « formateur » reste une ligne
   `class_members`. Admin de groupe ≠ formateur de classe.
+- `CourseCard` (tableau de bord, page classe) affiche « N questions · N
+  résumés · N membres » + badge « Formateur » si le viewer l'est (plus de
+  badge « Admin »). Compteurs via `countCourseContent()`
+  (`features/courses/queries.ts`), réutilisé par `getMyCourses`,
+  `getMyClasses`, `getClassCourses`.
 - Nav (après Phase 15/16) : fil d'Ariane (`← parent`) + **nom cliquable**
   (retour à l'accueil). Un **cours** a un menu compact
   `Questions · Résumés · Paramètres` (= les vues « liste complète ») ; une

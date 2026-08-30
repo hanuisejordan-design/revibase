@@ -9,6 +9,8 @@ export interface CourseSummary {
   /** L'utilisateur courant administre-t-il ce cours ? */
   isAdmin: boolean;
   memberCount: number;
+  questionCount: number;
+  summaryCount: number;
   /** Classe (promo) propriétaire, ou `null` si le cours est autonome. */
   classId: string | null;
 }

@@ -18,6 +18,29 @@ type CourseRow = {
   class_id: string | null;
 };
 
+/** Nombre de questions (non supprimées) et de résumés par cours. */
+export async function countCourseContent(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  courseIds: string[],
+): Promise<{ questions: Map<string, number>; summaries: Map<string, number> }> {
+  const questions = new Map<string, number>();
+  const summaries = new Map<string, number>();
+  if (courseIds.length === 0) return { questions, summaries };
+
+  const [{ data: qs }, { data: ss }] = await Promise.all([
+    supabase.from("questions").select("course_id").in("course_id", courseIds).is("deleted_at", null),
+    supabase.from("summaries").select("course_id").in("course_id", courseIds),
+  ]);
+
+  for (const q of (qs ?? []) as Array<{ course_id: string }>) {
+    questions.set(q.course_id, (questions.get(q.course_id) ?? 0) + 1);
+  }
+  for (const s of (ss ?? []) as Array<{ course_id: string }>) {
+    summaries.set(s.course_id, (summaries.get(s.course_id) ?? 0) + 1);
+  }
+  return { questions, summaries };
+}
+
 /** Tous les cours dont l'utilisateur courant est membre (adhésion explicite). */
 export const getMyCourses = cache(async (): Promise<CourseSummary[]> => {
   const user = await getUser();
@@ -43,10 +66,10 @@ export const getMyCourses = cache(async (): Promise<CourseSummary[]> => {
 
   const courseIds = rows.map((r) => r.course_id);
 
-  const { data: allMembers } = await supabase
-    .from("course_members")
-    .select("course_id")
-    .in("course_id", courseIds);
+  const [{ data: allMembers }, content] = await Promise.all([
+    supabase.from("course_members").select("course_id").in("course_id", courseIds),
+    countCourseContent(supabase, courseIds),
+  ]);
 
   const counts = new Map<string, number>();
   for (const m of (allMembers ?? []) as Array<{ course_id: string }>) {
@@ -62,6 +85,8 @@ export const getMyCourses = cache(async (): Promise<CourseSummary[]> => {
       role: r.role,
       isAdmin: r.is_admin,
       memberCount: counts.get(r.course_id) ?? 1,
+      questionCount: content.questions.get(r.course_id) ?? 0,
+      summaryCount: content.summaries.get(r.course_id) ?? 0,
       classId: r.courses.class_id,
     }));
 });

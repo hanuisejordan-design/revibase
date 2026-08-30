@@ -133,7 +133,7 @@ votes, validation formateur, calcul du score de quiz.
 
 Le développement suit des phases laissant l'app fonctionnelle à chaque étape : 0. Initialisation ✅ · 1. Authentification ✅ · 2. Classes ✅ · 3. Chapitres ✅ · 4. Questions ✅ · 5. Réponses & votes ✅ · 6. Discussions ✅ · 7. Validation formateur ✅ · 8. Quiz ✅ · 9. Notifications _(à venir)_ · 10. Polissage.
 
-**Post-MVP :** 11. Types de question (ouverte / vrai-faux / QCM) ✅ avec quiz auto-corrigés · 12. Répondre avant de voir les autres réponses + fusion des doublons exacts en vote + discussion en bulles ✅ · 13. Groupes (une promo chapeaute plusieurs cours) ✅ · 14. Photo attachée à une question ✅ · 15. Renommage groupe → **classe** → **cours** + refonte du tableau de bord ✅ · 16. Résumés par cours (dépôt de fiches / PDF) ✅ · 17. Favori privé sur les résumés ✅ · 18. Rôles du cours : admin ≠ formateur ✅ · 19. Éditer une question ✅
+**Post-MVP :** 11. Types de question (ouverte / vrai-faux / QCM) ✅ avec quiz auto-corrigés · 12. Répondre avant de voir les autres réponses + fusion des doublons exacts en vote + discussion en bulles ✅ · 13. Groupes (une promo chapeaute plusieurs cours) ✅ · 14. Photo attachée à une question ✅ · 15. Renommage groupe → **classe** → **cours** + refonte du tableau de bord ✅ · 16. Résumés par cours (dépôt de fiches / PDF) ✅ · 17. Favori privé sur les résumés ✅ · 18. Rôles du cours : admin ≠ formateur ✅ · 19. Éditer une question ✅ · 20. Vignettes de cours : compteurs questions / résumés ✅
 
 La boucle MVP est en ligne et testée en conditions réelles.
 

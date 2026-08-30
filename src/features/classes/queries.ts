@@ -4,8 +4,11 @@ import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
 import type { CourseRole } from "@/constants/app";
+import { countCourseContent } from "@/features/courses/queries";
 import type { CourseSummary } from "@/features/courses/types";
 import type { ClassContext, ClassMemberEntry, ClassSummary } from "./types";
+
+type ContentCounts = { questions: Map<string, number>; summaries: Map<string, number> };
 
 type ClassRow = { id: string; name: string; join_code: string };
 type CourseRow = {
@@ -56,6 +59,7 @@ function toCourseSummary(
   counts: Map<string, number>,
   myRole: Map<string, CourseRole>,
   myAdmin: Set<string>,
+  content: ContentCounts,
 ): CourseSummary {
   return {
     id: c.id,
@@ -64,6 +68,8 @@ function toCourseSummary(
     role: myRole.get(c.id) ?? "student",
     isAdmin: myAdmin.has(c.id),
     memberCount: counts.get(c.id) ?? 0,
+    questionCount: content.questions.get(c.id) ?? 0,
+    summaryCount: content.summaries.get(c.id) ?? 0,
     classId: c.class_id,
   };
 }
@@ -101,11 +107,11 @@ export const getMyClasses = cache(async (): Promise<ClassSummary[]> => {
   ]);
 
   const courses = (coursesData ?? []) as CourseRow[];
-  const { counts, myRole, myAdmin } = await courseMemberInfo(
-    supabase,
-    courses.map((c) => c.id),
-    user.id,
-  );
+  const courseIds = courses.map((c) => c.id);
+  const [{ counts, myRole, myAdmin }, content] = await Promise.all([
+    courseMemberInfo(supabase, courseIds, user.id),
+    countCourseContent(supabase, courseIds),
+  ]);
 
   const memberCount = new Map<string, number>();
   for (const m of (allClassMembers ?? []) as Array<{ class_id: string }>) {
@@ -122,7 +128,7 @@ export const getMyClasses = cache(async (): Promise<ClassSummary[]> => {
       memberCount: memberCount.get(r.class_id) ?? 1,
       courses: courses
         .filter((c) => c.class_id === r.class_id)
-        .map((c) => toCourseSummary(c, counts, myRole, myAdmin)),
+        .map((c) => toCourseSummary(c, counts, myRole, myAdmin, content)),
     }));
 });
 
@@ -173,13 +179,13 @@ export const getClassCourses = cache(async (classId: string): Promise<CourseSumm
     .order("created_at", { ascending: true });
 
   const courses = (data ?? []) as CourseRow[];
-  const { counts, myRole, myAdmin } = await courseMemberInfo(
-    supabase,
-    courses.map((c) => c.id),
-    user.id,
-  );
+  const courseIds = courses.map((c) => c.id);
+  const [{ counts, myRole, myAdmin }, content] = await Promise.all([
+    courseMemberInfo(supabase, courseIds, user.id),
+    countCourseContent(supabase, courseIds),
+  ]);
 
-  return courses.map((c) => toCourseSummary(c, counts, myRole, myAdmin));
+  return courses.map((c) => toCourseSummary(c, counts, myRole, myAdmin, content));
 });
 
 /** Membres de la classe, triés par date d'arrivée. */
