@@ -23,8 +23,11 @@ Deux attributs **indépendants** sur `course_members` :
 
 - Arriver dans un cours (par code ou via la classe) = `is_admin = false,
   role = 'student'` (**élève**).
-- `create_course` (RPC) : le créateur devient `is_admin = true,
-  role = 'student'`.
+- `create_course` (RPC) : le créateur devient `is_admin = true`. Une case
+  **« Je suis le formateur de ce cours »** (décochée par défaut,
+  `p_is_trainer`) le pose aussi `trainer` — pour l'enseignant qui monte son
+  propre cours, sans auto-promotion après coup. Un élève organisateur laisse
+  décoché.
 - Migration `0014` : colonne `course_members.is_admin` ; **backfill** des
   `trainer` actuels (les créateurs) en `is_admin = true`, `role` inchangé —
   ils validaient déjà, on ne casse rien.

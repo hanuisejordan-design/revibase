@@ -20,10 +20,12 @@ export async function createCourseAction(
   if (!parsed.success) return { errors: parsed.errors };
 
   const classId = String(formData.get("classId") ?? "").trim() || null;
+  const isTrainer = formData.get("isTrainer") === "on";
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("create_course", {
     p_name: parsed.data.name,
+    p_is_trainer: isTrainer,
     ...(classId ? { p_class_id: classId } : {}),
   });
 

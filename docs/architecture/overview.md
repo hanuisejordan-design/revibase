@@ -222,8 +222,9 @@ Calculé à la lecture, par priorité décroissante :
   (gestion : code, membres, attribution des rôles) et `role`
   (`student` / `trainer` — `trainer` = valide les réponses). Migration
   `0014` : colonne `is_admin`, backfill des `trainer` actuels,
-  `create_course` pose `is_admin = true, role = 'student'` (créateur = admin,
-  plus formateur d'office).
+  `create_course` pose `is_admin = true` (créateur = admin) ; case « Je suis
+  le formateur de ce cours » (`p_is_trainer`, décochée par défaut) → `role =
+  'trainer'` direct.
 - `is_course_admin()` + policy `UPDATE` sur `course_members` réservée aux
   admins ; `setCourseAdminAction` / `setCourseTrainerAction` (refus de
   retirer le dernier admin). UI : `CourseMemberManager` dans les paramètres

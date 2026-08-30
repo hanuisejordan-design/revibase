@@ -39,11 +39,15 @@ create policy "course_members_update_admin" on public.course_members
   using (public.is_course_admin(course_id))
   with check (public.is_course_admin(course_id));
 
--- Désormais, créer un cours = en être ADMIN, pas formateur d'office.
-create or replace function public.create_course(
-  p_name     text,
-  p_chapters text[] default null,
-  p_class_id uuid   default null
+-- Désormais, créer un cours = en être ADMIN. Le rôle « formateur » est
+-- optionnel à la création (`p_is_trainer`) : coché uniquement par un vrai
+-- enseignant. Nouveau paramètre => on supprime l'ancienne signature.
+drop function if exists public.create_course(text, text[], uuid);
+create function public.create_course(
+  p_name       text,
+  p_chapters   text[] default null,
+  p_class_id   uuid   default null,
+  p_is_trainer boolean default false
 )
 returns uuid language plpgsql security definer set search_path = public
 as $$
@@ -66,7 +70,7 @@ begin
   returning id into v_course_id;
 
   insert into public.course_members (course_id, user_id, is_admin, role)
-  values (v_course_id, auth.uid(), true, 'student');
+  values (v_course_id, auth.uid(), true, case when p_is_trainer then 'trainer' else 'student' end);
 
   foreach v_chapter in array coalesce(
     p_chapters,
@@ -83,4 +87,5 @@ begin
 end;
 $$;
 
-grant execute on function public.create_course(text, text[], uuid) to authenticated, service_role;
+grant execute on function public.create_course(text, text[], uuid, boolean)
+  to authenticated, service_role;
