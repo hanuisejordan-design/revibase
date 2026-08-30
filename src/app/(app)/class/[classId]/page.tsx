@@ -1,30 +1,30 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getGroupContext, getGroupClasses, getGroupMembers } from "@/features/groups/queries";
+import { getClassContext, getClassCourses, getClassMembers } from "@/features/classes/queries";
 import { InviteCode } from "@/components/courses/invite-code";
 import { CourseCard } from "@/components/courses/course-card";
-import { LeaveGroupButton } from "@/components/groups/leave-group-button";
+import { LeaveClassButton } from "@/components/classes/leave-class-button";
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ groupId: string }>;
+  params: Promise<{ classId: string }>;
 }): Promise<Metadata> {
-  const { groupId } = await params;
-  const ctx = await getGroupContext(groupId);
-  return { title: ctx?.name ?? "Groupe" };
+  const { classId } = await params;
+  const ctx = await getClassContext(classId);
+  return { title: ctx?.name ?? "Classe" };
 }
 
-export default async function GroupPage({ params }: { params: Promise<{ groupId: string }> }) {
-  const { groupId } = await params;
+export default async function ClassPage({ params }: { params: Promise<{ classId: string }> }) {
+  const { classId } = await params;
 
-  const ctx = await getGroupContext(groupId);
+  const ctx = await getClassContext(classId);
   if (!ctx) notFound();
 
-  const [classes, members] = await Promise.all([
-    getGroupClasses(groupId),
-    getGroupMembers(groupId),
+  const [courses, members] = await Promise.all([
+    getClassCourses(classId),
+    getClassMembers(classId),
   ]);
 
   return (
@@ -35,37 +35,37 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
         </Link>
         <h1 className="text-xl font-semibold">{ctx.name}</h1>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          Groupe · {classes.length} classe{classes.length > 1 ? "s" : ""} · {members.length}{" "}
-          membre{members.length > 1 ? "s" : ""}
+          Classe · {courses.length} cours · {members.length} membre
+          {members.length > 1 ? "s" : ""}
         </p>
       </div>
 
       <section className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">Classes</h2>
+          <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">Cours</h2>
           {ctx.isAdmin ? (
             <Link
-              href={`/group/${groupId}/course/new`}
+              href={`/class/${classId}/course/new`}
               className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
             >
-              + Créer une classe
+              + Créer un cours
             </Link>
           ) : null}
         </div>
 
-        {classes.length > 0 ? (
+        {courses.length > 0 ? (
           <ul className="grid gap-3 sm:grid-cols-2">
-            {classes.map((c) => (
+            {courses.map((c) => (
               <li key={c.id}>
-                <CourseCard cls={c} />
+                <CourseCard course={c} />
               </li>
             ))}
           </ul>
         ) : (
           <p className="text-sm text-zinc-500">
             {ctx.isAdmin
-              ? "Aucune classe pour l'instant. Crée la première."
-              : "Aucune classe pour l'instant."}
+              ? "Aucun cours pour l'instant. Crée le premier."
+              : "Aucun cours pour l'instant."}
           </p>
         )}
       </section>
@@ -73,7 +73,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
       <section className="flex flex-col gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
         <InviteCode
           code={ctx.joinCode}
-          hint="Partage ce code : ceux qui rejoignent le groupe ont accès à toutes ses classes."
+          hint="Partage ce code : ceux qui rejoignent la classe ont accès à tous ses cours."
         />
       </section>
 
@@ -97,7 +97,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
 
       {!ctx.isAdmin ? (
         <section className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
-          <LeaveGroupButton groupId={ctx.id} />
+          <LeaveClassButton classId={ctx.id} />
         </section>
       ) : null}
     </div>

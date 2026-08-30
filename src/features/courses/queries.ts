@@ -10,25 +10,25 @@ import type { CourseContext, CourseMemberEntry, CourseSummary } from "./types";
  * Sans types générés depuis Supabase, les lignes renvoyées sont peu typées.
  * On les projette dans des interfaces locales explicites.
  */
-type ClassRow = {
+type CourseRow = {
   id: string;
   name: string;
   join_code: string;
   created_by: string;
-  group_id: string | null;
+  class_id: string | null;
 };
 
-/** Toutes les classes dont l'utilisateur courant est membre. */
+/** Tous les cours dont l'utilisateur courant est membre (adhésion explicite). */
 export const getMyCourses = cache(async (): Promise<CourseSummary[]> => {
   const user = await getUser();
   if (!user) return [];
 
   const supabase = await createClient();
 
-  // La RLS laisse voir TOUS les membres de mes classes : on filtre sur moi.
+  // La RLS laisse voir TOUS les membres de mes cours : on filtre sur moi.
   const { data: memberships, error } = await supabase
     .from("course_members")
-    .select("role, course_id, classes(id, name, join_code, created_by, group_id)")
+    .select("role, course_id, courses(id, name, join_code, created_by, class_id)")
     .eq("user_id", user.id)
     .order("joined_at", { ascending: true });
 
@@ -37,7 +37,7 @@ export const getMyCourses = cache(async (): Promise<CourseSummary[]> => {
   const rows = memberships as unknown as Array<{
     role: CourseRole;
     course_id: string;
-    classes: ClassRow | null;
+    courses: CourseRow | null;
   }>;
 
   const courseIds = rows.map((r) => r.course_id);
@@ -53,20 +53,20 @@ export const getMyCourses = cache(async (): Promise<CourseSummary[]> => {
   }
 
   return rows
-    .filter((r): r is typeof r & { classes: ClassRow } => r.classes !== null)
+    .filter((r): r is typeof r & { courses: CourseRow } => r.courses !== null)
     .map((r) => ({
-      id: r.classes.id,
-      name: r.classes.name,
-      joinCode: r.classes.join_code,
+      id: r.courses.id,
+      name: r.courses.name,
+      joinCode: r.courses.join_code,
       role: r.role,
       memberCount: counts.get(r.course_id) ?? 1,
-      groupId: r.classes.group_id,
+      classId: r.courses.class_id,
     }));
 });
 
 /**
- * Contexte de la classe demandée, ou `null` si l'utilisateur n'en est pas
- * membre (la RLS ne renvoie alors aucune ligne).
+ * Contexte du cours demandé, ou `null` si l'utilisateur n'y a pas accès (la
+ * RLS ne renvoie alors aucune ligne).
  */
 export const getCourseContext = cache(async (courseId: string): Promise<CourseContext | null> => {
   const user = await getUser();
@@ -74,20 +74,20 @@ export const getCourseContext = cache(async (courseId: string): Promise<CourseCo
 
   const supabase = await createClient();
 
-  // La visibilité est décidée par la RLS de `classes` : ligne `class_members`
-  // OU membre du groupe propriétaire. Pas de ligne => pas d'accès => `null`.
-  const { data: cls } = await supabase
+  // La visibilité est décidée par la RLS de `courses` : ligne `course_members`
+  // OU membre de la classe propriétaire. Pas de ligne => pas d'accès => `null`.
+  const { data: course } = await supabase
     .from("courses")
-    .select("id, name, join_code, created_by, group_id, groups(name)")
+    .select("id, name, join_code, created_by, class_id, classes(name)")
     .eq("id", courseId)
     .maybeSingle();
 
-  if (!cls) return null;
+  if (!course) return null;
 
-  const row = cls as unknown as ClassRow & {
-    groups: { name: string } | { name: string }[] | null;
+  const row = course as unknown as CourseRow & {
+    classes: { name: string } | { name: string }[] | null;
   };
-  const group = Array.isArray(row.groups) ? (row.groups[0] ?? null) : row.groups;
+  const parentClass = Array.isArray(row.classes) ? (row.classes[0] ?? null) : row.classes;
 
   const { data: membership } = await supabase
     .from("course_members")
@@ -105,12 +105,12 @@ export const getCourseContext = cache(async (courseId: string): Promise<CourseCo
     role: explicitRole ?? "student",
     isCreator: row.created_by === user.id,
     isExplicitMember: explicitRole !== null,
-    groupId: row.group_id,
-    groupName: group?.name ?? null,
+    classId: row.class_id,
+    classLabel: parentClass?.name ?? null,
   };
 });
 
-/** Membres de la classe, triés par date d'arrivée. */
+/** Membres du cours, triés par date d'arrivée. */
 export const getCourseMembers = cache(async (courseId: string): Promise<CourseMemberEntry[]> => {
   const supabase = await createClient();
 

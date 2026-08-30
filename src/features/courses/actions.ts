@@ -19,20 +19,20 @@ export async function createCourseAction(
   const parsed = parseInput(createCourseSchema, { name: formData.get("name") });
   if (!parsed.success) return { errors: parsed.errors };
 
-  const groupId = String(formData.get("groupId") ?? "").trim() || null;
+  const classId = String(formData.get("classId") ?? "").trim() || null;
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("create_course", {
     p_name: parsed.data.name,
-    ...(groupId ? { p_group_id: groupId } : {}),
+    ...(classId ? { p_class_id: classId } : {}),
   });
 
   if (error || !data) {
-    return { formError: "Impossible de créer la classe. Réessaie dans un instant." };
+    return { formError: "Impossible de créer le cours. Réessaie dans un instant." };
   }
 
   revalidatePath("/dashboard");
-  if (groupId) revalidatePath(`/group/${groupId}`);
+  if (classId) revalidatePath(`/class/${classId}`);
   redirect(`/course/${data as string}`);
 }
 
@@ -49,7 +49,7 @@ export async function joinCourseAction(
   });
 
   if (error || !data) {
-    return { formError: "Code de classe invalide." };
+    return { formError: "Code de cours invalide." };
   }
 
   revalidatePath("/dashboard");

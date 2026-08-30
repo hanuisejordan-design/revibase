@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export function InviteCode({
   code,
-  hint = "Partage ce code pour que tes camarades rejoignent la classe.",
+  hint = "Partage ce code pour que tes camarades rejoignent le cours.",
 }: {
   code: string;
   hint?: string;

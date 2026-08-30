@@ -11,10 +11,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { courseId } = await params;
   const ctx = await getCourseContext(courseId);
-  return { title: ctx?.name ?? "Classe" };
+  return { title: ctx?.name ?? "Cours" };
 }
 
-export default async function ClassLayout({
+export default async function CourseLayout({
   children,
   params,
 }: {
@@ -30,10 +30,10 @@ export default async function ClassLayout({
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
           <Link
-            href={ctx.groupId ? `/group/${ctx.groupId}` : "/dashboard"}
+            href={ctx.classId ? `/class/${ctx.classId}` : "/dashboard"}
             className="text-xs text-zinc-500 hover:underline"
           >
-            ← {ctx.groupId ? ctx.groupName : "Mes classes"}
+            ← {ctx.classId ? ctx.classLabel : "Mes cours"}
           </Link>
           <h1 className="text-xl font-semibold">{ctx.name}</h1>
         </div>

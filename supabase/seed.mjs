@@ -95,16 +95,16 @@ async function main() {
 
   // Groupe de démo : il chapeaute deux classes.
   const { data: grp, error: grpErr } = await db
-    .from("groups")
+    .from("classes")
     .insert({ name: "Centre de formation — Démo", join_code: GROUP_CODE, created_by: ids.trainer })
     .select("id")
     .single();
   if (grpErr) throw grpErr;
-  const groupId = grp.id;
+  const classId = grp.id;
 
   const { error: gmErr } = await db
-    .from("group_members")
-    .insert(PEOPLE.map((p) => ({ group_id: groupId, user_id: ids[p.key], is_admin: p.key === "trainer" })));
+    .from("class_members")
+    .insert(PEOPLE.map((p) => ({ class_id: classId, user_id: ids[p.key], is_admin: p.key === "trainer" })));
   if (gmErr) throw gmErr;
 
   const { data: cls, error: clsErr } = await db
@@ -113,7 +113,7 @@ async function main() {
       name: "Promo Conduite — 2026",
       join_code: JOIN_CODE,
       created_by: ids.trainer,
-      group_id: groupId,
+      class_id: classId,
     })
     .select("id")
     .single();
@@ -284,7 +284,7 @@ async function main() {
       name: "Sécurité ferroviaire — Module 2",
       join_code: JOIN_CODE_2,
       created_by: ids.trainer,
-      group_id: groupId,
+      class_id: classId,
     })
     .select("id")
     .single();

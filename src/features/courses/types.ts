@@ -1,32 +1,32 @@
 import type { CourseRole } from "@/constants/app";
 
-/** Une classe telle qu'affichée dans la liste « mes classes ». */
+/** Un cours tel qu'affiché dans la liste « mes cours ». */
 export interface CourseSummary {
   id: string;
   name: string;
   joinCode: string;
   role: CourseRole;
   memberCount: number;
-  /** Groupe propriétaire, ou `null` si la classe est autonome. */
-  groupId: string | null;
+  /** Classe (promo) propriétaire, ou `null` si le cours est autonome. */
+  classId: string | null;
 }
 
-/** Contexte de la classe courante (page `class/[courseId]`). */
+/** Contexte du cours courant (pages `course/[courseId]`). */
 export interface CourseContext {
   id: string;
   name: string;
   joinCode: string;
   role: CourseRole;
-  /** L'utilisateur courant est-il le créateur de la classe ? */
+  /** L'utilisateur courant est-il le créateur du cours ? */
   isCreator: boolean;
-  /** A-t-il une ligne `class_members` (par opposition à l'accès via le groupe) ? */
+  /** A-t-il une ligne `course_members` (par opposition à l'accès via la classe) ? */
   isExplicitMember: boolean;
-  /** Groupe propriétaire de la classe, le cas échéant. */
-  groupId: string | null;
-  groupName: string | null;
+  /** Classe propriétaire du cours, le cas échéant. */
+  classId: string | null;
+  classLabel: string | null;
 }
 
-/** Un membre d'une classe, pour l'affichage de la liste des participants. */
+/** Un membre d'un cours, pour l'affichage de la liste des participants. */
 export interface CourseMemberEntry {
   userId: string;
   displayName: string;

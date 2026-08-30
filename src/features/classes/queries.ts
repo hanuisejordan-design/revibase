@@ -5,19 +5,19 @@ import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
 import type { CourseRole } from "@/constants/app";
 import type { CourseSummary } from "@/features/courses/types";
-import type { GroupContext, GroupMemberEntry, GroupSummary } from "./types";
+import type { ClassContext, ClassMemberEntry, ClassSummary } from "./types";
 
-type GroupRow = { id: string; name: string; join_code: string };
-type GroupClassRow = {
+type ClassRow = { id: string; name: string; join_code: string };
+type CourseRow = {
   id: string;
   name: string;
   join_code: string;
   created_by: string;
-  group_id: string;
+  class_id: string;
 };
 
 /** Compte les membres explicites et repère le rôle de l'utilisateur courant. */
-async function classMemberInfo(
+async function courseMemberInfo(
   supabase: Awaited<ReturnType<typeof createClient>>,
   courseIds: string[],
   userId: string,
@@ -39,7 +39,7 @@ async function classMemberInfo(
 }
 
 function toCourseSummary(
-  c: GroupClassRow,
+  c: CourseRow,
   counts: Map<string, number>,
   myRole: Map<string, CourseRole>,
 ): CourseSummary {
@@ -49,94 +49,94 @@ function toCourseSummary(
     joinCode: c.join_code,
     role: myRole.get(c.id) ?? "student",
     memberCount: counts.get(c.id) ?? 0,
-    groupId: c.group_id,
+    classId: c.class_id,
   };
 }
 
-/** Tous les groupes dont l'utilisateur est membre, avec leurs classes. */
-export const getMyGroups = cache(async (): Promise<GroupSummary[]> => {
+/** Toutes les classes (promos) dont l'utilisateur est membre, avec leurs cours. */
+export const getMyClasses = cache(async (): Promise<ClassSummary[]> => {
   const user = await getUser();
   if (!user) return [];
 
   const supabase = await createClient();
 
   const { data: memberships, error } = await supabase
-    .from("group_members")
-    .select("group_id, is_admin, groups(id, name, join_code)")
+    .from("class_members")
+    .select("class_id, is_admin, classes(id, name, join_code)")
     .eq("user_id", user.id)
     .order("joined_at", { ascending: true });
 
   if (error || !memberships || memberships.length === 0) return [];
 
   const rows = memberships as unknown as Array<{
-    group_id: string;
+    class_id: string;
     is_admin: boolean;
-    groups: GroupRow | null;
+    classes: ClassRow | null;
   }>;
 
-  const groupIds = rows.map((r) => r.group_id);
+  const classIds = rows.map((r) => r.class_id);
 
-  const { data: classesData } = await supabase
+  const { data: coursesData } = await supabase
     .from("courses")
-    .select("id, name, join_code, created_by, group_id")
-    .in("group_id", groupIds)
+    .select("id, name, join_code, created_by, class_id")
+    .in("class_id", classIds)
     .order("created_at", { ascending: true });
 
-  const classes = (classesData ?? []) as GroupClassRow[];
-  const { counts, myRole } = await classMemberInfo(
+  const courses = (coursesData ?? []) as CourseRow[];
+  const { counts, myRole } = await courseMemberInfo(
     supabase,
-    classes.map((c) => c.id),
+    courses.map((c) => c.id),
     user.id,
   );
 
   return rows
-    .filter((r): r is typeof r & { groups: GroupRow } => r.groups !== null)
+    .filter((r): r is typeof r & { classes: ClassRow } => r.classes !== null)
     .map((r) => ({
-      id: r.groups.id,
-      name: r.groups.name,
-      joinCode: r.groups.join_code,
+      id: r.classes.id,
+      name: r.classes.name,
+      joinCode: r.classes.join_code,
       isAdmin: r.is_admin,
-      classes: classes
-        .filter((c) => c.group_id === r.group_id)
+      courses: courses
+        .filter((c) => c.class_id === r.class_id)
         .map((c) => toCourseSummary(c, counts, myRole)),
     }));
 });
 
-/** Contexte du groupe, ou `null` si l'utilisateur n'en est pas membre. */
-export const getGroupContext = cache(async (groupId: string): Promise<GroupContext | null> => {
+/** Contexte de la classe, ou `null` si l'utilisateur n'en est pas membre. */
+export const getClassContext = cache(async (classId: string): Promise<ClassContext | null> => {
   const user = await getUser();
   if (!user) return null;
 
   const supabase = await createClient();
 
   const { data: membership } = await supabase
-    .from("group_members")
+    .from("class_members")
     .select("is_admin")
-    .eq("group_id", groupId)
+    .eq("class_id", classId)
     .eq("user_id", user.id)
     .maybeSingle();
 
   if (!membership) return null;
 
-  const { data: grp } = await supabase
-    .from("groups")
+  const { data: cls } = await supabase
+    .from("classes")
     .select("id, name, join_code")
-    .eq("id", groupId)
+    .eq("id", classId)
     .maybeSingle();
 
-  if (!grp) return null;
+  if (!cls) return null;
 
-  const g = grp as GroupRow;
+  const row = cls as ClassRow;
   return {
-    id: g.id,
-    name: g.name,
-    joinCode: g.join_code,
+    id: row.id,
+    name: row.name,
+    joinCode: row.join_code,
     isAdmin: (membership as { is_admin: boolean }).is_admin,
   };
 });
 
-/** Classes d'un groupe (pour la page du groupe). */
-export const getGroupClasses = cache(async (groupId: string): Promise<CourseSummary[]> => {
+/** Cours d'une classe (pour la page de la classe). */
+export const getClassCourses = cache(async (classId: string): Promise<CourseSummary[]> => {
   const user = await getUser();
   if (!user) return [];
 
@@ -144,28 +144,28 @@ export const getGroupClasses = cache(async (groupId: string): Promise<CourseSumm
 
   const { data } = await supabase
     .from("courses")
-    .select("id, name, join_code, created_by, group_id")
-    .eq("group_id", groupId)
+    .select("id, name, join_code, created_by, class_id")
+    .eq("class_id", classId)
     .order("created_at", { ascending: true });
 
-  const classes = (data ?? []) as GroupClassRow[];
-  const { counts, myRole } = await classMemberInfo(
+  const courses = (data ?? []) as CourseRow[];
+  const { counts, myRole } = await courseMemberInfo(
     supabase,
-    classes.map((c) => c.id),
+    courses.map((c) => c.id),
     user.id,
   );
 
-  return classes.map((c) => toCourseSummary(c, counts, myRole));
+  return courses.map((c) => toCourseSummary(c, counts, myRole));
 });
 
-/** Membres du groupe, triés par date d'arrivée. */
-export const getGroupMembers = cache(async (groupId: string): Promise<GroupMemberEntry[]> => {
+/** Membres de la classe, triés par date d'arrivée. */
+export const getClassMembers = cache(async (classId: string): Promise<ClassMemberEntry[]> => {
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from("group_members")
+    .from("class_members")
     .select("user_id, is_admin, joined_at, profiles(display_name)")
-    .eq("group_id", groupId)
+    .eq("class_id", classId)
     .order("joined_at", { ascending: true });
 
   if (error || !data) return [];

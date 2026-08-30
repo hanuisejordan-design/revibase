@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-export function CreateCourseForm({ groupId }: { groupId?: string }) {
+export function CreateCourseForm({ classId }: { classId?: string }) {
   const [state, formAction, pending] = useActionState<CourseFormState | undefined, FormData>(
     createCourseAction,
     undefined,
@@ -14,8 +14,8 @@ export function CreateCourseForm({ groupId }: { groupId?: string }) {
 
   return (
     <form action={formAction} className="flex flex-col gap-4" noValidate>
-      {groupId ? <input type="hidden" name="groupId" value={groupId} /> : null}
-      <Field label="Nom de la classe" htmlFor="name" error={state?.errors?.name}>
+      {classId ? <input type="hidden" name="classId" value={classId} /> : null}
+      <Field label="Nom du cours" htmlFor="name" error={state?.errors?.name}>
         <Input id="name" name="name" required autoFocus placeholder="ex. Promo Conduite 2026" />
       </Field>
 
@@ -26,7 +26,7 @@ export function CreateCourseForm({ groupId }: { groupId?: string }) {
       ) : null}
 
       <Button type="submit" disabled={pending}>
-        {pending ? "Création…" : "Créer la classe"}
+        {pending ? "Création…" : "Créer le cours"}
       </Button>
     </form>
   );

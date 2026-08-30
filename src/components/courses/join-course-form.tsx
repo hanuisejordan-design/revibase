@@ -33,7 +33,7 @@ export function JoinCourseForm() {
       ) : null}
 
       <Button type="submit" disabled={pending}>
-        {pending ? "Adhésion…" : "Rejoindre la classe"}
+        {pending ? "Adhésion…" : "Rejoindre le cours"}
       </Button>
     </form>
   );

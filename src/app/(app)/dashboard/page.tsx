@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/dal";
 import { getMyCourses } from "@/features/courses/queries";
-import { getMyGroups } from "@/features/groups/queries";
+import { getMyClasses } from "@/features/classes/queries";
 import { CourseCard } from "@/components/courses/course-card";
 
 export const metadata: Metadata = { title: "Tableau de bord" };
@@ -14,13 +14,13 @@ const secondaryLink =
 
 export default async function DashboardPage() {
   const user = await requireUser();
-  const [groups, allClasses] = await Promise.all([getMyGroups(), getMyCourses()]);
+  const [classes, allCourses] = await Promise.all([getMyClasses(), getMyCourses()]);
 
-  // Les classes affichées sous un groupe ne sont pas répétées dans « Autres ».
-  const groupedClassIds = new Set(groups.flatMap((g) => g.classes.map((c) => c.id)));
-  const standaloneClasses = allClasses.filter((c) => !groupedClassIds.has(c.id));
+  // Les cours affichés sous leur classe ne sont pas répétés dans « Autres cours ».
+  const nestedCourseIds = new Set(classes.flatMap((cl) => cl.courses.map((c) => c.id)));
+  const standaloneCourses = allCourses.filter((c) => !nestedCourseIds.has(c.id));
 
-  const isEmpty = groups.length === 0 && standaloneClasses.length === 0;
+  const isEmpty = classes.length === 0 && standaloneCourses.length === 0;
 
   return (
     <div className="flex flex-col gap-8">
@@ -28,56 +28,56 @@ export default async function DashboardPage() {
         <h1 className="text-xl font-semibold">Bonjour {user.displayName}</h1>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
           {isEmpty
-            ? "Crée une classe ou un groupe, ou rejoins-en un avec un code d'invitation."
-            : "Choisis une classe pour continuer."}
+            ? "Rejoins ta classe avec le code d'invitation, ou crées-en une."
+            : "Choisis un cours pour continuer."}
         </p>
       </div>
 
-      {groups.map((g) => (
-        <section key={g.id} className="flex flex-col gap-3">
+      {classes.map((cl) => (
+        <section key={cl.id} className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <Link
-              href={`/group/${g.id}`}
+              href={`/class/${cl.id}`}
               className="text-xs font-semibold tracking-wide text-zinc-500 uppercase hover:underline"
             >
-              {g.name}
+              {cl.name}
             </Link>
-            {g.isAdmin ? (
+            {cl.isAdmin ? (
               <Link
-                href={`/group/${g.id}/course/new`}
+                href={`/class/${cl.id}/course/new`}
                 className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
               >
-                + Classe
+                + Cours
               </Link>
             ) : null}
           </div>
-          {g.classes.length > 0 ? (
+          {cl.courses.length > 0 ? (
             <ul className="grid gap-3 sm:grid-cols-2">
-              {g.classes.map((c) => (
+              {cl.courses.map((c) => (
                 <li key={c.id}>
-                  <CourseCard cls={c} />
+                  <CourseCard course={c} />
                 </li>
               ))}
             </ul>
           ) : (
             <p className="text-sm text-zinc-500">
-              Aucune classe dans ce groupe pour l&apos;instant.
+              Aucun cours dans cette classe pour l&apos;instant.
             </p>
           )}
         </section>
       ))}
 
-      {standaloneClasses.length > 0 ? (
+      {standaloneCourses.length > 0 ? (
         <section className="flex flex-col gap-3">
-          {groups.length > 0 ? (
+          {classes.length > 0 ? (
             <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
-              Autres classes
+              Autres cours
             </h2>
           ) : null}
           <ul className="grid gap-3 sm:grid-cols-2">
-            {standaloneClasses.map((c) => (
+            {standaloneCourses.map((c) => (
               <li key={c.id}>
-                <CourseCard cls={c} />
+                <CourseCard course={c} />
               </li>
             ))}
           </ul>
@@ -86,21 +86,23 @@ export default async function DashboardPage() {
 
       <div className="flex flex-col gap-3 border-t border-zinc-200 pt-6 dark:border-zinc-800">
         <div className="flex flex-wrap gap-3">
-          <Link href="/course/new" className={primaryLink}>
-            Créer une classe
-          </Link>
-          <Link href="/course/join" className={secondaryLink}>
+          <Link href="/class/join" className={primaryLink}>
             Rejoindre une classe
           </Link>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <Link href="/group/new" className={secondaryLink}>
-            Créer un groupe
-          </Link>
-          <Link href="/group/join" className={secondaryLink}>
-            Rejoindre un groupe
+          <Link href="/class/new" className={secondaryLink}>
+            Créer une classe
           </Link>
         </div>
+        <p className="text-xs text-zinc-500">
+          Juste besoin d&apos;un espace de révision seul, sans classe ?{" "}
+          <Link href="/course/join" className="underline">
+            Rejoindre un cours
+          </Link>{" "}
+          ·{" "}
+          <Link href="/course/new" className="underline">
+            en créer un
+          </Link>
+        </p>
       </div>
     </div>
   );

@@ -20,7 +20,7 @@ export default async function QuizPage({ params }: { params: Promise<{ courseId:
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold">Faire un quiz</h2>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          L&apos;app tire des questions de la classe. Les QCM et vrai/faux sont corrigés
+          L&apos;app tire des questions du cours. Les QCM et vrai/faux sont corrigés
           automatiquement ; pour les questions ouvertes, tu révèles la réponse de référence et tu
           dis si tu la savais.
         </p>

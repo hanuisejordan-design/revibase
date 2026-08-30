@@ -28,7 +28,7 @@ export default async function ClassSettingsPage({
       <section className="flex flex-col gap-3">
         <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">Chapitres</h2>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          Les chapitres rangent les questions par thème. Chaque membre de la classe peut les
+          Les chapitres rangent les questions par thème. Chaque membre du cours peut les
           modifier. Supprimer un chapitre ne supprime pas ses questions : elles se retrouvent « sans
           chapitre ».
         </p>
@@ -52,15 +52,15 @@ export default async function ClassSettingsPage({
         </ul>
       </section>
 
-      {ctx.groupId ? (
+      {ctx.classId ? (
         <section className="border-t border-zinc-200 pt-4 text-sm text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
-          Classe rattachée au groupe{" "}
-          <Link href={`/group/${ctx.groupId}`} className="underline">
-            {ctx.groupName}
+          Cours rattaché à la classe{" "}
+          <Link href={`/class/${ctx.classId}`} className="underline">
+            {ctx.classLabel}
           </Link>
           .{" "}
           {!ctx.isExplicitMember
-            ? "Tu y as accès via le groupe — pour partir, quitte le groupe."
+            ? "Tu y as accès via la classe — pour partir, quitte la classe."
             : null}
         </section>
       ) : null}

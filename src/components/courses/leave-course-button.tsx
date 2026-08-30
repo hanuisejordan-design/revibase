@@ -7,7 +7,7 @@ export function LeaveCourseButton({ courseId }: { courseId: string }) {
     <form
       action={leaveCourseAction}
       onSubmit={(e) => {
-        if (!confirm("Quitter cette classe ? Tu pourras la rejoindre à nouveau avec le code.")) {
+        if (!confirm("Quitter ce cours ? Tu pourras la rejoindre à nouveau avec le code.")) {
           e.preventDefault();
         }
       }}
@@ -17,7 +17,7 @@ export function LeaveCourseButton({ courseId }: { courseId: string }) {
         type="submit"
         className="text-sm text-red-600 underline hover:text-red-700 dark:text-red-400"
       >
-        Quitter la classe
+        Quitter le cours
       </button>
     </form>
   );

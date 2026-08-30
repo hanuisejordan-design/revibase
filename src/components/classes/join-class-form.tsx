@@ -1,20 +1,20 @@
 "use client";
 
 import { useActionState } from "react";
-import { joinGroupAction, type GroupFormState } from "@/features/groups/actions";
+import { joinClassAction, type ClassFormState } from "@/features/classes/actions";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-export function JoinGroupForm() {
-  const [state, formAction, pending] = useActionState<GroupFormState | undefined, FormData>(
-    joinGroupAction,
+export function JoinClassForm() {
+  const [state, formAction, pending] = useActionState<ClassFormState | undefined, FormData>(
+    joinClassAction,
     undefined,
   );
 
   return (
     <form action={formAction} className="flex flex-col gap-4" noValidate>
-      <Field label="Code du groupe" htmlFor="code" error={state?.errors?.code}>
+      <Field label="Code de la classe" htmlFor="code" error={state?.errors?.code}>
         <Input
           id="code"
           name="code"
@@ -33,7 +33,7 @@ export function JoinGroupForm() {
       ) : null}
 
       <Button type="submit" disabled={pending}>
-        {pending ? "Adhésion…" : "Rejoindre le groupe"}
+        {pending ? "Adhésion…" : "Rejoindre la classe"}
       </Button>
     </form>
   );

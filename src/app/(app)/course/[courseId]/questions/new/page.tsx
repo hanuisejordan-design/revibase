@@ -40,7 +40,7 @@ export default async function NewQuestionPage({
       {chapters.length === 0 ? (
         <div className="flex flex-col gap-2 rounded-xl border border-dashed border-zinc-300 p-4 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
           <p>
-            Cette classe n&apos;a pas encore de chapitre. Il en faut au moins un pour classer les
+            Ce cours n&apos;a pas encore de chapitre. Il en faut au moins un pour classer les
             questions.
           </p>
           <Link href={`/course/${courseId}/settings`} className="font-medium underline">
