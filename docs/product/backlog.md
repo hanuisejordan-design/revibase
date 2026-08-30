@@ -35,6 +35,20 @@ Suites (arbitrées avec l'utilisateur) :
 (pédagogie, valide les réponses). Créateur = admin, plus formateur d'office ;
 un admin attribue « formateur ». Migration `0014`.
 
+### Quiz au niveau de la classe
+
+- **Idée** : un bouton « Faire un quiz » sur la page de la classe (à côté de
+  « Créer un cours »). Au lancement, choix de la **portée** : toute la classe
+  / un cours / des chapitres précis. Utile quand les cours sont liés (ex.
+  formation conducteur) ; une classe « classique » n'utilise juste pas
+  l'option « toute la classe ».
+- **Ampleur** : vraie phase. `quizzes` / `quiz_attempts` sont liés à un
+  `course_id` → permettre une portée « classe » (course_id nullable +
+  class_id, ou un champ `scope`). `selectQuizQuestions` devient class-aware
+  (piocher dans les questions de tous les cours de la classe, filtrable par
+  cours / chapitre). Pages runner + résultat à adapter.
+- En attendant : le quiz reste **par cours**, accessible depuis chaque cours.
+
 ### Supprimer un cours / une classe — hésitant, reporté
 
 - Aujourd'hui on ne peut que *quitter*. Suppression = ligne à effacer dans
