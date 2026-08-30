@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCourseContext } from "@/features/courses/queries";
-import { listChapters } from "@/features/chapters/queries";
 import { getRecentQuestions } from "@/features/questions/queries";
 import { listSummaries } from "@/features/summaries/queries";
 import { QuestionCard } from "@/components/questions/question-card";
@@ -19,8 +18,7 @@ export default async function CourseHomePage({ params }: { params: Promise<{ cou
   const ctx = await getCourseContext(courseId);
   if (!ctx) notFound();
 
-  const [chapters, recentQuestions, allSummaries] = await Promise.all([
-    listChapters(courseId),
+  const [recentQuestions, allSummaries] = await Promise.all([
     getRecentQuestions(courseId, 5),
     listSummaries(courseId),
   ]);
@@ -81,24 +79,6 @@ export default async function CourseHomePage({ params }: { params: Promise<{ cou
           <p className="text-sm text-zinc-500">Aucun résumé pour l&apos;instant.</p>
         )}
       </section>
-
-      {chapters.length > 0 ? (
-        <section className="flex flex-col gap-2">
-          <h2 className={sectionTitle}>Chapitres</h2>
-          <ul className="flex flex-wrap gap-2">
-            {chapters.map((ch) => (
-              <li key={ch.id}>
-                <Link
-                  href={`/course/${courseId}/questions?chapter=${ch.id}`}
-                  className="rounded-full border border-zinc-200 px-3 py-1 text-sm hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
-                >
-                  {ch.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
     </div>
   );
 }
