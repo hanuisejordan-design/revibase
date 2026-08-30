@@ -300,9 +300,9 @@ Calculé à la lecture, par priorité décroissante :
   `deleteSummaryAction` (nettoient le fichier Storage).
 - Upload côté client au submit (sans redimensionnement, max 20 Mo) sur une
   page dédiée `course/[courseId]/summaries/new` ; `createSummaryAction`
-  redirige vers la liste. La page `summaries` = `SummaryList` (client, liste
-  compacte groupée par chapitre + filtre titre / chapitre, « Ouvrir » URL
-  signée) + un bouton « Ajouter un résumé ».
+  redirige vers la liste. La page `summaries` = `SummaryList` (liste compacte
+  groupée par chapitre, **toute la ligne cliquable** = `<a>` vers l'URL
+  signée, « Supprimer » à part) + un bouton « Ajouter un résumé ».
 
 ## Flux d'une requête authentifiée
 
