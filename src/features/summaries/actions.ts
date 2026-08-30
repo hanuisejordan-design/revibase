@@ -67,6 +67,36 @@ export async function createSummaryAction(
   redirect(`/course/${courseId}/summaries`);
 }
 
+/** Épingle / désépingle un résumé pour l'utilisateur courant (favori privé). */
+export async function toggleSummaryPinAction(formData: FormData): Promise<void> {
+  const courseId = String(formData.get("courseId") ?? "");
+  const summaryId = String(formData.get("summaryId") ?? "");
+
+  const user = await getUser();
+  if (!user) redirect("/login");
+
+  const supabase = await createClient();
+  const { data: existing } = await supabase
+    .from("summary_pins")
+    .select("summary_id")
+    .eq("summary_id", summaryId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (existing) {
+    await supabase
+      .from("summary_pins")
+      .delete()
+      .eq("summary_id", summaryId)
+      .eq("user_id", user.id);
+  } else {
+    await supabase.from("summary_pins").insert({ summary_id: summaryId, user_id: user.id });
+  }
+
+  revalidatePath(`/course/${courseId}/summaries`);
+  revalidatePath(`/course/${courseId}`);
+}
+
 export async function deleteSummaryAction(formData: FormData): Promise<void> {
   const courseId = String(formData.get("courseId") ?? "");
   const summaryId = String(formData.get("summaryId") ?? "");

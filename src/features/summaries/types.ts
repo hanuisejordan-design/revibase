@@ -12,5 +12,7 @@ export interface SummaryItem {
   fileUrl: string | null;
   /** L'utilisateur courant peut-il supprimer ce résumé ? */
   canDelete: boolean;
+  /** L'utilisateur courant a-t-il épinglé ce résumé (favori privé) ? */
+  pinned: boolean;
   kind: "image" | "pdf" | "other";
 }

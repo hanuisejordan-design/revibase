@@ -48,17 +48,23 @@ export const listSummaries = cache(async (courseId: string): Promise<SummaryItem
   if (error || !data || data.length === 0) return [];
 
   const rows = data as unknown as SummaryRow[];
+  const ids = rows.map((r) => r.id);
 
-  const { data: signed } = await supabase.storage
-    .from(BUCKET)
-    .createSignedUrls(
+  const [{ data: signed }, { data: pins }] = await Promise.all([
+    supabase.storage.from(BUCKET).createSignedUrls(
       rows.map((r) => r.file_path),
       URL_TTL,
-    );
+    ),
+    supabase.from("summary_pins").select("summary_id").eq("user_id", user.id).in("summary_id", ids),
+  ]);
+
   const urlByPath = new Map<string, string>();
   for (const s of signed ?? []) {
     if (s.path && s.signedUrl && !s.error) urlByPath.set(s.path, s.signedUrl);
   }
+  const pinnedIds = new Set(
+    ((pins ?? []) as Array<{ summary_id: string }>).map((p) => p.summary_id),
+  );
 
   const isTrainer = ctx.role === "trainer";
 
@@ -73,6 +79,7 @@ export const listSummaries = cache(async (courseId: string): Promise<SummaryItem
     fileName: r.file_name,
     fileUrl: urlByPath.get(r.file_path) ?? null,
     canDelete: r.author_id === user.id || isTrainer,
+    pinned: pinnedIds.has(r.id),
     kind: kindOf(r.file_name),
   }));
 });

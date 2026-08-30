@@ -304,6 +304,11 @@ Calculé à la lecture, par priorité décroissante :
   redirige vers la liste. La page `summaries` = `SummaryList` (liste compacte
   groupée par chapitre, **toute la ligne cliquable** = `<a>` vers l'URL
   signée, « Supprimer » à part) + un bouton « Ajouter un résumé ».
+- **Favori privé (Phase 17, migration `0013`)** : `summary_pins
+  (summary_id, user_id)`, RLS `user_id = auth.uid()` (strictement privé).
+  Étoile ☆/★ par ligne (`toggleSummaryPinAction`), `listSummaries` renvoie
+  `pinned` ; case « Mes favoris uniquement » = paramètre `?favoris=1` filtré
+  côté serveur.
 
 ## Flux d'une requête authentifiée
 

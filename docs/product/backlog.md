@@ -28,18 +28,18 @@ créent dedans ; cours autonome possible en secondaire.
 Onglet « Résumés » : un fichier + un titre + chapitre optionnel, bucket privé,
 suppression auteur/formateur.
 
-Suites possibles (arbitrées avec l'utilisateur) :
+Suites (arbitrées avec l'utilisateur) :
 
+- **Favori privé** (« épingler ») à la place d'un « 👍 utile » public :
+  **fait — Phase 17** (migration `0013`). Table `summary_pins
+  (summary_id, user_id)` strictement privée (RLS `user_id = auth.uid()`),
+  étoile ☆/★ par ligne, case « Mes favoris uniquement » (`?favoris=1`). Un
+  compteur agrégé public reste possible plus tard si le collectif se
+  confirme.
 - **Éditeur de texte dans l'app** (`summaries.body` markdown) : **écarté** —
   ce n'est pas le rôle de l'app, d'autres outils le font mieux.
 - **Plusieurs fichiers par résumé** (`summary_files`) : *peut-être utile*
   (doc scanné multi-pages, PDF + annexes). Pas prioritaire.
-- **Favori privé** (« épingler ») à la place d'un « 👍 utile » public :
-  chacun marque les fiches sur lesquelles il révise, filtre « mes favoris » ;
-  personne ne voit les favoris des autres → pas de comparaison / vexation.
-  Un compteur agrégé public reste possible plus tard si le besoin de
-  collectif se confirme. Ampleur : petite (table `summary_pins`
-  (summary_id, user_id) + toggle + filtre).
 
 ### Supprimer un cours / une classe
 

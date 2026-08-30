@@ -1,6 +1,7 @@
 import type { SummaryItem } from "@/features/summaries/types";
 import { relativeTime } from "@/lib/utils/date";
 import { DeleteSummaryButton } from "./delete-summary-button";
+import { SummaryPinButton } from "./summary-pin-button";
 
 const KIND_LABEL: Record<SummaryItem["kind"], string> = {
   pdf: "PDF",
@@ -27,17 +28,20 @@ export function SummaryRow({ summary, courseId }: { summary: SummaryItem; course
 
   return (
     <li className="flex items-stretch gap-1 rounded-lg border border-zinc-200 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600">
+      <span className="flex items-center pl-2">
+        <SummaryPinButton courseId={courseId} summaryId={summary.id} pinned={summary.pinned} />
+      </span>
       {summary.fileUrl ? (
         <a
           href={summary.fileUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 gap-y-1 px-3 py-2 text-sm"
+          className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 gap-y-1 py-2 pr-3 pl-1 text-sm"
         >
           {inner}
         </a>
       ) : (
-        <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 gap-y-1 px-3 py-2 text-sm text-zinc-400">
+        <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 gap-y-1 py-2 pr-3 pl-1 text-sm text-zinc-400">
           {inner} · aperçu indisponible
         </span>
       )}
