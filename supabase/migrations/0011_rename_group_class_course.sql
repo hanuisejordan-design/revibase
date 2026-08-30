@@ -141,28 +141,33 @@ begin
 end $$;
 
 -- ---- 4. Réécrire les corps de fonctions (texte re-parsé à l'exécution) --
+--
+-- NB : `create or replace` NE PEUT PAS renommer un paramètre. Les fonctions
+-- ici dépendues par des policies ne peuvent pas non plus être `drop`ées.
+-- On garde donc le NOM DE PARAMÈTRE D'ORIGINE (interne, jamais appelé par
+-- nom depuis l'app) et on ne change que le corps.
 
--- niveau « cours »
-create or replace function public.is_course_member(target_course uuid)
+-- niveau « cours » (paramètre historiquement nommé target_class / target_*)
+create or replace function public.is_course_member(target_class uuid)
 returns boolean language sql security definer set search_path = public stable
 as $$
   select exists (
     select 1 from public.course_members
-    where course_id = target_course and user_id = auth.uid()
+    where course_id = target_class and user_id = auth.uid()
   ) or exists (
     select 1
     from public.courses c
     join public.class_members cm on cm.class_id = c.class_id
-    where c.id = target_course and cm.user_id = auth.uid()
+    where c.id = target_class and cm.user_id = auth.uid()
   );
 $$;
 
-create or replace function public.is_course_trainer(target_course uuid)
+create or replace function public.is_course_trainer(target_class uuid)
 returns boolean language sql security definer set search_path = public stable
 as $$
   select exists (
     select 1 from public.course_members
-    where course_id = target_course and user_id = auth.uid() and role = 'trainer'
+    where course_id = target_class and user_id = auth.uid() and role = 'trainer'
   );
 $$;
 
@@ -185,22 +190,22 @@ as $$
   select course_id from public.quizzes where id = target_quiz;
 $$;
 
--- niveau « classe »
-create or replace function public.is_class_member(target_class uuid)
+-- niveau « classe » (paramètre historiquement nommé target_group)
+create or replace function public.is_class_member(target_group uuid)
 returns boolean language sql security definer set search_path = public stable
 as $$
   select exists (
     select 1 from public.class_members
-    where class_id = target_class and user_id = auth.uid()
+    where class_id = target_group and user_id = auth.uid()
   );
 $$;
 
-create or replace function public.is_class_admin(target_class uuid)
+create or replace function public.is_class_admin(target_group uuid)
 returns boolean language sql security definer set search_path = public stable
 as $$
   select exists (
     select 1 from public.class_members
-    where class_id = target_class and user_id = auth.uid() and is_admin
+    where class_id = target_group and user_id = auth.uid() and is_admin
   );
 $$;
 
@@ -266,8 +271,11 @@ begin
 end;
 $$;
 
--- RPC : créer un cours (ex-create_class), avec rattachement optionnel à une classe
-create or replace function public.create_course(
+-- RPC : créer un cours (ex-create_class), avec rattachement optionnel à une
+-- classe. Le paramètre passe de p_group_id à p_class_id -> impossible via
+-- `create or replace` ; aucune policy ne dépend d'une RPC, donc drop + create.
+drop function if exists public.create_course(text, text[], uuid);
+create function public.create_course(
   p_name     text,
   p_chapters text[] default null,
   p_class_id uuid   default null
