@@ -11,6 +11,18 @@ Vocabulaire aligné (base incluse, migration `0011` en `RENAME`). Tableau de
 bord : action principale = rejoindre / créer une **classe** ; les **cours** se
 créent dedans ; cours autonome possible en secondaire.
 
+### Rattacher un cours existant à une classe
+
+- **Manque** : à la création d'un cours on peut le mettre dans une classe
+  (`create_course(p_class_id)`), mais un cours **déjà créé** hors classe ne
+  peut plus y être rattaché depuis l'UI. Il reste bloqué dans « Autres cours ».
+- **À faire** : sur `course/[courseId]/settings`, pour un admin d'au moins
+  une classe, un sélecteur « Rattacher ce cours à une classe » (liste des
+  classes qu'il administre) → RPC `attach_course_to_class(p_course, p_class)`
+  `security definer` (vérifie `is_class_admin` + que l'appelant peut gérer le
+  cours). Détacher = remettre `class_id` à `null`.
+- **Ampleur** : petite (1 RPC + 1 select dans les paramètres).
+
 ### Résumés par cours
 
 - **Idée** : dans chaque cours (= « classe » aujourd'hui), un espace où les
