@@ -292,8 +292,9 @@ Calculé à la lecture, par priorité décroissante :
   déduit de l'extension, `canDelete`), `createSummaryAction` /
   `deleteSummaryAction` (nettoient le fichier Storage).
 - Upload côté client au submit (sans redimensionnement, max 20 Mo). Onglet
-  « Résumés » dans la nav du cours ; liste groupée par chapitre ; aperçu
-  inline image / `<iframe>` PDF + lien « Ouvrir ».
+  « Résumés » (nav + bouton accueil du cours) ; `SummaryList` (client) =
+  liste compacte groupée par chapitre + filtre titre / chapitre, « Ouvrir »
+  (URL signée) dans un onglet.
 
 ## Flux d'une requête authentifiée
 

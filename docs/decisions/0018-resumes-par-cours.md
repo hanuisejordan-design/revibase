@@ -24,9 +24,11 @@ manuscrites scannées). Un endroit pour les déposer et les consulter manque,
 - **Upload côté client** au moment de « Ajouter », sans redimensionnement
   (ce sont des PDF), refus > 20 Mo. L'action ne reçoit que le chemin, vérifie
   le préfixe `{courseId}/`, nettoie le fichier si l'insert échoue.
-- **Affichage** : onglet « Résumés » dans la nav du cours ; liste **groupée
-  par chapitre** ; aperçu inline (image `<img>`, PDF `<iframe>`) + lien
-  « Ouvrir » (URL signée ~1 h) ; bouton Supprimer pour l'auteur / le
+- **Affichage** : onglet « Résumés » (nav + bouton sur l'accueil du cours) ;
+  **liste compacte** — une ligne par résumé (badge de type · titre · auteur ·
+  date · « Ouvrir » · « Supprimer ») **groupée par chapitre**, avec **filtre
+  par titre** et **par chapitre** (client). Pas d'aperçu inline : « Ouvrir »
+  ouvre le fichier (URL signée ~1 h) dans un onglet. Supprimer = auteur ou
   formateur.
 - **Pas d'interactions** en v1 : ni vote, ni commentaire.
 
@@ -45,6 +47,7 @@ manuscrites scannées). Un endroit pour les déposer et les consulter manque,
 - **Fichiers orphelins** possibles (upload réussi puis onglet fermé avant
   « Ajouter ») — même dette que les photos (ADR 0016), nettoyage périodique à
   prévoir.
-- Un `<iframe>` de PDF peut ne pas s'afficher selon le navigateur / les
-  en-têtes ; le lien « Ouvrir » reste le repli.
+- Aperçu retiré de la liste (illisible dès qu'il y a beaucoup de fiches) ; il
+  ne servait qu'à la vérification au moment de l'ajout — on l'a laissé
+  tomber, « Ouvrir » suffit.
 - Le seed n'ajoute pas de résumé (il faudrait un vrai fichier binaire).
