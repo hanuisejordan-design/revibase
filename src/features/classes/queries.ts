@@ -76,11 +76,14 @@ export const getMyClasses = cache(async (): Promise<ClassSummary[]> => {
 
   const classIds = rows.map((r) => r.class_id);
 
-  const { data: coursesData } = await supabase
-    .from("courses")
-    .select("id, name, join_code, created_by, class_id")
-    .in("class_id", classIds)
-    .order("created_at", { ascending: true });
+  const [{ data: coursesData }, { data: allClassMembers }] = await Promise.all([
+    supabase
+      .from("courses")
+      .select("id, name, join_code, created_by, class_id")
+      .in("class_id", classIds)
+      .order("created_at", { ascending: true }),
+    supabase.from("class_members").select("class_id").in("class_id", classIds),
+  ]);
 
   const courses = (coursesData ?? []) as CourseRow[];
   const { counts, myRole } = await courseMemberInfo(
@@ -89,6 +92,11 @@ export const getMyClasses = cache(async (): Promise<ClassSummary[]> => {
     user.id,
   );
 
+  const memberCount = new Map<string, number>();
+  for (const m of (allClassMembers ?? []) as Array<{ class_id: string }>) {
+    memberCount.set(m.class_id, (memberCount.get(m.class_id) ?? 0) + 1);
+  }
+
   return rows
     .filter((r): r is typeof r & { classes: ClassRow } => r.classes !== null)
     .map((r) => ({
@@ -96,6 +104,7 @@ export const getMyClasses = cache(async (): Promise<ClassSummary[]> => {
       name: r.classes.name,
       joinCode: r.classes.join_code,
       isAdmin: r.is_admin,
+      memberCount: memberCount.get(r.class_id) ?? 1,
       courses: courses
         .filter((c) => c.class_id === r.class_id)
         .map((c) => toCourseSummary(c, counts, myRole)),

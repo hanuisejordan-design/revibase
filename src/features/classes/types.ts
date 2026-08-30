@@ -7,6 +7,8 @@ export interface ClassSummary {
   joinCode: string;
   /** L'utilisateur courant administre-t-il cette classe ? */
   isAdmin: boolean;
+  /** Nombre de membres de la classe. */
+  memberCount: number;
   courses: CourseSummary[];
 }
 

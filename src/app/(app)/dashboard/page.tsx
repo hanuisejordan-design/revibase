@@ -3,6 +3,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth/dal";
 import { getMyCourses } from "@/features/courses/queries";
 import { getMyClasses } from "@/features/classes/queries";
+import { ClassCard } from "@/components/classes/class-card";
 import { CourseCard } from "@/components/courses/course-card";
 
 export const metadata: Metadata = { title: "Tableau de bord" };
@@ -16,7 +17,7 @@ export default async function DashboardPage() {
   const user = await requireUser();
   const [classes, allCourses] = await Promise.all([getMyClasses(), getMyCourses()]);
 
-  // Les cours affichés sous leur classe ne sont pas répétés dans « Autres cours ».
+  // Un cours rattaché à l'une de mes classes n'apparaît pas en « Autres cours ».
   const nestedCourseIds = new Set(classes.flatMap((cl) => cl.courses.map((c) => c.id)));
   const standaloneCourses = allCourses.filter((c) => !nestedCourseIds.has(c.id));
 
@@ -29,51 +30,30 @@ export default async function DashboardPage() {
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
           {isEmpty
             ? "Rejoins ta classe avec le code d'invitation, ou crées-en une."
-            : "Choisis un cours pour continuer."}
+            : "Choisis une classe pour voir ses cours."}
         </p>
       </div>
 
-      {classes.map((cl) => (
-        <section key={cl.id} className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <Link
-              href={`/class/${cl.id}`}
-              className="text-xs font-semibold tracking-wide text-zinc-500 uppercase hover:underline"
-            >
-              {cl.name}
-            </Link>
-            {cl.isAdmin ? (
-              <Link
-                href={`/class/${cl.id}/course/new`}
-                className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
-              >
-                + Cours
-              </Link>
-            ) : null}
-          </div>
-          {cl.courses.length > 0 ? (
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {cl.courses.map((c) => (
-                <li key={c.id}>
-                  <CourseCard course={c} />
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-zinc-500">
-              Aucun cours dans cette classe pour l&apos;instant.
-            </p>
-          )}
+      {classes.length > 0 ? (
+        <section className="flex flex-col gap-3">
+          <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+            Mes classes
+          </h2>
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {classes.map((cl) => (
+              <li key={cl.id}>
+                <ClassCard cls={cl} />
+              </li>
+            ))}
+          </ul>
         </section>
-      ))}
+      ) : null}
 
       {standaloneCourses.length > 0 ? (
         <section className="flex flex-col gap-3">
-          {classes.length > 0 ? (
-            <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
-              Autres cours
-            </h2>
-          ) : null}
+          <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+            {classes.length > 0 ? "Autres cours" : "Mes cours"}
+          </h2>
           <ul className="grid gap-3 sm:grid-cols-2">
             {standaloneCourses.map((c) => (
               <li key={c.id}>
