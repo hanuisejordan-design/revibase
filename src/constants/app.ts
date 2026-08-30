@@ -56,10 +56,8 @@ export const QUIZ_MIN_QUESTIONS = 1;
 export const QUIZ_MAX_QUESTIONS = 50;
 export const QUIZ_DEFAULT_QUESTIONS = 10;
 
-/** Chapitres proposés par défaut à la création d'une classe. */
-export const DEFAULT_CHAPTERS = [
-  "Signalisation",
-  "Réglementation",
-  "Matériel",
-  "Sécurité",
-] as const;
+/**
+ * Chapitres créés par défaut avec un cours neuf (cf. RPC `create_course`).
+ * Neutres — l'auteur les renomme selon sa matière.
+ */
+export const DEFAULT_CHAPTERS = ["Chapitre 1", "Chapitre 2", "Chapitre 3", "Chapitre 4"] as const;
