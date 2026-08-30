@@ -40,6 +40,23 @@ un admin attribue « formateur ». Migration `0014`.
 Modifier titre / contexte / chapitre / options / photo (auteur ou formateur).
 Type non modifiable. Pas de migration (RLS déjà en place).
 
+### Nouvelles questions depuis la dernière visite (territoire « notifs »)
+
+- **Idée** : savoir ce qui est apparu depuis qu'on est passé.
+  - Vignettes (tableau de bord) : badge « N nouvelles questions » par cours,
+    additionné sur la vignette de la classe.
+  - Accueil du cours : section « Nouvelles questions (N) » en haut si N > 0.
+  - Les **enchaîner** : d'abord un simple filtre « Nouvelles » sur la page
+    Questions (comme « Sans réponse ») ; un mode « une par une » plein écran
+    seulement si le besoin se confirme.
+- **À faire** : table `course_reads (course_id, user_id,
+  questions_seen_at)` (RLS `user_id = auth.uid()`), mise à jour à l'ouverture
+  de la liste des questions ; « nouvelle » = `question.created_at >
+  questions_seen_at` (pas les siennes, pas les supprimées).
+  `getMyCourses` / requêtes classe renvoient `newQuestionCount`.
+- **Ampleur** : migration + comptages dans 2-3 requêtes + un filtre. L'UI
+  fine (feed) est repoussée — « sobre et efficace » suffira.
+
 ### Quiz au niveau de la classe
 
 - **Idée** : un bouton « Faire un quiz » sur la page de la classe (à côté de
