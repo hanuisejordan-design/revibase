@@ -75,7 +75,7 @@ export function SummaryList({
   if (summaries.length === 0) {
     return (
       <p className="text-sm text-zinc-500">
-        Aucun résumé pour l&apos;instant. Ajoute le premier ci-dessous.
+        Aucun résumé pour l&apos;instant. Ajoute le premier avec le bouton ci-dessus.
       </p>
     );
   }

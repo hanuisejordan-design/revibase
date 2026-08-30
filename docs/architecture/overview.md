@@ -298,10 +298,11 @@ Calculé à la lecture, par priorité décroissante :
 - `features/summaries` : `listSummaries` (URL signées, type image/pdf/other
   déduit de l'extension, `canDelete`), `createSummaryAction` /
   `deleteSummaryAction` (nettoient le fichier Storage).
-- Upload côté client au submit (sans redimensionnement, max 20 Mo). Onglet
-  « Résumés » (nav + bouton accueil du cours) ; `SummaryList` (client) =
-  liste compacte groupée par chapitre + filtre titre / chapitre, « Ouvrir »
-  (URL signée) dans un onglet.
+- Upload côté client au submit (sans redimensionnement, max 20 Mo) sur une
+  page dédiée `course/[courseId]/summaries/new` ; `createSummaryAction`
+  redirige vers la liste. La page `summaries` = `SummaryList` (client, liste
+  compacte groupée par chapitre + filtre titre / chapitre, « Ouvrir » URL
+  signée) + un bouton « Ajouter un résumé ».
 
 ## Flux d'une requête authentifiée
 

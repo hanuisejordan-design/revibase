@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useActionState, useEffect, useRef, useState } from "react";
+import { startTransition, useActionState, useRef, useState } from "react";
 import { createSummaryAction, type SummaryFormState } from "@/features/summaries/actions";
 import type { ChapterEntry } from "@/features/chapters/queries";
 import { createClient } from "@/lib/supabase/client";
@@ -31,7 +31,6 @@ export function SummaryUploadForm({
     createSummaryAction,
     undefined,
   );
-  const formRef = useRef<HTMLFormElement>(null);
   const fileRef = useRef<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -71,15 +70,8 @@ export function SummaryUploadForm({
     startTransition(() => formAction(fd));
   }
 
-  useEffect(() => {
-    if (state?.ok) {
-      formRef.current?.reset();
-      fileRef.current = null;
-    }
-  }, [state]);
-
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
       <input type="hidden" name="courseId" value={courseId} />
 
       <Field label="Titre" htmlFor="title" error={state?.errors?.title}>

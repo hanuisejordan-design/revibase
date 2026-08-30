@@ -13,7 +13,6 @@ const BUCKET = "summaries";
 export interface SummaryFormState {
   errors?: Record<string, string>;
   formError?: string;
-  ok?: boolean;
 }
 
 export async function createSummaryAction(
@@ -65,7 +64,7 @@ export async function createSummaryAction(
   }
 
   revalidatePath(`/course/${courseId}/summaries`);
-  return { ok: true };
+  redirect(`/course/${courseId}/summaries`);
 }
 
 export async function deleteSummaryAction(formData: FormData): Promise<void> {
