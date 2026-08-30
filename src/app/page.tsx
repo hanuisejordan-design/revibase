@@ -4,16 +4,18 @@ import { APP_NAME, APP_TAGLINE } from "@/constants/app";
 const CORE_ACTIONS = [
   {
     title: "Poser une question",
-    description: "Une difficulté rencontrée devient un objet permanent, rangé dans un chapitre.",
-  },
-  {
-    title: "Voir les questions",
     description:
-      "La bibliothèque des questions de la classe, avec les réponses et les discussions.",
+      "Une difficulté rencontrée devient un objet permanent, rangé dans un chapitre du cours.",
   },
   {
-    title: "Faire un quiz",
-    description: "Réviser à partir des vraies difficultés rencontrées par la classe.",
+    title: "Répondre, discuter, valider",
+    description:
+      "Les autres répondent, on en débat dans un fil rattaché à la question, une réponse est retenue.",
+  },
+  {
+    title: "Réviser",
+    description:
+      "Quiz auto-corrigés à partir des vraies questions du cours, plus les fiches et résumés partagés.",
   },
 ];
 
@@ -26,8 +28,12 @@ export default function HomePage() {
           {APP_TAGLINE}
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400">
-          Une question posée ne se perd pas dans un fil de discussion : elle reste retrouvable,
-          discutable et réutilisable pour réviser.
+          Une question posée ne se perd pas dans un fil de discussion : elle devient un objet
+          permanent, rangé par chapitre, retrouvable et réutilisable pour réviser.
+        </p>
+        <p className="text-sm text-zinc-500">
+          Une <strong>classe</strong> (ta promo) regroupe des <strong>cours</strong> ; chaque
+          cours a ses chapitres, ses questions, ses fiches et ses quiz.
         </p>
       </header>
 
@@ -59,7 +65,7 @@ export default function HomePage() {
       </div>
 
       <p className="text-sm text-zinc-500">
-        Projet en cours de construction — Phase 1 : authentification.
+        Outil de révision communautaire, qui évolue avec les retours de la classe.
       </p>
     </main>
   );

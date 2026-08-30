@@ -2,7 +2,8 @@
 export const APP_NAME = "Revibase";
 
 /** Baseline courte, utilisée sur la page d'accueil et les métadonnées. */
-export const APP_TAGLINE = "Les questions de la classe, rangées et réutilisables pour réviser.";
+export const APP_TAGLINE =
+  "Les questions et les fiches d'un cours, rangées et réutilisables pour réviser.";
 
 /**
  * Rôle d'un membre AU SEIN d'une classe (et non au niveau du compte).
