@@ -1,0 +1,52 @@
+import { notFound } from "next/navigation";
+import { getClassContext, getClassMembers } from "@/features/classes/queries";
+import { InviteCode } from "@/components/courses/invite-code";
+import { LeaveClassButton } from "@/components/classes/leave-class-button";
+
+export default async function ClassSettingsPage({
+  params,
+}: {
+  params: Promise<{ classId: string }>;
+}) {
+  const { classId } = await params;
+
+  const ctx = await getClassContext(classId);
+  if (!ctx) notFound();
+
+  const members = await getClassMembers(classId);
+
+  return (
+    <div className="flex flex-col gap-8">
+      <section className="flex flex-col gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
+        <InviteCode
+          code={ctx.joinCode}
+          hint="Partage ce code : ceux qui rejoignent la classe ont accès à tous ses cours."
+        />
+      </section>
+
+      <section className="flex flex-col gap-2">
+        <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+          Membres ({members.length})
+        </h2>
+        <ul className="flex flex-col gap-1 text-sm">
+          {members.map((m) => (
+            <li key={m.userId} className="flex items-center gap-2">
+              <span>{m.displayName}</span>
+              {m.isAdmin ? (
+                <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                  Admin
+                </span>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {!ctx.isAdmin ? (
+        <section className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
+          <LeaveClassButton classId={ctx.id} />
+        </section>
+      ) : null}
+    </div>
+  );
+}
