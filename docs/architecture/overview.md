@@ -281,6 +281,20 @@ Calculé à la lecture, par priorité décroissante :
   `QuestionCard`, image cliquable sur la page détail, image dans le
   `QuizRunner`.
 
+## Résumés par cours (Phase 16, ADR 0018)
+
+- `summaries` (`course_id`, `chapter_id` nullable, `author_id`, `title`,
+  `file_path`, `file_name`) ; RLS : lecture/ajout = `is_course_member`,
+  suppression = auteur ou `is_course_trainer`. Bucket Storage privé
+  `summaries`, chemin `{course_id}/{uuid}.ext`, mêmes policies que
+  `question-images`. Migration `0012_summaries.sql`.
+- `features/summaries` : `listSummaries` (URL signées, type image/pdf/other
+  déduit de l'extension, `canDelete`), `createSummaryAction` /
+  `deleteSummaryAction` (nettoient le fichier Storage).
+- Upload côté client au submit (sans redimensionnement, max 20 Mo). Onglet
+  « Résumés » dans la nav du cours ; liste groupée par chapitre ; aperçu
+  inline image / `<iframe>` PDF + lien « Ouvrir ».
+
 ## Flux d'une requête authentifiée
 
 1. `src/proxy.ts` rafraîchit la session Supabase (cookies).
