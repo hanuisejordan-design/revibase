@@ -143,6 +143,11 @@ Calculé à la lecture, par priorité décroissante :
   `class/[classId]/layout` remonte vers le groupe s'il y en a un.
 - Rôle : membre par le groupe = `student` ; « formateur » reste une ligne
   `class_members`. Admin de groupe ≠ formateur de classe.
+- Nav (après renommage Phase 15) : une **classe** a `class/[classId]/layout`
+  avec `Cours · Paramètres` (liste des cours d'un côté, code d'invitation +
+  membres dans `settings`), comme un **cours** a
+  `Accueil · Questions · Quiz · Résumés · Paramètres`. L'accueil d'un cours
+  ne garde que « Poser une question » (le reste est dans la nav).
 
 ## Chapitres (Phase 3)
 
