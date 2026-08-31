@@ -11,7 +11,10 @@ import {
   MCQ_MAX_OPTIONS,
   QUESTION_KINDS,
   QUESTION_KIND_LABELS,
+  QUESTION_PURPOSES,
+  QUESTION_PURPOSE_LABELS,
   type QuestionKind,
+  type QuestionPurpose,
 } from "@/constants/app";
 import { createClient } from "@/lib/supabase/client";
 import { downscaleImage } from "@/lib/images/downscale";
@@ -27,6 +30,7 @@ type McqOption = { body: string; correct: boolean };
 export type QuestionFormInitial = {
   questionId: string;
   kind: QuestionKind;
+  purpose: QuestionPurpose;
   title: string;
   body: string | null;
   chapterId: string | null;
@@ -146,6 +150,25 @@ export function QuestionForm({
             ))}
           </select>
         )}
+      </Field>
+
+      <Field label="Pourquoi cette question ?" htmlFor="purpose">
+        <select
+          id="purpose"
+          name="purpose"
+          defaultValue={initial?.purpose ?? "help"}
+          className={inputCls}
+        >
+          {QUESTION_PURPOSES.map((p) => (
+            <option key={p} value={p}>
+              {QUESTION_PURPOSE_LABELS[p]}
+            </option>
+          ))}
+        </select>
+        <p className="mt-1 text-xs text-zinc-500">
+          « Défi » = tu connais la réponse, c&apos;est pour entraîner les autres et nourrir les
+          quiz.
+        </p>
       </Field>
 
       <Field label="Chapitre" htmlFor="chapterId" error={state?.errors?.chapterId}>

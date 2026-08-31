@@ -33,6 +33,24 @@ describe("createQuestionSchema — question ouverte", () => {
       false,
     );
   });
+
+  it("purpose : défaut « help », accepte « challenge », refuse le reste", () => {
+    const def = createQuestionSchema.safeParse({ ...base, kind: "open", options: [] });
+    expect(def.success && def.data.purpose).toBe("help");
+
+    const chal = createQuestionSchema.safeParse({
+      ...base,
+      kind: "open",
+      options: [],
+      purpose: "challenge",
+    });
+    expect(chal.success && chal.data.purpose).toBe("challenge");
+
+    expect(
+      createQuestionSchema.safeParse({ ...base, kind: "open", options: [], purpose: "autre" })
+        .success,
+    ).toBe(false);
+  });
 });
 
 describe("createQuestionSchema — QCM / vrai-faux", () => {

@@ -175,12 +175,18 @@ Calculé à la lecture, par priorité décroissante :
 - `src/features/questions/` : `schema.ts`, `types.ts`, `queries.ts`
   (`listQuestions`, `getRecentQuestions`, `getQuestion`), `actions.ts`
   (`createQuestionAction`, `updateQuestionAction`, `deleteQuestionAction`).
-- Routes : `course/[courseId]/questions` (liste — filtre chapitre, recherche
-  `ILIKE` titre, tri récent/sans réponse/populaire, tout via `searchParams`),
+- Routes : `course/[courseId]/questions` (liste — filtres chapitre +
+  **intention** (`?purpose=help|challenge`), recherche `ILIKE` titre, tri
+  récent/sans réponse/populaire, tout via `searchParams`),
   `.../questions/new` (formulaire), `.../questions/[questionId]` (détail),
   `.../questions/[questionId]/edit` (**Phase 19, ADR 0020** — auteur ou
   formateur ; `QuestionForm` avec prop `initial` ; titre / contexte /
-  chapitre / options / photo modifiables, **type figé**).
+  chapitre / options / photo / **intention** modifiables, **type figé**).
+- **`questions.purpose`** (`help` défaut | `challenge`, migration `0022`,
+  ADR 0026) : « J'ai besoin d'aide » vs « Question défi ». Éditable.
+  `PurposeBadge` sur les listes / le détail / la zone « nouvelles ». **Le
+  quiz n'en tient pas compte** (pour l'instant). `purpose` est dans
+  `QUESTION_SELECT` → migration à passer avant/avec le déploiement.
 - Statut d'une question = `validated` / `answered` / `unanswered`, calculé
   depuis `answers` (2 requêtes de comptage par lot d'ids).
 - **Suppression douce** (`deleted_at`) par l'auteur ou un formateur ; les

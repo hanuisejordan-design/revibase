@@ -84,13 +84,16 @@ Pas prioritaire.
   visible seulement en petit écran ; l'en-tête reste en desktop). Pop-ups,
   zones sûres (`env(safe-area-inset-bottom)`), état actif par route.
 
-### Distinguer l'intention d'une question — demandé (ordre 2→1→**3**)
+### ✅ Distinguer l'intention d'une question — fait (Phase 26, ADR 0026)
 
-- Champ `questions.purpose` : **« J'ai besoin d'aide »** (blocage de
-  compréhension) vs **« Question défi »** (je connais la réponse, c'est pour
-  entraîner / nourrir les quiz). Badge + filtre dans les listes, éditable.
-- **Quiz** : rien pour l'instant (choix utilisateur) — le lien avec le
-  générateur de quiz sera une phase ultérieure.
+`questions.purpose` (`help` / `challenge`, migration `0022`) : « J'ai besoin
+d'aide » vs « Question défi ». Sélecteur au formulaire (éditable), pastille
+`PurposeBadge` (violette pour « défi ») sur listes / détail / zone
+« nouvelles », filtre `?purpose=` sur la page Questions.
+
+Reste : **lien quiz ↔ « défi »** (prioriser / restreindre le générateur aux
+questions défi). Choix utilisateur : rien pour l'instant, à faire dans une
+phase dédiée au quiz.
 
 ### Quiz au niveau de la classe
 

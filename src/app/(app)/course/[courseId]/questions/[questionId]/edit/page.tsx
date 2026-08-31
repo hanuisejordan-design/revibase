@@ -43,6 +43,7 @@ export default async function EditQuestionPage({
         initial={{
           questionId: question.id,
           kind: question.kind,
+          purpose: question.purpose,
           title: question.title,
           body: question.body,
           chapterId: question.chapterId,

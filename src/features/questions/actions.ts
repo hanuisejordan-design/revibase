@@ -40,6 +40,7 @@ export async function createQuestionAction(
     body: String(formData.get("body") ?? ""),
     chapterId: String(formData.get("chapterId") ?? ""),
     kind: String(formData.get("kind") ?? "open"),
+    purpose: String(formData.get("purpose") ?? "help"),
     options: rawOptions,
   });
   if (!parsed.success) return { errors: parsed.errors };
@@ -75,6 +76,7 @@ export async function createQuestionAction(
       title: parsed.data.title,
       body: parsed.data.body,
       kind: parsed.data.kind,
+      purpose: parsed.data.purpose,
       image_path: imagePath,
     })
     .select("id")
@@ -168,6 +170,7 @@ export async function updateQuestionAction(
     body: String(formData.get("body") ?? ""),
     chapterId: String(formData.get("chapterId") ?? ""),
     kind: cur.kind, // figé : on ignore ce que le formulaire enverrait
+    purpose: String(formData.get("purpose") ?? "help"), // modifiable, lui
     options: rawOptions,
   });
   if (!parsed.success) return { errors: parsed.errors };
@@ -193,6 +196,7 @@ export async function updateQuestionAction(
       chapter_id: parsed.data.chapterId,
       title: parsed.data.title,
       body: parsed.data.body,
+      purpose: parsed.data.purpose,
       image_path: finalImagePath,
     })
     .eq("id", questionId)

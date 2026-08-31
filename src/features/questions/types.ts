@@ -1,4 +1,4 @@
-import type { QuestionKind } from "@/constants/app";
+import type { QuestionKind, QuestionPurpose } from "@/constants/app";
 
 /** Statut d'une question ouverte dans la liste, dérivé de ses réponses. */
 export type QuestionStatus = "validated" | "answered" | "unanswered";
@@ -15,6 +15,7 @@ export interface QuestionListItem {
   id: string;
   title: string;
   kind: QuestionKind;
+  purpose: QuestionPurpose;
   chapterId: string | null;
   chapterName: string | null;
   authorName: string;
@@ -32,6 +33,7 @@ export interface QuestionDetail {
   title: string;
   body: string | null;
   kind: QuestionKind;
+  purpose: QuestionPurpose;
   options: QuestionOption[];
   chapterId: string | null;
   chapterName: string | null;

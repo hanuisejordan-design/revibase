@@ -4,7 +4,7 @@ import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
 import type { CourseRole } from "@/constants/app";
-import type { QuestionKind } from "@/constants/app";
+import type { QuestionKind, QuestionPurpose } from "@/constants/app";
 import {
   countCourseContent,
   countNewQuestions,
@@ -247,7 +247,7 @@ export const getClassNewQuestions = cache(
         .from("questions")
         // Depuis 0021 (`question_reads`), `questions` a 2 chemins vers `profiles`.
         .select(
-          "id, title, kind, course_id, created_at, chapters(name), author:profiles!questions_author_id_fkey(display_name)",
+          "id, title, kind, purpose, course_id, created_at, chapters(name), author:profiles!questions_author_id_fkey(display_name)",
         )
         .in("course_id", courseIds)
         .is("deleted_at", null)
@@ -260,6 +260,7 @@ export const getClassNewQuestions = cache(
         id: string;
         title: string;
         kind: QuestionKind;
+        purpose: QuestionPurpose;
         course_id: string;
         created_at: string;
         chapters: { name: string } | null;
@@ -296,6 +297,7 @@ export const getClassNewQuestions = cache(
         id: r.id,
         title: r.title,
         kind: r.kind,
+        purpose: r.purpose,
         courseId: r.course_id,
         courseName: courseName.get(r.course_id) ?? "Cours",
         chapterName: r.chapters?.name ?? null,

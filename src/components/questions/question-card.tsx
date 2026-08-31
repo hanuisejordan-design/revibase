@@ -3,6 +3,7 @@ import type { QuestionListItem } from "@/features/questions/types";
 import { relativeTime } from "@/lib/utils/date";
 import { QUESTION_KIND_LABELS } from "@/constants/app";
 import { QuestionStatusBadge } from "./question-status-badge";
+import { PurposeBadge } from "./purpose-badge";
 
 export function QuestionCard({
   courseId,
@@ -23,6 +24,7 @@ export function QuestionCard({
         <span className="rounded-full border border-zinc-200 px-2 py-0.5 dark:border-zinc-800">
           {question.chapterName ?? "Sans chapitre"}
         </span>
+        <PurposeBadge purpose={question.purpose} />
         {question.imageUrl ? <span title="Photo jointe">📷</span> : null}
         {isOpen ? (
           <>

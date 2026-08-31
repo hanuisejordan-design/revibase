@@ -3,14 +3,14 @@ import "server-only";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
-import type { QuestionKind } from "@/constants/app";
+import type { QuestionKind, QuestionPurpose } from "@/constants/app";
 import type { QuestionSort } from "./schema";
 import type { QuestionDetail, QuestionListItem, QuestionOption, QuestionStatus } from "./types";
 
 // `author:profiles!questions_author_id_fkey` : depuis la migration 0021
 // (`question_reads`), `questions` a deux chemins vers `profiles` — on désambiguïse.
 const QUESTION_SELECT =
-  "id, title, body, kind, chapter_id, author_id, created_at, updated_at, image_path, chapters(name), author:profiles!questions_author_id_fkey(display_name)";
+  "id, title, body, kind, purpose, chapter_id, author_id, created_at, updated_at, image_path, chapters(name), author:profiles!questions_author_id_fkey(display_name)";
 
 const IMAGE_BUCKET = "question-images";
 const IMAGE_URL_TTL = 60 * 60; // 1 h
@@ -20,6 +20,7 @@ type QuestionRow = {
   title: string;
   body: string | null;
   kind: QuestionKind;
+  purpose: QuestionPurpose;
   chapter_id: string | null;
   author_id: string;
   created_at: string;
@@ -87,6 +88,7 @@ function toListItem(
     id: row.id,
     title: row.title,
     kind: row.kind,
+    purpose: row.purpose,
     chapterId: row.chapter_id,
     chapterName: row.chapters?.name ?? null,
     authorName: row.author?.display_name ?? "Membre",
@@ -100,6 +102,7 @@ export interface ListQuestionsOptions {
   chapter?: string; // id de chapitre, ou "none" pour « sans chapitre »
   search?: string;
   sort?: QuestionSort;
+  purpose?: QuestionPurpose;
 }
 
 export const listQuestions = cache(
@@ -115,6 +118,8 @@ export const listQuestions = cache(
 
     if (opts.chapter === "none") query = query.is("chapter_id", null);
     else if (opts.chapter) query = query.eq("chapter_id", opts.chapter);
+
+    if (opts.purpose) query = query.eq("purpose", opts.purpose);
 
     const search = opts.search?.trim();
     if (search) query = query.ilike("title", `%${search}%`);
@@ -196,6 +201,7 @@ export const getQuestion = cache(
       title: row.title,
       body: row.body,
       kind: row.kind,
+      purpose: row.purpose,
       options,
       chapterId: row.chapter_id,
       chapterName: row.chapters?.name ?? null,

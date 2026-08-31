@@ -60,3 +60,4 @@ qui remplace l'ancien (et on met à jour le statut de l'ancien).
 | 0023 | [PWA installable + notifications push](0023-pwa-push.md) | accepté |
 | 0024 | [Suivi de lecture par élément](0024-lecture-par-element.md) | accepté (amende 0022) |
 | 0025 | [Page Paramètres + thème clair / sombre](0025-parametres-theme.md) | accepté |
+| 0026 | [Intention d'une question : besoin d'aide vs défi](0026-intention-question.md) | accepté |

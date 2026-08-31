@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getClassContext, getClassNewQuestions } from "@/features/classes/queries";
 import { markAllClassQuestionsReadAction } from "@/features/reads/actions";
+import { PurposeBadge } from "@/components/questions/purpose-badge";
 import { relativeTime } from "@/lib/utils/date";
 import { QUESTION_KIND_LABELS } from "@/constants/app";
 
@@ -61,6 +62,7 @@ export default async function ClassNewQuestionsPage({
                   <span className="rounded-full border border-zinc-200 px-2 py-0.5 dark:border-zinc-800">
                     {q.chapterName ?? "Sans chapitre"}
                   </span>
+                  <PurposeBadge purpose={q.purpose} />
                   {q.kind === "open" ? (
                     <span>
                       {q.answerCount} réponse{q.answerCount > 1 ? "s" : ""}

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MCQ_MAX_OPTIONS, MCQ_MIN_OPTIONS, QUESTION_KINDS } from "@/constants/app";
+import { MCQ_MAX_OPTIONS, MCQ_MIN_OPTIONS, QUESTION_KINDS, QUESTION_PURPOSES } from "@/constants/app";
 
 export const questionOptionInput = z.object({
   body: z.string().trim().min(1, "Option vide.").max(500, "500 caractères maximum."),
@@ -22,6 +22,7 @@ export const createQuestionSchema = z
       .min(1, "Choisis un chapitre pour classer ta question.")
       .pipe(z.string().uuid("Chapitre invalide.")),
     kind: z.enum(QUESTION_KINDS),
+    purpose: z.enum(QUESTION_PURPOSES).default("help"),
     options: z.array(questionOptionInput).default([]),
   })
   .superRefine((val, ctx) => {
@@ -53,4 +54,9 @@ export type QuestionSort = (typeof QUESTION_SORTS)[number];
 
 export function parseSort(value: string | undefined): QuestionSort {
   return QUESTION_SORTS.includes(value as QuestionSort) ? (value as QuestionSort) : "recent";
+}
+
+/** Filtre d'intention pour la liste des questions, ou `undefined` = toutes. */
+export function parsePurpose(value: string | undefined): "help" | "challenge" | undefined {
+  return value === "help" || value === "challenge" ? value : undefined;
 }

@@ -1,4 +1,4 @@
-import type { QuestionKind } from "@/constants/app";
+import type { QuestionKind, QuestionPurpose } from "@/constants/app";
 import type { CourseSummary } from "@/features/courses/types";
 import type { QuestionStatus } from "@/features/questions/types";
 import type { SummaryItem } from "@/features/summaries/types";
@@ -35,6 +35,7 @@ export interface ClassNewQuestion {
   id: string;
   title: string;
   kind: QuestionKind;
+  purpose: QuestionPurpose;
   courseId: string;
   courseName: string;
   chapterName: string | null;

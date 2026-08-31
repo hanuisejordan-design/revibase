@@ -16,6 +16,7 @@ import { CreateAnswerForm } from "@/components/answers/create-answer-form";
 import { CommentList } from "@/components/discussions/comment-list";
 import { CreateCommentForm } from "@/components/discussions/create-comment-form";
 import { MarkQuestionRead } from "@/components/questions/mark-question-read";
+import { PurposeBadge } from "@/components/questions/purpose-badge";
 
 export async function generateMetadata({
   params,
@@ -88,6 +89,7 @@ export default async function QuestionPage({
           <span className="rounded-full border border-zinc-200 px-2 py-0.5 dark:border-zinc-800">
             {question.chapterName ?? "Sans chapitre"}
           </span>
+          <PurposeBadge purpose={question.purpose} />
           {!isOpen ? (
             <span className="rounded-full bg-zinc-100 px-2 py-0.5 font-medium dark:bg-zinc-800">
               {QUESTION_KIND_LABELS[question.kind]}

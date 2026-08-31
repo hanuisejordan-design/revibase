@@ -2,9 +2,10 @@ import Link from "next/link";
 import Form from "next/form";
 import type { ChapterEntry } from "@/features/chapters/queries";
 import type { QuestionSort } from "@/features/questions/schema";
+import { QUESTION_PURPOSE_SHORT, type QuestionPurpose } from "@/constants/app";
 import { cn } from "@/lib/utils/cn";
 
-type Params = { chapter?: string; q?: string; sort: QuestionSort };
+type Params = { chapter?: string; q?: string; sort: QuestionSort; purpose?: QuestionPurpose };
 
 const SORT_LABELS: Record<QuestionSort, string> = {
   recent: "Récent",
@@ -12,12 +13,19 @@ const SORT_LABELS: Record<QuestionSort, string> = {
   popular: "Populaire",
 };
 
+const PURPOSE_FILTERS: { value: QuestionPurpose | undefined; label: string }[] = [
+  { value: undefined, label: "Toutes intentions" },
+  { value: "help", label: QUESTION_PURPOSE_SHORT.help },
+  { value: "challenge", label: QUESTION_PURPOSE_SHORT.challenge },
+];
+
 function buildQuery(base: Params, override: Partial<Params>): string {
   const merged = { ...base, ...override };
   const sp = new URLSearchParams();
   if (merged.chapter) sp.set("chapter", merged.chapter);
   if (merged.q) sp.set("q", merged.q);
   if (merged.sort && merged.sort !== "recent") sp.set("sort", merged.sort);
+  if (merged.purpose) sp.set("purpose", merged.purpose);
   const s = sp.toString();
   return s ? `?${s}` : "";
 }
@@ -90,6 +98,7 @@ export function QuestionFilters({
           {params.sort !== "recent" ? (
             <input type="hidden" name="sort" value={params.sort} />
           ) : null}
+          {params.purpose ? <input type="hidden" name="purpose" value={params.purpose} /> : null}
           <input
             name="q"
             defaultValue={params.q ?? ""}
@@ -97,6 +106,18 @@ export function QuestionFilters({
             className="w-40 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
           />
         </Form>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {PURPOSE_FILTERS.map((p) => (
+          <Chip
+            key={p.value ?? "all"}
+            href={url({ purpose: p.value })}
+            active={(params.purpose ?? undefined) === p.value}
+          >
+            {p.label}
+          </Chip>
+        ))}
       </div>
     </div>
   );

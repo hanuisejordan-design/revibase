@@ -28,6 +28,27 @@ export const QUESTION_KIND_LABELS: Record<QuestionKind, string> = {
   mcq: "QCM",
 };
 
+/**
+ * Intention derrière une question :
+ * - `help`      : blocage de compréhension, on attend de l'aide ;
+ * - `challenge` : l'auteur connaît la réponse, c'est pour entraîner les
+ *   autres / nourrir les quiz.
+ * N'influe pas (encore) sur le générateur de quiz.
+ */
+export const QUESTION_PURPOSES = ["help", "challenge"] as const;
+export type QuestionPurpose = (typeof QUESTION_PURPOSES)[number];
+
+export const QUESTION_PURPOSE_LABELS: Record<QuestionPurpose, string> = {
+  help: "J'ai besoin d'aide",
+  challenge: "Question défi",
+};
+
+/** Libellés courts, pour les pastilles de liste. */
+export const QUESTION_PURPOSE_SHORT: Record<QuestionPurpose, string> = {
+  help: "Besoin d'aide",
+  challenge: "Défi",
+};
+
 /** Nombre d'options pour un QCM. */
 export const MCQ_MIN_OPTIONS = 2;
 export const MCQ_MAX_OPTIONS = 6;

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getCourseContext } from "@/features/courses/queries";
 import { listChapters } from "@/features/chapters/queries";
 import { listQuestions } from "@/features/questions/queries";
-import { parseSort } from "@/features/questions/schema";
+import { parsePurpose, parseSort } from "@/features/questions/schema";
 import { QuestionCard } from "@/components/questions/question-card";
 import { QuestionFilters } from "@/components/questions/question-filters";
 
@@ -26,10 +26,11 @@ export default async function QuestionsPage({
   const chapter = first(sp.chapter);
   const q = first(sp.q);
   const sort = parseSort(first(sp.sort));
+  const purpose = parsePurpose(first(sp.purpose));
 
   const [chapters, questions, allForChips] = await Promise.all([
     listChapters(courseId),
-    listQuestions(courseId, { chapter, search: q, sort }),
+    listQuestions(courseId, { chapter, search: q, sort, purpose }),
     listQuestions(courseId, {}),
   ]);
 
@@ -50,7 +51,7 @@ export default async function QuestionsPage({
       <QuestionFilters
         courseId={courseId}
         chapters={chapters}
-        params={{ chapter, q, sort }}
+        params={{ chapter, q, sort, purpose }}
         hasUnchaptered={hasUnchaptered}
       />
 
@@ -64,7 +65,7 @@ export default async function QuestionsPage({
         </ul>
       ) : (
         <p className="rounded-xl border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
-          {q || chapter || sort !== "recent"
+          {q || chapter || purpose || sort !== "recent"
             ? "Aucune question ne correspond à ces filtres."
             : "Aucune question pour l'instant. Sois le premier à en poser une."}
         </p>
