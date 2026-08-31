@@ -29,8 +29,11 @@ export default async function ClassLayout({
     <div className="flex flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <Link href="/dashboard" className="text-xs text-zinc-500 hover:underline">
-            ← Tableau de bord
+          <Link
+            href="/dashboard"
+            className="-ml-2 inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+          >
+            <span aria-hidden>←</span> Tableau de bord
           </Link>
           <Link href={`/class/${classId}`} className="text-xl font-semibold hover:underline">
             {ctx.name}

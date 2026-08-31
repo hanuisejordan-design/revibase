@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { APP_NAME, APP_TAGLINE } from "@/constants/app";
+import { ThemeWatcher } from "@/components/settings/theme-watcher";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -21,7 +22,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="fr" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <ThemeWatcher />
+        {children}
+      </body>
     </html>
   );
 }

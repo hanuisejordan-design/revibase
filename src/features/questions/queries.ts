@@ -7,8 +7,10 @@ import type { QuestionKind } from "@/constants/app";
 import type { QuestionSort } from "./schema";
 import type { QuestionDetail, QuestionListItem, QuestionOption, QuestionStatus } from "./types";
 
+// `author:profiles!questions_author_id_fkey` : depuis la migration 0021
+// (`question_reads`), `questions` a deux chemins vers `profiles` — on désambiguïse.
 const QUESTION_SELECT =
-  "id, title, body, kind, chapter_id, author_id, created_at, updated_at, image_path, chapters(name), profiles(display_name)";
+  "id, title, body, kind, chapter_id, author_id, created_at, updated_at, image_path, chapters(name), author:profiles!questions_author_id_fkey(display_name)";
 
 const IMAGE_BUCKET = "question-images";
 const IMAGE_URL_TTL = 60 * 60; // 1 h
@@ -24,7 +26,7 @@ type QuestionRow = {
   updated_at: string;
   image_path: string | null;
   chapters: { name: string } | null;
-  profiles: { display_name: string } | null;
+  author: { display_name: string } | null;
 };
 
 /** URL signées (1 h) pour un lot de chemins d'images. */
@@ -87,7 +89,7 @@ function toListItem(
     kind: row.kind,
     chapterId: row.chapter_id,
     chapterName: row.chapters?.name ?? null,
-    authorName: row.profiles?.display_name ?? "Membre",
+    authorName: row.author?.display_name ?? "Membre",
     createdAt: row.created_at,
     imageUrl,
     ...meta,
@@ -198,7 +200,7 @@ export const getQuestion = cache(
       chapterId: row.chapter_id,
       chapterName: row.chapters?.name ?? null,
       authorId: row.author_id,
-      authorName: row.profiles?.display_name ?? "Membre",
+      authorName: row.author?.display_name ?? "Membre",
       createdAt: row.created_at,
       updatedAt: row.updated_at,
       answerCount: meta.answerCount,

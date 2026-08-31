@@ -63,6 +63,11 @@ vide). On perd la trace de ce qu'on voulait consulter.
 - Ouvrir une question **depuis n'importe où** (carte de liste, zone
   nouveautés, lien de notif) la marque lue — cohérent.
 - `0022` reste la référence pour tout le reste (UI, couleurs, zones).
+- **Piège PostgREST** : `question_reads` / `summary_reads` ajoutent un 2ᵉ
+  chemin `questions`↔`profiles` et `summaries`↔`profiles`. Les embeds
+  `profiles(...)` sur `questions` deviennent ambigus (PGRST201) → il faut
+  `profiles!questions_author_id_fkey(...)` partout (`QUESTION_SELECT`,
+  `getClassNewQuestions`). Corrigé après coup.
 - Le revirement est assumé : `0022` avait préféré le curseur « pour ne pas
   cocher » ; l'usage a montré que le coût réel est de **perdre** les
   nouveautés avant de les avoir vues.

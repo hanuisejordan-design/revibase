@@ -3,7 +3,6 @@ import Link from "next/link";
 import { listNotifications } from "@/features/notifications/queries";
 import { markAllNotificationsReadAction } from "@/features/notifications/actions";
 import { MarkAllRead } from "@/components/notifications/mark-all-read";
-import { PushToggle } from "@/components/notifications/push-toggle";
 import { relativeTime } from "@/lib/utils/date";
 import { cn } from "@/lib/utils/cn";
 import type { NotificationType } from "@/features/notifications/types";
@@ -36,7 +35,13 @@ export default async function NotificationsPage() {
         ) : null}
       </div>
 
-      <PushToggle />
+      <p className="text-sm text-zinc-500">
+        Activer les notifications sur cet appareil :{" "}
+        <Link href="/parametres" className="underline hover:text-zinc-700 dark:hover:text-zinc-300">
+          Paramètres
+        </Link>
+        .
+      </p>
 
       {notifications.length === 0 ? (
         <p className="text-sm text-zinc-500">Aucune notification.</p>

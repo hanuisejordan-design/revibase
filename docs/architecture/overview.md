@@ -395,6 +395,24 @@ Calculé à la lecture, par priorité décroissante :
   agrégées tous cours, la plus ancienne d'abord.
 - Requêtes tolérantes : si `0021` non appliquée, l'erreur de lecture de
   `question_reads` / `summary_reads` ⇒ « aucune nouveauté ».
+- **Piège PostgREST** : `question_reads` / `summary_reads` créent un 2ᵉ
+  chemin `questions`↔`profiles`. Tout embed d'auteur sur `questions` doit
+  être `author:profiles!questions_author_id_fkey(...)` (cf. `QUESTION_SELECT`,
+  `getClassNewQuestions`) — sinon PGRST201.
+
+## Page Paramètres + thème (Phase 25, ADR 0025)
+
+- **`/parametres`** (atteinte via `Nom ⚙` dans l'en-tête) : thème,
+  notifications (`PushToggle` déplacé depuis `/notifications`), codes
+  d'invitation (`getMyClasses`), compte + `Se déconnecter` (retiré de
+  l'en-tête).
+- **Thème** : préférence `localStorage` (`system|light|dark`). « système » =
+  pas d'attribut ⇒ media query CSS. « clair » / « sombre » ⇒ `data-theme`
+  sur `<html>`. `@custom-variant dark` (Tailwind v4) couvre les deux cas.
+  `ThemeWatcher` (layout racine) applique le choix stocké après hydratation
+  (pas de script inline, pas de mismatch). `src/lib/theme.ts`,
+  `src/components/settings/`.
+- Liens de retour (`← …`) agrandis (zone cliquable).
 
 ## PWA + notifications push (Phase 23, ADR 0023)
 

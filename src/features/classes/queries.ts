@@ -245,7 +245,10 @@ export const getClassNewQuestions = cache(
       memberSinceByCourse(supabase, user.id, courseIds),
       supabase
         .from("questions")
-        .select("id, title, kind, course_id, created_at, chapters(name), profiles(display_name)")
+        // Depuis 0021 (`question_reads`), `questions` a 2 chemins vers `profiles`.
+        .select(
+          "id, title, kind, course_id, created_at, chapters(name), author:profiles!questions_author_id_fkey(display_name)",
+        )
         .in("course_id", courseIds)
         .is("deleted_at", null)
         .neq("author_id", user.id)
@@ -260,7 +263,7 @@ export const getClassNewQuestions = cache(
         course_id: string;
         created_at: string;
         chapters: { name: string } | null;
-        profiles: { display_name: string } | null;
+        author: { display_name: string } | null;
       }> | null
     )?.filter(
       (q) => new Date(q.created_at).getTime() > (baseline.get(q.course_id) ?? 0),
@@ -296,7 +299,7 @@ export const getClassNewQuestions = cache(
         courseId: r.course_id,
         courseName: courseName.get(r.course_id) ?? "Cours",
         chapterName: r.chapters?.name ?? null,
-        authorName: r.profiles?.display_name ?? "Membre",
+        authorName: r.author?.display_name ?? "Membre",
         createdAt: r.created_at,
         answerCount: m.answerCount,
         commentCount: m.commentCount,

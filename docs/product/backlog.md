@@ -71,6 +71,27 @@ Pas prioritaire.
 - **Ampleur** : migration + comptages dans 2-3 requêtes + un filtre. L'UI
   fine (feed) est repoussée — « sobre et efficace » suffira.
 
+### Barre de navigation basse (mobile, accès pouce)
+
+- **Idée** (utilisateur, Phase 25) : sur mobile, une barre fixe en bas avec
+  - **Cours** → mini pop-up au-dessus listant tous les cours accessibles,
+    pour sauter de l'un à l'autre sans repasser par le tableau de bord ;
+  - **`+`** → pop-up « + question · + résumé · + quiz » ;
+  - **notifications** et **profil** (aujourd'hui dans l'en-tête).
+- Règle aussi la plainte « le bouton retour vers les autres cours est trop
+  petit » (Phase 25 l'a juste agrandi en attendant).
+- **Ampleur** : vraie phase, couplée au passage **responsive mobile** (barre
+  visible seulement en petit écran ; l'en-tête reste en desktop). Pop-ups,
+  zones sûres (`env(safe-area-inset-bottom)`), état actif par route.
+
+### Distinguer l'intention d'une question — demandé (ordre 2→1→**3**)
+
+- Champ `questions.purpose` : **« J'ai besoin d'aide »** (blocage de
+  compréhension) vs **« Question défi »** (je connais la réponse, c'est pour
+  entraîner / nourrir les quiz). Badge + filtre dans les listes, éditable.
+- **Quiz** : rien pour l'instant (choix utilisateur) — le lien avec le
+  générateur de quiz sera une phase ultérieure.
+
 ### Quiz au niveau de la classe
 
 - **Idée** : un bouton « Faire un quiz » sur la page de la classe (à côté de

@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/dal";
 import { countUnreadNotifications } from "@/features/notifications/queries";
-import { SignOutButton } from "@/components/auth/sign-out-button";
 import { APP_NAME } from "@/constants/app";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
@@ -28,8 +27,12 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
                 </span>
               ) : null}
             </Link>
-            <span className="text-zinc-600 dark:text-zinc-400">{user.displayName}</span>
-            <SignOutButton />
+            <Link
+              href="/parametres"
+              className="rounded-md px-2 py-1 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+            >
+              {user.displayName} <span aria-hidden>⚙</span>
+            </Link>
           </div>
         </div>
       </header>
