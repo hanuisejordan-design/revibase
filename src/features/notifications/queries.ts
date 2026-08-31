@@ -3,6 +3,7 @@ import "server-only";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
+import type { QuestionPurpose } from "@/constants/app";
 import type { NotificationItem, NotificationType } from "./types";
 
 type Row = {
@@ -11,7 +12,7 @@ type Row = {
   read_at: string | null;
   created_at: string;
   actor: { display_name: string } | null;
-  questions: { id: string; title: string; course_id: string } | null;
+  questions: { id: string; title: string; course_id: string; purpose: QuestionPurpose } | null;
 };
 
 /** Notifications de l'utilisateur courant, les plus récentes d'abord. */
@@ -23,7 +24,7 @@ export const listNotifications = cache(async (): Promise<NotificationItem[]> => 
   const { data, error } = await supabase
     .from("notifications")
     .select(
-      "id, type, read_at, created_at, actor:profiles!notifications_actor_id_fkey(display_name), questions(id, title, course_id)",
+      "id, type, read_at, created_at, actor:profiles!notifications_actor_id_fkey(display_name), questions(id, title, course_id, purpose)",
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
@@ -39,6 +40,7 @@ export const listNotifications = cache(async (): Promise<NotificationItem[]> => 
     actorName: r.actor?.display_name ?? "Quelqu'un",
     questionId: r.questions?.id ?? null,
     questionTitle: r.questions?.title ?? null,
+    questionPurpose: r.questions?.purpose ?? null,
     courseId: r.questions?.course_id ?? null,
   }));
 });

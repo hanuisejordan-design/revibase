@@ -77,6 +77,50 @@ export default async function QuestionPage({
     </section>
   );
 
+  const answersSection = isOpen ? (
+    viewerHasAnswered ? (
+      <>
+        {answersBlock}
+        {answerFormBlock}
+      </>
+    ) : (
+      <>
+        {answerFormBlock}
+        {answersBlock}
+      </>
+    )
+  ) : (
+    <section className="flex flex-col gap-3">
+      <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">Réponse</h2>
+      <QuestionOptionsView options={question.options} />
+    </section>
+  );
+
+  const discussionSection = (
+    <section className="flex flex-col gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+          Discussion ({comments.length})
+        </h2>
+        <p className="text-xs text-zinc-500">
+          Pour échanger autour de la question (formulation, cas limites, « pourquoi »…).
+        </p>
+      </div>
+      <CommentList
+        comments={comments}
+        courseId={courseId}
+        questionId={question.id}
+        viewerId={user.id}
+        viewerIsTrainer={ctx.role === "trainer"}
+      />
+      <CreateCommentForm courseId={courseId} questionId={question.id} />
+    </section>
+  );
+
+  // Une question « besoin d'aide » appelle d'abord la discussion ; la
+  // validation d'une réponse reste possible, en dessous.
+  const discussionFirst = isOpen && question.purpose === "help";
+
   return (
     <div className="flex flex-col gap-6">
       <MarkQuestionRead questionId={question.id} />
@@ -120,43 +164,17 @@ export default async function QuestionPage({
         ) : null}
       </article>
 
-      {isOpen ? (
-        viewerHasAnswered ? (
-          <>
-            {answersBlock}
-            {answerFormBlock}
-          </>
-        ) : (
-          <>
-            {answerFormBlock}
-            {answersBlock}
-          </>
-        )
+      {discussionFirst ? (
+        <>
+          {discussionSection}
+          {answersSection}
+        </>
       ) : (
-        <section className="flex flex-col gap-3">
-          <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">Réponse</h2>
-          <QuestionOptionsView options={question.options} />
-        </section>
+        <>
+          {answersSection}
+          {discussionSection}
+        </>
       )}
-
-      <section className="flex flex-col gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
-            Discussion ({comments.length})
-          </h2>
-          <p className="text-xs text-zinc-500">
-            Pour échanger autour de la question (formulation, cas limites, « pourquoi »…).
-          </p>
-        </div>
-        <CommentList
-          comments={comments}
-          courseId={courseId}
-          questionId={question.id}
-          viewerId={user.id}
-          viewerIsTrainer={ctx.role === "trainer"}
-        />
-        <CreateCommentForm courseId={courseId} questionId={question.id} />
-      </section>
 
       {question.isAuthor || ctx.role === "trainer" ? (
         <div className="flex items-center gap-4 border-t border-zinc-200 pt-4 dark:border-zinc-800">

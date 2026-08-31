@@ -48,9 +48,13 @@ export default async function NotificationsPage() {
       ) : (
         <ul className="flex flex-col gap-1.5">
           {notifications.map((n) => {
+            const verb =
+              n.type === "validation" && n.questionPurpose === "help"
+                ? "a validé ton aide sur"
+                : VERB[n.type];
             const body = (
               <>
-                <span className="font-medium">{n.actorName}</span> {VERB[n.type]}
+                <span className="font-medium">{n.actorName}</span> {verb}
                 {n.questionTitle ? (
                   <>
                     {" "}

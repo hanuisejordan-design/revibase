@@ -187,6 +187,11 @@ Calculé à la lecture, par priorité décroissante :
   `PurposeBadge` sur les listes / le détail / la zone « nouvelles ». **Le
   quiz n'en tient pas compte** (pour l'instant). `purpose` est dans
   `QUESTION_SELECT` → migration à passer avant/avec le déploiement.
+- **Question `help`** (ADR 0027) : sur la page détail, la **Discussion passe
+  avant les Réponses** (`discussionFirst = isOpen && purpose === 'help'`) ;
+  la validation d'une réponse reste possible. La notification de validation
+  devient « **a validé ton aide sur** … » (in-app + push), calculée selon
+  `purpose` (pas de nouveau type de notif). `NotificationItem.questionPurpose`.
 - Statut d'une question = `validated` / `answered` / `unanswered`, calculé
   depuis `answers` (2 requêtes de comptage par lot d'ids).
 - **Suppression douce** (`deleted_at`) par l'auteur ou un formateur ; les

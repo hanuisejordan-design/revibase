@@ -1,3 +1,5 @@
+import type { QuestionPurpose } from "@/constants/app";
+
 export type NotificationType = "answer" | "comment" | "validation" | "new_question";
 
 export interface NotificationItem {
@@ -8,5 +10,6 @@ export interface NotificationItem {
   actorName: string;
   questionId: string | null;
   questionTitle: string | null;
+  questionPurpose: QuestionPurpose | null;
   courseId: string | null;
 }

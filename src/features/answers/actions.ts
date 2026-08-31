@@ -183,14 +183,19 @@ export async function toggleValidateAction(formData: FormData): Promise<void> {
   if (ans && !currentlyValidated && ans.author_id !== user.id) {
     const { data: question } = await supabase
       .from("questions")
-      .select("title")
+      .select("title, purpose")
       .eq("id", questionId)
       .maybeSingle();
-    const title = (question as { title: string } | null)?.title ?? "ta réponse";
+    const q = question as { title: string; purpose: string } | null;
+    const title = q?.title ?? "ta réponse";
+    const body =
+      q?.purpose === "help"
+        ? `a validé ton aide sur « ${title} »`
+        : `a validé ta réponse à « ${title} »`;
     after(() =>
       sendPushToUsers([ans.author_id], {
         title: user.displayName,
-        body: `a validé ta réponse à « ${title} »`,
+        body,
         url: `/course/${courseId}/questions/${questionId}`,
       }),
     );
