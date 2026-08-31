@@ -41,6 +41,50 @@ export async function countCourseContent(
   return { questions, summaries };
 }
 
+/**
+ * Nombre de questions « nouvelles depuis la dernière visite » par cours :
+ * `created_at` postérieur au `seen_at` de `course_reads` (jamais visité => tout
+ * est nouveau), hors les questions de l'utilisateur et hors questions supprimées.
+ */
+export async function countNewQuestions(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  courseIds: string[],
+): Promise<Map<string, number>> {
+  const out = new Map<string, number>();
+  if (courseIds.length === 0) return out;
+
+  const [{ data: reads, error: readsError }, { data: qs }] = await Promise.all([
+    supabase
+      .from("course_reads")
+      .select("course_id, seen_at")
+      .eq("user_id", userId)
+      .in("course_id", courseIds),
+    supabase
+      .from("questions")
+      .select("course_id, created_at")
+      .in("course_id", courseIds)
+      .is("deleted_at", null)
+      .neq("author_id", userId),
+  ]);
+
+  // Migration 0018 pas encore appliquée : pas de compteur plutôt que « tout est nouveau ».
+  if (readsError) return out;
+
+  const seenAt = new Map<string, number>();
+  for (const r of (reads ?? []) as Array<{ course_id: string; seen_at: string }>) {
+    seenAt.set(r.course_id, new Date(r.seen_at).getTime());
+  }
+
+  for (const q of (qs ?? []) as Array<{ course_id: string; created_at: string }>) {
+    const seen = seenAt.get(q.course_id);
+    if (seen === undefined || new Date(q.created_at).getTime() > seen) {
+      out.set(q.course_id, (out.get(q.course_id) ?? 0) + 1);
+    }
+  }
+  return out;
+}
+
 /** Tous les cours dont l'utilisateur courant est membre (adhésion explicite). */
 export const getMyCourses = cache(async (): Promise<CourseSummary[]> => {
   const user = await getUser();
@@ -66,9 +110,10 @@ export const getMyCourses = cache(async (): Promise<CourseSummary[]> => {
 
   const courseIds = rows.map((r) => r.course_id);
 
-  const [{ data: allMembers }, content] = await Promise.all([
+  const [{ data: allMembers }, content, newQuestions] = await Promise.all([
     supabase.from("course_members").select("course_id").in("course_id", courseIds),
     countCourseContent(supabase, courseIds),
+    countNewQuestions(supabase, user.id, courseIds),
   ]);
 
   const counts = new Map<string, number>();
@@ -87,6 +132,7 @@ export const getMyCourses = cache(async (): Promise<CourseSummary[]> => {
       memberCount: counts.get(r.course_id) ?? 1,
       questionCount: content.questions.get(r.course_id) ?? 0,
       summaryCount: content.summaries.get(r.course_id) ?? 0,
+      newQuestionCount: newQuestions.get(r.course_id) ?? 0,
       classId: r.courses.class_id,
     }));
 });

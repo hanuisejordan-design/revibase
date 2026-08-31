@@ -56,3 +56,4 @@ qui remplace l'ancien (et on met à jour le statut de l'ancien).
 | 0019 | [Rôles d'un cours : admin ≠ formateur](0019-roles-cours-admin-formateur.md) | accepté |
 | 0020 | [Édition d'une question](0020-edition-question.md) | accepté |
 | 0021 | [Centre de notifications](0021-notifications.md) | accepté |
+| 0022 | [Nouvelles questions depuis la dernière visite](0022-nouvelles-questions.md) | accepté |

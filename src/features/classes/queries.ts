@@ -4,9 +4,12 @@ import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
 import type { CourseRole } from "@/constants/app";
-import { countCourseContent } from "@/features/courses/queries";
+import type { QuestionKind } from "@/constants/app";
+import { countCourseContent, countNewQuestions } from "@/features/courses/queries";
+import { enrich } from "@/features/questions/queries";
 import type { CourseSummary } from "@/features/courses/types";
-import type { ClassContext, ClassMemberEntry, ClassSummary } from "./types";
+import type { QuestionStatus } from "@/features/questions/types";
+import type { ClassContext, ClassMemberEntry, ClassNewQuestion, ClassSummary } from "./types";
 
 type ContentCounts = { questions: Map<string, number>; summaries: Map<string, number> };
 
@@ -60,6 +63,7 @@ function toCourseSummary(
   myRole: Map<string, CourseRole>,
   myAdmin: Set<string>,
   content: ContentCounts,
+  newQuestions: Map<string, number>,
 ): CourseSummary {
   return {
     id: c.id,
@@ -70,6 +74,7 @@ function toCourseSummary(
     memberCount: counts.get(c.id) ?? 0,
     questionCount: content.questions.get(c.id) ?? 0,
     summaryCount: content.summaries.get(c.id) ?? 0,
+    newQuestionCount: newQuestions.get(c.id) ?? 0,
     classId: c.class_id,
   };
 }
@@ -108,9 +113,10 @@ export const getMyClasses = cache(async (): Promise<ClassSummary[]> => {
 
   const courses = (coursesData ?? []) as CourseRow[];
   const courseIds = courses.map((c) => c.id);
-  const [{ counts, myRole, myAdmin }, content] = await Promise.all([
+  const [{ counts, myRole, myAdmin }, content, newQuestions] = await Promise.all([
     courseMemberInfo(supabase, courseIds, user.id),
     countCourseContent(supabase, courseIds),
+    countNewQuestions(supabase, user.id, courseIds),
   ]);
 
   const memberCount = new Map<string, number>();
@@ -120,16 +126,20 @@ export const getMyClasses = cache(async (): Promise<ClassSummary[]> => {
 
   return rows
     .filter((r): r is typeof r & { classes: ClassRow } => r.classes !== null)
-    .map((r) => ({
-      id: r.classes.id,
-      name: r.classes.name,
-      joinCode: r.classes.join_code,
-      isAdmin: r.is_admin,
-      memberCount: memberCount.get(r.class_id) ?? 1,
-      courses: courses
+    .map((r) => {
+      const classCourses = courses
         .filter((c) => c.class_id === r.class_id)
-        .map((c) => toCourseSummary(c, counts, myRole, myAdmin, content)),
-    }));
+        .map((c) => toCourseSummary(c, counts, myRole, myAdmin, content, newQuestions));
+      return {
+        id: r.classes.id,
+        name: r.classes.name,
+        joinCode: r.classes.join_code,
+        isAdmin: r.is_admin,
+        memberCount: memberCount.get(r.class_id) ?? 1,
+        newQuestionCount: classCourses.reduce((n, c) => n + c.newQuestionCount, 0),
+        courses: classCourses,
+      };
+    });
 });
 
 /** Contexte de la classe, ou `null` si l'utilisateur n'en est pas membre. */
@@ -180,13 +190,105 @@ export const getClassCourses = cache(async (classId: string): Promise<CourseSumm
 
   const courses = (data ?? []) as CourseRow[];
   const courseIds = courses.map((c) => c.id);
-  const [{ counts, myRole, myAdmin }, content] = await Promise.all([
+  const [{ counts, myRole, myAdmin }, content, newQuestions] = await Promise.all([
     courseMemberInfo(supabase, courseIds, user.id),
     countCourseContent(supabase, courseIds),
+    countNewQuestions(supabase, user.id, courseIds),
   ]);
 
-  return courses.map((c) => toCourseSummary(c, counts, myRole, myAdmin, content));
+  return courses.map((c) => toCourseSummary(c, counts, myRole, myAdmin, content, newQuestions));
 });
+
+/**
+ * Questions « nouvelles depuis la dernière visite » de tous les cours de la
+ * classe, les plus anciennes d'abord (pour les enchaîner dans l'ordre).
+ * « Nouvelle » = `created_at > course_reads.seen_at`, hors les siennes.
+ */
+export const getClassNewQuestions = cache(
+  async (classId: string): Promise<ClassNewQuestion[]> => {
+    const user = await getUser();
+    if (!user) return [];
+
+    const supabase = await createClient();
+
+    const { data: coursesData } = await supabase
+      .from("courses")
+      .select("id, name")
+      .eq("class_id", classId);
+
+    const courses = (coursesData ?? []) as Array<{ id: string; name: string }>;
+    if (courses.length === 0) return [];
+
+    const courseIds = courses.map((c) => c.id);
+    const courseName = new Map(courses.map((c) => [c.id, c.name]));
+
+    const [{ data: reads, error: readsError }, { data: qs }] = await Promise.all([
+      supabase
+        .from("course_reads")
+        .select("course_id, seen_at")
+        .eq("user_id", user.id)
+        .in("course_id", courseIds),
+      supabase
+        .from("questions")
+        .select("id, title, kind, course_id, created_at, chapters(name), profiles(display_name)")
+        .in("course_id", courseIds)
+        .is("deleted_at", null)
+        .neq("author_id", user.id)
+        .order("created_at", { ascending: true }),
+    ]);
+
+    // Migration 0018 pas encore appliquée : rien à afficher plutôt que tout.
+    if (readsError) return [];
+
+    const seenAt = new Map<string, number>();
+    for (const r of (reads ?? []) as Array<{ course_id: string; seen_at: string }>) {
+      seenAt.set(r.course_id, new Date(r.seen_at).getTime());
+    }
+
+    const rows = (
+      qs as unknown as Array<{
+        id: string;
+        title: string;
+        kind: QuestionKind;
+        course_id: string;
+        created_at: string;
+        chapters: { name: string } | null;
+        profiles: { display_name: string } | null;
+      }> | null
+    )?.filter((q) => {
+      const seen = seenAt.get(q.course_id);
+      return seen === undefined || new Date(q.created_at).getTime() > seen;
+    });
+
+    if (!rows || rows.length === 0) return [];
+
+    const meta = await enrich(
+      supabase,
+      rows.map((r) => r.id),
+    );
+
+    return rows.map((r) => {
+      const m = meta.get(r.id) ?? {
+        answerCount: 0,
+        commentCount: 0,
+        status: "unanswered" as QuestionStatus,
+      };
+      return {
+        id: r.id,
+        title: r.title,
+        kind: r.kind,
+        courseId: r.course_id,
+        courseName: courseName.get(r.course_id) ?? "Cours",
+        chapterName: r.chapters?.name ?? null,
+        authorName: r.profiles?.display_name ?? "Membre",
+        createdAt: r.created_at,
+        answerCount: m.answerCount,
+        commentCount: m.commentCount,
+        status: m.status,
+      };
+    });
+  },
+);
 
 /** Membres de la classe, triés par date d'arrivée. */
 export const getClassMembers = cache(async (classId: string): Promise<ClassMemberEntry[]> => {

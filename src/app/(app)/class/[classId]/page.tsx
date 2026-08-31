@@ -15,6 +15,7 @@ export default async function ClassCoursesPage({
   if (!ctx) notFound();
 
   const courses = await getClassCourses(classId);
+  const newCount = courses.reduce((n, c) => n + c.newQuestionCount, 0);
 
   return (
     <div className="flex flex-col gap-6">
@@ -24,6 +25,19 @@ export default async function ClassCoursesPage({
           hint="Partage ce code pour faire entrer quelqu'un : il aura accès à tous les cours de la classe."
         />
       </section>
+
+      {newCount > 0 ? (
+        <Link
+          href={`/class/${classId}/nouvelles`}
+          className="flex items-center justify-between gap-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm transition-colors hover:border-amber-400 dark:border-amber-900 dark:bg-amber-950/40 dark:hover:border-amber-800"
+        >
+          <span className="font-medium text-amber-900 dark:text-amber-200">
+            {newCount} nouvelle{newCount > 1 ? "s" : ""} question{newCount > 1 ? "s" : ""} depuis ta
+            dernière visite
+          </span>
+          <span className="shrink-0 text-amber-800 dark:text-amber-300">Les parcourir →</span>
+        </Link>
+      ) : null}
 
       {ctx.isAdmin ? (
         <div className="flex flex-wrap gap-3">

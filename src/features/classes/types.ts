@@ -1,4 +1,6 @@
+import type { QuestionKind } from "@/constants/app";
 import type { CourseSummary } from "@/features/courses/types";
+import type { QuestionStatus } from "@/features/questions/types";
 
 /** Une classe (promo) telle qu'affichée sur le tableau de bord, avec ses cours. */
 export interface ClassSummary {
@@ -9,6 +11,8 @@ export interface ClassSummary {
   isAdmin: boolean;
   /** Nombre de membres de la classe. */
   memberCount: number;
+  /** Somme des « nouvelles questions » sur tous les cours de la classe. */
+  newQuestionCount: number;
   courses: CourseSummary[];
 }
 
@@ -18,6 +22,24 @@ export interface ClassContext {
   name: string;
   joinCode: string;
   isAdmin: boolean;
+}
+
+/**
+ * Une question « nouvelle depuis la dernière visite », agrégée sur tous les
+ * cours d'une classe (zone `class/[classId]/nouvelles`).
+ */
+export interface ClassNewQuestion {
+  id: string;
+  title: string;
+  kind: QuestionKind;
+  courseId: string;
+  courseName: string;
+  chapterName: string | null;
+  authorName: string;
+  createdAt: string;
+  answerCount: number;
+  commentCount: number;
+  status: QuestionStatus;
 }
 
 /** Un membre d'une classe, pour la liste des participants. */

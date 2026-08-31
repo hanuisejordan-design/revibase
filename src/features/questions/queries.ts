@@ -44,7 +44,7 @@ async function signImages(
 }
 
 /** Compte réponses / commentaires et détecte une réponse validée, par question. */
-async function enrich(
+export async function enrich(
   supabase: Awaited<ReturnType<typeof createClient>>,
   questionIds: string[],
 ): Promise<Map<string, { answerCount: number; commentCount: number; status: QuestionStatus }>> {

@@ -20,18 +20,16 @@ quand on répond / commente leur question, ni quand leur réponse est validée.
 | réponse ajoutée à une question | l'auteur de la question |
 | commentaire ajouté à une question | l'auteur de la question |
 | réponse validée par un formateur | l'auteur de la réponse |
-| nouvelle question posée dans un cours | tous les autres membres du cours |
+
+Le centre de notifications est réservé aux **échanges**. « Une nouvelle
+question est apparue dans un cours » n'y figure pas : c'est traité par une
+zone dédiée au niveau de la classe (compteur `course_reads`, [ADR 0022](0022-nouvelles-questions.md)).
 
 - **Écriture par triggers `security definer`** sur `answers` (insert +
-  update) et `comments` (insert) — migration `0016` ; sur `questions`
-  (insert) — migration `0017`. Robuste — impossible à oublier, indépendant du
-  chemin d'appel — et contourne l'absence voulue de policy INSERT sur
-  `notifications`. On ne se notifie jamais soi-même (`actor <> destinataire`).
-- **`new_question`** (`0017`) notifie l'union « membres directs du cours
-  (`course_members`) + membres via la classe parente (`class_members` sur
-  `courses.class_id`) », dédoublonnée, l'auteur exclu. Une notification n'est
-  pas de l'UI : elle fait partie du pratique de l'app, d'où son inclusion dès
-  la v1 (contrairement à un *feed* « nouvelles questions », repoussé).
+  update) et `comments` (insert) — migration `0016`. Robuste — impossible à
+  oublier, indépendant du chemin d'appel — et contourne l'absence voulue de
+  policy INSERT sur `notifications`. On ne se notifie jamais soi-même
+  (`actor <> destinataire`).
 - **Lecture** : `listNotifications()` (50 dernières, avec le nom de l'acteur,
   le titre et le cours de la question) ; `countUnreadNotifications()` pour la
   cloche de l'en-tête (`read_at is null`).
@@ -48,10 +46,10 @@ quand on répond / commente leur question, ni quand leur réponse est validée.
 - **Écriture depuis les Server Actions** (`createAnswerAction`…) : fragile
   (un nouveau chemin d'écriture oublie la notif) et demande une policy INSERT
   ou un RPC. Les triggers sont la source de vérité.
-- **Feed « nouvelles questions depuis ma dernière visite »** (section en haut
-  du cours, mode « enchaîner ») : c'est de l'UI, repoussé (`course_reads`,
-  backlog). La **notification** `new_question`, elle, est retenue : une ligne
-  par membre et par question, volume acceptable à l'échelle d'un cours.
+- **Notifier « nouvelle question dans le cours »** via un trigger (essayé en
+  `0017`, abandonné avant application) : une notification par membre et par
+  question, et surtout ça mélange « on t'a répondu » avec « il y a du neuf à
+  lire ». Séparé dans une zone dédiée (`course_reads`, [ADR 0022](0022-nouvelles-questions.md)).
 - **Notifier les autres répondeurs / commentateurs d'un fil** : reporté ;
   v1 se limite à l'auteur de la question / de la réponse.
 - **Marquage lu par notification individuelle au clic** : friction en plus
@@ -62,9 +60,6 @@ quand on répond / commente leur question, ni quand leur réponse est validée.
 - Le trigger `notify_on_validation` est un `AFTER UPDATE` sur `answers`
   (distinct des triggers `BEFORE` existants) ; il ne notifie que quand
   `validated_by` passe à une valeur non nulle.
-- `notify_on_new_question` insère N lignes d'un coup (une par membre). Dans un
-  gros cours actif ça peut devenir bruyant → à regrouper / rendre optionnel
-  (préférences par cours) si besoin.
 - Un flot de réponses = un flot de notifications (pas de regroupement). À
   revoir si ça devient bruyant.
 - `services/notifications/` (vide depuis 0001) reste inutilisé — la logique

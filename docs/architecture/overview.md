@@ -354,12 +354,9 @@ Calculé à la lecture, par priorité décroissante :
   - `notify_on_validation` — `AFTER UPDATE` sur `answers`, quand
     `validated_by` passe à non-nul → l'auteur de la réponse
     (`type = 'validation'`).
-  - `notify_on_new_question` (migration `0017`) — `AFTER INSERT` sur
-    `questions` → **tous les autres membres du cours** : union
-    `course_members` (membres directs) + `class_members` sur
-    `courses.class_id` (membres via la classe), dédoublonnée
-    (`type = 'new_question'`).
   - Jamais de notification à soi-même (`actor_id <> user_id`).
+  - Réservé aux **échanges** : « nouvelle question dans un cours » est traité
+    à part (`course_reads`, cf. section suivante et ADR 0022).
 - `features/notifications/` : `queries.ts` (`listNotifications` — 50
   dernières, jointure `actor:profiles` + `questions` ; `countUnreadNotifications`
   — `read_at is null`, pour la cloche), `actions.ts`
@@ -370,6 +367,25 @@ Calculé à la lecture, par priorité décroissante :
   question, « Tout marquer comme lu »). **Ouvrir la page marque tout lu**
   (`MarkAllRead`, effet client au montage).
 - `services/notifications/` reste vide — la logique est en base + `features/`.
-- Le *feed* « nouvelles questions depuis ma dernière visite » (section en
-  haut du cours) reste au backlog (`course_reads`) : c'est de l'UI. La
-  **notification** `new_question`, elle, est bien émise (`0017`).
+
+## Nouvelles questions depuis la dernière visite (Phase 22, ADR 0022)
+
+- **Migration `0018`** : table `course_reads (course_id, user_id, seen_at)`,
+  privée (RLS `user_id = auth.uid()`). Marqueur de lecture, pas une notif.
+  La migration retire aussi le trigger `new_question` de l'ancien `0017`
+  (abandonné).
+- **« Nouvelle »** = `question.created_at > course_reads.seen_at` (jamais vu
+  ⇒ tout), hors les siennes, hors supprimées.
+- `seen_at` remis à maintenant à l'ouverture de la liste des questions d'un
+  cours (`MarkCourseSeen` → `markCourseQuestionsSeenAction`) ou de la zone
+  classe (`MarkClassSeen` → `markClassQuestionsSeenAction`, un upsert par
+  cours de la classe).
+- `countNewQuestions()` (`features/courses/queries.ts`) alimente
+  `CourseSummary.newQuestionCount` (via `getMyClasses` / `getClassCourses` /
+  `getMyCourses`) et `ClassSummary.newQuestionCount` (somme).
+- **UI** : pastille ambre « N nouvelles » sur les vignettes de cours et de
+  classe ; encart au-dessus de « Créer un cours » sur la page de la classe ;
+  zone `class/[classId]/nouvelles` = liste agrégée tous cours, la plus
+  ancienne d'abord (`getClassNewQuestions`), chaque ligne → la question.
+- Requêtes tolérantes : si `0018` n'est pas appliquée, l'erreur de lecture
+  de `course_reads` ⇒ « aucune nouvelle » (jamais « tout est nouveau »).

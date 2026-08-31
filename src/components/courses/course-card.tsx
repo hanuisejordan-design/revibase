@@ -3,6 +3,8 @@ import type { CourseSummary } from "@/features/courses/types";
 
 const trainerBadge =
   "inline-flex items-center rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-800 dark:bg-sky-950 dark:text-sky-300";
+const newBadge =
+  "inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900 dark:bg-amber-950 dark:text-amber-300";
 
 /** Carte d'un cours, utilisée sur le tableau de bord et la page d'une classe. */
 export function CourseCard({ course }: { course: CourseSummary }) {
@@ -20,6 +22,11 @@ export function CourseCard({ course }: { course: CourseSummary }) {
       <span className="font-medium">{course.name}</span>
       <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-zinc-500">
         {course.role === "trainer" ? <span className={trainerBadge}>Formateur</span> : null}
+        {course.newQuestionCount > 0 ? (
+          <span className={newBadge}>
+            {course.newQuestionCount} nouvelle{course.newQuestionCount > 1 ? "s" : ""}
+          </span>
+        ) : null}
         {bits.join(" · ")}
       </span>
     </Link>

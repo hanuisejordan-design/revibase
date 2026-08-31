@@ -58,6 +58,50 @@ export async function joinCourseAction(
   redirect(`/course/${data as string}`);
 }
 
+/**
+ * Marque la liste des questions d'un cours comme vue (maintenant) pour
+ * l'utilisateur courant. Alimente le compteur « nouvelles questions ».
+ * Silencieux : appelé au montage de la page, une erreur ne doit rien casser.
+ */
+export async function markCourseQuestionsSeenAction(courseId: string): Promise<void> {
+  if (!courseId) return;
+  const user = await getUser();
+  if (!user) return;
+
+  const supabase = await createClient();
+  await supabase
+    .from("course_reads")
+    .upsert(
+      { course_id: courseId, user_id: user.id, seen_at: new Date().toISOString() },
+      { onConflict: "course_id,user_id" },
+    );
+
+  revalidatePath("/dashboard");
+}
+
+/** Idem, mais pour tous les cours d'une classe (zone « nouvelles questions »). */
+export async function markClassQuestionsSeenAction(classId: string): Promise<void> {
+  if (!classId) return;
+  const user = await getUser();
+  if (!user) return;
+
+  const supabase = await createClient();
+  const { data: courses } = await supabase.from("courses").select("id").eq("class_id", classId);
+
+  const rows = ((courses ?? []) as Array<{ id: string }>).map((c) => ({
+    course_id: c.id,
+    user_id: user.id,
+    seen_at: new Date().toISOString(),
+  }));
+  if (rows.length > 0) {
+    await supabase.from("course_reads").upsert(rows, { onConflict: "course_id,user_id" });
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath(`/class/${classId}`);
+  revalidatePath(`/class/${classId}/nouvelles`);
+}
+
 /** Quitte un cours. Réservé aux membres non créateurs (garde-fou côté UI). */
 export async function leaveCourseAction(formData: FormData): Promise<void> {
   const courseId = String(formData.get("courseId") ?? "");
