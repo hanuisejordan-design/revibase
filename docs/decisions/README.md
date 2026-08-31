@@ -57,3 +57,4 @@ qui remplace l'ancien (et on met à jour le statut de l'ancien).
 | 0020 | [Édition d'une question](0020-edition-question.md) | accepté |
 | 0021 | [Centre de notifications](0021-notifications.md) | accepté |
 | 0022 | [Nouveautés depuis la dernière visite (questions & résumés)](0022-nouvelles-questions.md) | accepté |
+| 0023 | [PWA installable + notifications push](0023-pwa-push.md) | accepté |

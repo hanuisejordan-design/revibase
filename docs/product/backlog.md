@@ -122,7 +122,9 @@ navigateur. Reste : nettoyage des images orphelines (cf. reports).
 | Sujet                                           | Référence               | Note                                                                                               |
 | ----------------------------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------- |
 | Responsive mobile à peaufiner                   | brief §17, Phase 10     | Cible n°1 ; à faire avant adoption large par la classe                                             |
-| Notifications : pas de temps réel / push               | Phase 21, ADR 0021      | Centre de notifs livré (réponse / commentaire / validation). Compteur rafraîchi à la navigation ; pas de WebSocket ni de push navigateur |
+| Notifications : pas de temps réel (WebSocket)           | Phase 21, ADR 0021      | Compteur rafraîchi à la navigation. Push navigateur : **fait** (Phase 23, ADR 0023) ; l'in-app n'est pas « live » pour autant |
+| Push : envoi depuis les Server Actions (best-effort)    | Phase 23, ADR 0023      | Pas depuis les triggers → un futur chemin d'écriture pourrait oublier le push. L'in-app reste garanti. Alternative Edge Function écartée (trop d'infra) |
+| Icône PWA provisoire                                    | Phase 23                | Monogramme « R » généré (`scripts/gen-icons.mjs`). À remplacer par un vrai visuel avec l'identité graphique |
 | Recherche plein-texte                           | ADR 0002, 0008          | Aujourd'hui : `ILIKE` sur le titre uniquement                                                      |
 | Types Supabase générés                          | `src/types/database.ts` | Remplacer les types écrits à la main par `supabase gen types`                                      |
 | États de chargement / erreurs soignés           | Phase 10                | `loading.tsx`, messages d'erreur, empty states                                                     |

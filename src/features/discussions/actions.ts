@@ -2,10 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
 import { getCourseContext } from "@/features/courses/queries";
 import { parseInput } from "@/lib/validation/helpers";
+import { sendPushToUsers } from "@/lib/push/send";
 import { createCommentSchema } from "./schema";
 
 export interface CommentFormState {
@@ -37,12 +39,13 @@ export async function createCommentAction(
 
   const { data: question } = await supabase
     .from("questions")
-    .select("id")
+    .select("id, author_id, title")
     .eq("id", questionId)
     .eq("course_id", courseId)
     .is("deleted_at", null)
     .maybeSingle();
   if (!question) return { formError: "Question introuvable." };
+  const q = question as { id: string; author_id: string; title: string };
 
   const { error } = await supabase.from("comments").insert({
     question_id: questionId,
@@ -52,6 +55,19 @@ export async function createCommentAction(
   if (error) return { formError: "Envoi impossible. Réessaie." };
 
   revalidateQuestion(courseId, questionId);
+
+  // Push best-effort à l'auteur de la question (notif in-app = trigger
+  // `comments_notify`).
+  if (q.author_id !== user.id) {
+    after(() =>
+      sendPushToUsers([q.author_id], {
+        title: user.displayName,
+        body: `a commenté « ${q.title} »`,
+        url: `/course/${courseId}/questions/${questionId}`,
+      }),
+    );
+  }
+
   return { ok: true };
 }
 

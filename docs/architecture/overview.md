@@ -398,3 +398,30 @@ Calculé à la lecture, par priorité décroissante :
   listes agrégées tous cours, la plus ancienne d'abord.
 - Requêtes tolérantes : si `0018`/`0019` non appliquées, l'erreur de lecture
   ⇒ « aucune nouveauté » (jamais « tout est nouveau »).
+
+## PWA + notifications push (Phase 23, ADR 0023)
+
+- **PWA** : `app/manifest.ts` (`display: standalone`, icônes `public/`
+  générées par `scripts/gen-icons.mjs`). Service worker `public/sw.js` —
+  **push uniquement**, pas de cache offline (`push` → `showNotification`,
+  `notificationclick` → focus/ouvre l'URL). En-têtes dans `next.config.ts`.
+- **Web Push** : clés VAPID (`NEXT_PUBLIC_VAPID_PUBLIC_KEY` client,
+  `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` serveur) — **optionnelles**, absentes
+  ⇒ push désactivé proprement.
+- **Migration `0020`** : `push_subscriptions` (un appareil = une ligne, clé
+  `endpoint`), privée. `security definer` : `list_push_targets(uuid[])` (lire
+  les abonnements des destinataires), `delete_push_subscription_by_endpoint`
+  (purge 404/410).
+- `features/push/` : `actions.ts` (`subscribeToPushAction` /
+  `unsubscribeFromPushAction`), `audience.ts` (`courseAudience` =
+  `course_members` ∪ `class_members`). `lib/push/send.ts`
+  (`sendPushToUsers`, best-effort, `web-push`).
+- `components/notifications/push-toggle.tsx` en tête de `/notifications` :
+  enregistre le SW, permission, `pushManager.subscribe`, Activer/Désactiver.
+- **Envoi depuis les Server Actions** dans un `after()` (non bloquant) :
+  `createAnswerAction` / `createCommentAction` / `toggleValidateAction` →
+  auteur concerné ; `createQuestionAction` / `createSummaryAction` →
+  `courseAudience`. La notif in-app (triggers) + les pastilles `course_reads`
+  restent la source de vérité ; le push est une couche de livraison.
+- **iOS** : push seulement si l'app est installée sur l'écran d'accueil
+  (16.4+). Un encart l'explique dans `PushToggle`.

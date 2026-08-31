@@ -2,10 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
 import { getCourseContext } from "@/features/courses/queries";
 import { parseInput } from "@/lib/validation/helpers";
+import { sendPushToUsers } from "@/lib/push/send";
+import { courseAudience } from "@/features/push/audience";
 import { createSummarySchema } from "./schema";
 
 const BUCKET = "summaries";
@@ -64,6 +67,23 @@ export async function createSummaryAction(
   }
 
   revalidatePath(`/course/${courseId}/summaries`);
+  revalidatePath(`/course/${courseId}`);
+
+  // Push best-effort aux autres membres du cours (pas de notif in-app pour
+  // les résumés — pastilles `course_reads`).
+  after(async () => {
+    try {
+      const audience = await courseAudience(courseId, user.id);
+      await sendPushToUsers(audience, {
+        title: user.displayName,
+        body: `a ajouté le résumé « ${parsed.data.title} »`,
+        url: `/course/${courseId}/summaries`,
+      });
+    } catch {
+      // best-effort
+    }
+  });
+
   redirect(`/course/${courseId}/summaries`);
 }
 

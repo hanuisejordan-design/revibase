@@ -2,10 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
 import { getCourseContext } from "@/features/courses/queries";
 import { parseInput } from "@/lib/validation/helpers";
+import { sendPushToUsers } from "@/lib/push/send";
 import { createAnswerSchema } from "./schema";
 import { isSameAnswer } from "./normalize";
 
@@ -40,12 +42,13 @@ export async function createAnswerAction(
 
   const { data: question } = await supabase
     .from("questions")
-    .select("id")
+    .select("id, author_id, title")
     .eq("id", questionId)
     .eq("course_id", courseId)
     .is("deleted_at", null)
     .maybeSingle();
   if (!question) return { formError: "Question introuvable." };
+  const q = question as { id: string; author_id: string; title: string };
 
   // Doublon exact ? On ne recrée pas la réponse : on ajoute un vote à celle
   // qui existe déjà (cf. ADR 0014). Comparaison stricte, pas de correction
@@ -90,6 +93,19 @@ export async function createAnswerAction(
     );
 
   revalidateQuestion(courseId, questionId);
+
+  // Push best-effort à l'auteur de la question (la notif in-app est écrite
+  // par le trigger `answers_notify`).
+  if (q.author_id !== user.id) {
+    after(() =>
+      sendPushToUsers([q.author_id], {
+        title: user.displayName,
+        body: `a répondu à « ${q.title} »`,
+        url: `/course/${courseId}/questions/${questionId}`,
+      }),
+    );
+  }
+
   return { ok: true };
 }
 
@@ -148,11 +164,12 @@ export async function toggleValidateAction(formData: FormData): Promise<void> {
   const supabase = await createClient();
   const { data: answer } = await supabase
     .from("answers")
-    .select("validated_by")
+    .select("validated_by, author_id")
     .eq("id", answerId)
     .maybeSingle();
 
-  const currentlyValidated = (answer as { validated_by: string | null } | null)?.validated_by;
+  const ans = answer as { validated_by: string | null; author_id: string } | null;
+  const currentlyValidated = ans?.validated_by;
   // Le trigger `enforce_answer_validation` force validated_by = auth.uid() et
   // gère validated_at ; on se contente d'activer / désactiver.
   await supabase
@@ -161,6 +178,23 @@ export async function toggleValidateAction(formData: FormData): Promise<void> {
     .eq("id", answerId);
 
   revalidateQuestion(courseId, questionId);
+
+  // Push best-effort à l'auteur de la réponse quand on vient de la valider.
+  if (ans && !currentlyValidated && ans.author_id !== user.id) {
+    const { data: question } = await supabase
+      .from("questions")
+      .select("title")
+      .eq("id", questionId)
+      .maybeSingle();
+    const title = (question as { title: string } | null)?.title ?? "ta réponse";
+    after(() =>
+      sendPushToUsers([ans.author_id], {
+        title: user.displayName,
+        body: `a validé ta réponse à « ${title} »`,
+        url: `/course/${courseId}/questions/${questionId}`,
+      }),
+    );
+  }
 }
 
 export async function deleteAnswerAction(formData: FormData): Promise<void> {

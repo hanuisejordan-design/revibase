@@ -2,10 +2,13 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
 import { getCourseContext } from "@/features/courses/queries";
 import { parseInput } from "@/lib/validation/helpers";
+import { sendPushToUsers } from "@/lib/push/send";
+import { courseAudience } from "@/features/push/audience";
 import type { QuestionKind } from "@/constants/app";
 import { createQuestionSchema } from "./schema";
 
@@ -104,6 +107,23 @@ export async function createQuestionAction(
   revalidatePath(`/course/${courseId}`);
   revalidatePath(`/course/${courseId}/questions`);
   revalidatePath(`/course/${courseId}/questions/${questionId}`);
+
+  // Push best-effort aux autres membres du cours. Pas de notif in-app pour
+  // « nouvelle question » (cf. ADR 0022 : géré par les pastilles
+  // `course_reads`) — le push, lui, est explicitement voulu.
+  after(async () => {
+    try {
+      const audience = await courseAudience(courseId, user.id);
+      await sendPushToUsers(audience, {
+        title: user.displayName,
+        body: `a posé la question « ${parsed.data.title} »`,
+        url: `/course/${courseId}/questions/${questionId}`,
+      });
+    } catch {
+      // best-effort
+    }
+  });
+
   redirect(`/course/${courseId}/questions/${questionId}`);
 }
 

@@ -50,6 +50,12 @@ Dans le tableau de bord Supabase → _Project Settings_ :
 > Ces variables ne sont réellement nécessaires qu'à partir de la Phase 1
 > (authentification). La page d'accueil actuelle fonctionne sans.
 
+**Notifications push (optionnel, Phase 23)** — générer une paire avec
+`npx web-push generate-vapid-keys`, puis renseigner `NEXT_PUBLIC_VAPID_PUBLIC_KEY`
+(publique), `VAPID_PRIVATE_KEY` (**secrète**, à mettre dans les variables
+Vercel) et `VAPID_SUBJECT` (`mailto:` de contact). Sans elles, l'app tourne
+et le push est simplement désactivé. Détails : [`docs/decisions/0023-pwa-push.md`](docs/decisions/0023-pwa-push.md).
+
 ### Base de données
 
 **1. Schéma** — dans _SQL Editor_ (Supabase Studio), exécuter **dans l'ordre**
@@ -133,7 +139,7 @@ votes, validation formateur, calcul du score de quiz.
 
 Le développement suit des phases laissant l'app fonctionnelle à chaque étape : 0. Initialisation ✅ · 1. Authentification ✅ · 2. Classes ✅ · 3. Chapitres ✅ · 4. Questions ✅ · 5. Réponses & votes ✅ · 6. Discussions ✅ · 7. Validation formateur ✅ · 8. Quiz ✅ · 9. Notifications ✅ · 10. Polissage.
 
-**Post-MVP :** 11. Types de question (ouverte / vrai-faux / QCM) ✅ avec quiz auto-corrigés · 12. Répondre avant de voir les autres réponses + fusion des doublons exacts en vote + discussion en bulles ✅ · 13. Groupes (une promo chapeaute plusieurs cours) ✅ · 14. Photo attachée à une question ✅ · 15. Renommage groupe → **classe** → **cours** + refonte du tableau de bord ✅ · 16. Résumés par cours (dépôt de fiches / PDF) ✅ · 17. Favori privé sur les résumés ✅ · 18. Rôles du cours : admin ≠ formateur ✅ · 19. Éditer une question ✅ · 20. Vignettes de cours : compteurs questions / résumés ✅ · 21. Centre de notifications ✅ · 22. Nouveautés depuis la dernière visite : questions & résumés ✅
+**Post-MVP :** 11. Types de question (ouverte / vrai-faux / QCM) ✅ avec quiz auto-corrigés · 12. Répondre avant de voir les autres réponses + fusion des doublons exacts en vote + discussion en bulles ✅ · 13. Groupes (une promo chapeaute plusieurs cours) ✅ · 14. Photo attachée à une question ✅ · 15. Renommage groupe → **classe** → **cours** + refonte du tableau de bord ✅ · 16. Résumés par cours (dépôt de fiches / PDF) ✅ · 17. Favori privé sur les résumés ✅ · 18. Rôles du cours : admin ≠ formateur ✅ · 19. Éditer une question ✅ · 20. Vignettes de cours : compteurs questions / résumés ✅ · 21. Centre de notifications ✅ · 22. Nouveautés depuis la dernière visite : questions & résumés ✅ · 23. PWA installable + notifications push ✅
 
 La boucle MVP est en ligne et testée en conditions réelles.
 
