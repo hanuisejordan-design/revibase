@@ -120,6 +120,78 @@ export async function countNewSummaries(
   return out;
 }
 
+export interface CourseOption {
+  id: string;
+  name: string;
+  className: string | null;
+}
+
+/**
+ * Liste plate et légère de tous les cours accessibles (adhésion directe +
+ * via la classe), triée par nom. Pour la navigation rapide (barre du bas).
+ */
+export const getMyCourseOptions = cache(async (): Promise<CourseOption[]> => {
+  const user = await getUser();
+  if (!user) return [];
+
+  const supabase = await createClient();
+
+  const [{ data: direct }, { data: myClasses }] = await Promise.all([
+    supabase
+      .from("course_members")
+      .select("courses(id, name, class_id, classes(name))")
+      .eq("user_id", user.id),
+    supabase.from("class_members").select("class_id, classes(name)").eq("user_id", user.id),
+  ]);
+
+  const byId = new Map<string, CourseOption>();
+
+  for (const row of (direct ?? []) as unknown as Array<{
+    courses: {
+      id: string;
+      name: string;
+      class_id: string | null;
+      classes: { name: string } | { name: string }[] | null;
+    } | null;
+  }>) {
+    const c = row.courses;
+    if (!c) continue;
+    const cls = Array.isArray(c.classes) ? (c.classes[0] ?? null) : c.classes;
+    byId.set(c.id, { id: c.id, name: c.name, className: cls?.name ?? null });
+  }
+
+  const classNameById = new Map<string, string>();
+  for (const row of (myClasses ?? []) as unknown as Array<{
+    class_id: string;
+    classes: { name: string } | { name: string }[] | null;
+  }>) {
+    const cls = Array.isArray(row.classes) ? (row.classes[0] ?? null) : row.classes;
+    if (cls) classNameById.set(row.class_id, cls.name);
+  }
+
+  const classIds = [...classNameById.keys()];
+  if (classIds.length > 0) {
+    const { data: classCourses } = await supabase
+      .from("courses")
+      .select("id, name, class_id")
+      .in("class_id", classIds);
+    for (const c of (classCourses ?? []) as Array<{
+      id: string;
+      name: string;
+      class_id: string | null;
+    }>) {
+      if (byId.has(c.id)) continue;
+      byId.set(c.id, {
+        id: c.id,
+        name: c.name,
+        className: c.class_id ? (classNameById.get(c.class_id) ?? null) : null,
+      });
+    }
+  }
+
+  return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name, "fr"));
+});
+
 /** Tous les cours dont l'utilisateur courant est membre (adhésion explicite). */
 export const getMyCourses = cache(async (): Promise<CourseSummary[]> => {
   const user = await getUser();

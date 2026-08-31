@@ -2,10 +2,16 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/dal";
 import { countUnreadNotifications } from "@/features/notifications/queries";
+import { getMyCourseOptions } from "@/features/courses/queries";
+import { BottomNav } from "@/components/nav/bottom-nav";
 import { APP_NAME } from "@/constants/app";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
-  const [user, unread] = await Promise.all([requireUser(), countUnreadNotifications()]);
+  const [user, unread, courseOptions] = await Promise.all([
+    requireUser(),
+    countUnreadNotifications(),
+    getMyCourseOptions(),
+  ]);
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
@@ -14,7 +20,8 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           <Link href="/dashboard" className="font-semibold">
             {APP_NAME}
           </Link>
-          <div className="flex items-center gap-3 text-sm">
+          {/* Sur mobile, cloche + profil sont dans la barre du bas. */}
+          <div className="hidden items-center gap-3 text-sm md:flex">
             <Link
               href="/notifications"
               aria-label="Notifications"
@@ -36,7 +43,8 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-8">{children}</main>
+      <main className="mx-auto w-full max-w-3xl flex-1 px-6 pt-8 pb-24 md:pb-8">{children}</main>
+      <BottomNav unread={unread} courses={courseOptions} />
     </div>
   );
 }

@@ -425,6 +425,21 @@ Calculé à la lecture, par priorité décroissante :
   `src/components/settings/`.
 - Liens de retour (`← …`) agrandis (zone cliquable).
 
+## Barre de navigation basse — mobile (Phase 28, ADR 0028)
+
+- `src/components/nav/` : `bottom-nav.tsx` (barre `md:hidden`, 5 onglets
+  Accueil / Cours / **+** / Notifs / Profil, état actif via `usePathname`),
+  `nav-sheet.tsx` (feuille remontante + backdrop), `courses-sheet.tsx`,
+  `create-sheet.tsx`.
+- Layout `(app)` : en-tête → cloche + `Nom ⚙` en `hidden md:flex` ; rend
+  `<BottomNav>` avec `unread` + `getMyCourseOptions()` (id/nom/classe,
+  `cache()`). `<main>` en `pb-24 md:pb-8`.
+- Feuille **Cours** : saut direct vers n'importe quel cours accessible.
+- Feuille **+** : cours (pré-rempli si on y est) + chapitre
+  (`listCourseChaptersAction`) + 3 actions (`questions/new?chapter=…`,
+  `summaries/new`, `quiz`). `key`-remontée à chaque ouverture.
+- Ne couvre PAS le reste du responsive (formulaires, quiz) — phase à part.
+
 ## PWA + notifications push (Phase 23, ADR 0023)
 
 - **PWA** : `app/manifest.ts` (`display: standalone`, icônes `public/`

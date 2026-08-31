@@ -18,6 +18,20 @@ async function isMemberOf(courseId: string): Promise<boolean> {
   return ctx !== null;
 }
 
+/** Chapitres d'un cours (id + nom), pour un sélecteur côté client. */
+export async function listCourseChaptersAction(
+  courseId: string,
+): Promise<{ id: string; name: string }[]> {
+  if (!courseId || !(await isMemberOf(courseId))) return [];
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("chapters")
+    .select("id, name")
+    .eq("course_id", courseId)
+    .order("position", { ascending: true });
+  return (data ?? []) as { id: string; name: string }[];
+}
+
 function revalidateClass(courseId: string) {
   revalidatePath(`/course/${courseId}`);
   revalidatePath(`/course/${courseId}/settings`);

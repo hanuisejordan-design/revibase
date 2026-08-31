@@ -71,18 +71,14 @@ Pas prioritaire.
 - **Ampleur** : migration + comptages dans 2-3 requêtes + un filtre. L'UI
   fine (feed) est repoussée — « sobre et efficace » suffira.
 
-### Barre de navigation basse (mobile, accès pouce)
+### ✅ Barre de navigation basse (mobile) — fait (Phase 28, ADR 0028)
 
-- **Idée** (utilisateur, Phase 25) : sur mobile, une barre fixe en bas avec
-  - **Cours** → mini pop-up au-dessus listant tous les cours accessibles,
-    pour sauter de l'un à l'autre sans repasser par le tableau de bord ;
-  - **`+`** → pop-up « + question · + résumé · + quiz » ;
-  - **notifications** et **profil** (aujourd'hui dans l'en-tête).
-- Règle aussi la plainte « le bouton retour vers les autres cours est trop
-  petit » (Phase 25 l'a juste agrandi en attendant).
-- **Ampleur** : vraie phase, couplée au passage **responsive mobile** (barre
-  visible seulement en petit écran ; l'en-tête reste en desktop). Pop-ups,
-  zones sûres (`env(safe-area-inset-bottom)`), état actif par route.
+Barre fixe en bas, `md:hidden` : Accueil · Cours (feuille de saut) · **+**
+(feuille : cours + chapitre + question/résumé/quiz) · Notifs · Profil.
+En-tête allégé sur mobile (cloche + « Nom ⚙ » descendent dans la barre).
+
+Reste : le **passage responsive mobile complet** (formulaires, page quiz,
+tableaux) — la Phase 28 n'a fait que la barre + l'allègement d'en-tête.
 
 ### ✅ Distinguer l'intention d'une question — fait (Phase 26, ADR 0026)
 

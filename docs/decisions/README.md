@@ -62,3 +62,4 @@ qui remplace l'ancien (et on met à jour le statut de l'ancien).
 | 0025 | [Page Paramètres + thème clair / sombre](0025-parametres-theme.md) | accepté |
 | 0026 | [Intention d'une question : besoin d'aide vs défi](0026-intention-question.md) | accepté |
 | 0027 | [Question « besoin d'aide » : discussion d'abord, « aide validée »](0027-question-aide-discussion.md) | accepté |
+| 0028 | [Barre de navigation basse (mobile)](0028-barre-nav-mobile.md) | accepté |
