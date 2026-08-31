@@ -435,9 +435,10 @@ Calculé à la lecture, par priorité décroissante :
   `<BottomNav>` avec `unread` + `getMyCourseOptions()` (id/nom/classe,
   `cache()`). `<main>` en `pb-24 md:pb-8`.
 - Feuille **Cours** : saut direct vers n'importe quel cours accessible.
-- Feuille **+** : cours (pré-rempli si on y est) + chapitre
-  (`listCourseChaptersAction`) + 3 actions (`questions/new?chapter=…`,
-  `summaries/new`, `quiz`). `key`-remontée à chaque ouverture.
+- Feuille **+** : 2 temps — d'abord le **type** (question / résumé / quiz),
+  puis le **cours** (pré-rempli si on y est) + le **chapitre**
+  (`listCourseChaptersAction`, question uniquement) → `questions/new?chapter=…`
+  / `summaries/new` / `quiz`. `key`-remontée à chaque ouverture.
 - Ne couvre PAS le reste du responsive (formulaires, quiz) — phase à part.
 
 ## PWA + notifications push (Phase 23, ADR 0023)

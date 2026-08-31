@@ -26,11 +26,12 @@ Une **barre fixe en bas**, accès au pouce, **mobile uniquement**
   saut direct vers `/course/[id]`. Query légère `getMyCourseOptions()`
   (id + nom + nom de classe seulement, `cache()`), appelée dans le layout
   `(app)`.
-- **« + »** ouvre une feuille : sélecteur de **cours** (pré-rempli avec le
-  cours courant si on y est) + sélecteur de **chapitre** (chargé via
-  `listCourseChaptersAction`, pour « poser une question ») + 3 actions →
-  `questions/new?chapter=…`, `summaries/new`, `quiz`. La feuille est
-  `key`-remontée à chaque ouverture pour repartir du contexte courant.
+- **« + »** ouvre une feuille en **2 temps** : d'abord **quoi** (question /
+  résumé / quiz), puis **dans quel cours** (pré-rempli avec le cours courant
+  si on y est) et, pour une question, **quel chapitre** (chargé via
+  `listCourseChaptersAction`). Bouton final → `questions/new?chapter=…`,
+  `summaries/new` ou `quiz`. La feuille est `key`-remontée à chaque
+  ouverture pour repartir du contexte courant.
 - `<main>` reçoit `pb-24 md:pb-8` ; la barre respecte
   `env(safe-area-inset-bottom)`.
 

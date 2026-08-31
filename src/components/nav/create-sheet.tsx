@@ -7,13 +7,18 @@ import { listCourseChaptersAction } from "@/features/chapters/actions";
 import { NavSheet } from "./nav-sheet";
 
 type Chapter = { id: string; name: string };
+type CreateType = "question" | "summary" | "quiz";
+
+const TYPES: { value: CreateType; label: string; cta: string }[] = [
+  { value: "question", label: "Poser une question", cta: "Poser la question" },
+  { value: "summary", label: "Ajouter un résumé", cta: "Ajouter le résumé" },
+  { value: "quiz", label: "Faire un quiz", cta: "Lancer le quiz" },
+];
 
 const selectCls =
   "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950";
-const actionCls =
-  "rounded-lg border border-zinc-300 px-3 py-2 text-left text-sm font-medium hover:bg-zinc-100 disabled:opacity-40 dark:border-zinc-700 dark:hover:bg-zinc-800";
 
-/** Feuille « + » : créer une question / un résumé / un quiz dans un cours. */
+/** Feuille « + » : d'abord QUOI créer, puis dans quel cours (et chapitre). */
 export function CreateSheet({
   open,
   onClose,
@@ -25,16 +30,16 @@ export function CreateSheet({
   courses: CourseOption[];
   currentCourseId: string | null;
 }) {
-  // `key` sur ce composant (côté parent) le remonte à chaque ouverture, donc
-  // l'état repart du cours courant sans effet de synchronisation.
+  // `key` sur ce composant (côté parent) le remonte à chaque ouverture.
   const router = useRouter();
+  const [type, setType] = useState<CreateType | null>(null);
   const [courseId, setCourseId] = useState<string>(currentCourseId ?? "");
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [chapterId, setChapterId] = useState<string>("");
 
-  // Charge les chapitres du cours choisi (pour « poser une question »).
+  // Chapitres du cours choisi — uniquement utile pour « poser une question ».
   useEffect(() => {
-    if (!courseId) return;
+    if (type !== "question" || !courseId) return;
     let cancelled = false;
     listCourseChaptersAction(courseId)
       .then((ch) => {
@@ -46,7 +51,7 @@ export function CreateSheet({
     return () => {
       cancelled = true;
     };
-  }, [courseId]);
+  }, [type, courseId]);
 
   function pickCourse(id: string) {
     setCourseId(id);
@@ -54,80 +59,89 @@ export function CreateSheet({
     setChapterId("");
   }
 
-  function go(path: string) {
+  function submit() {
+    if (!type || !courseId) return;
+    const path =
+      type === "question"
+        ? `/course/${courseId}/questions/new${chapterId ? `?chapter=${chapterId}` : ""}`
+        : type === "summary"
+          ? `/course/${courseId}/summaries/new`
+          : `/course/${courseId}/quiz`;
     onClose();
     router.push(path);
   }
 
-  const disabled = !courseId;
+  const chosen = TYPES.find((t) => t.value === type);
 
   return (
     <NavSheet open={open} onClose={onClose} title="Créer">
-      <div className="flex flex-col gap-3">
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">Dans quel cours ?</span>
-          <select
-            value={courseId}
-            onChange={(e) => pickCourse(e.target.value)}
-            className={selectCls}
+      {!type ? (
+        <div className="flex flex-col gap-2">
+          {TYPES.map((t) => (
+            <button
+              key={t.value}
+              type="button"
+              onClick={() => setType(t.value)}
+              className="rounded-lg border border-zinc-300 px-3 py-3 text-left text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-3">
+          <button
+            type="button"
+            onClick={() => setType(null)}
+            className="w-fit text-xs text-zinc-500 hover:underline"
           >
-            <option value="">— Choisir un cours —</option>
-            {courses.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.className ? `${c.className} · ${c.name}` : c.name}
-              </option>
-            ))}
-          </select>
-        </label>
+            ← Autre type
+          </button>
+          <p className="text-sm font-medium">{chosen?.label}</p>
 
-        {courseId && chapters.length > 0 ? (
           <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium">Chapitre (pour une question)</span>
+            <span className="font-medium">Dans quel cours ?</span>
             <select
-              value={chapterId}
-              onChange={(e) => setChapterId(e.target.value)}
+              value={courseId}
+              onChange={(e) => pickCourse(e.target.value)}
               className={selectCls}
             >
-              {chapters.map((ch) => (
-                <option key={ch.id} value={ch.id}>
-                  {ch.name}
+              <option value="">— Choisir un cours —</option>
+              {courses.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.className ? `${c.className} · ${c.name}` : c.name}
                 </option>
               ))}
             </select>
           </label>
-        ) : null}
 
-        <div className="mt-1 flex flex-col gap-2">
+          {type === "question" && courseId && chapters.length > 0 ? (
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="font-medium">Chapitre</span>
+              <select
+                value={chapterId}
+                onChange={(e) => setChapterId(e.target.value)}
+                className={selectCls}
+              >
+                {chapters.map((ch) => (
+                  <option key={ch.id} value={ch.id}>
+                    {ch.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+
           <button
             type="button"
-            disabled={disabled}
-            onClick={() =>
-              go(
-                `/course/${courseId}/questions/new${chapterId ? `?chapter=${chapterId}` : ""}`,
-              )
-            }
-            className={actionCls}
+            disabled={!courseId}
+            onClick={submit}
+            className="mt-1 rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900"
           >
-            Poser une question
-          </button>
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() => go(`/course/${courseId}/summaries/new`)}
-            className={actionCls}
-          >
-            Ajouter un résumé
-          </button>
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() => go(`/course/${courseId}/quiz`)}
-            className={actionCls}
-          >
-            Faire un quiz
+            {chosen?.cta}
           </button>
         </div>
-      </div>
+      )}
     </NavSheet>
   );
 }
