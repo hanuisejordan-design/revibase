@@ -72,14 +72,31 @@ export async function markCourseQuestionsSeenAction(courseId: string): Promise<v
   await supabase
     .from("course_reads")
     .upsert(
-      { course_id: courseId, user_id: user.id, seen_at: new Date().toISOString() },
+      { course_id: courseId, user_id: user.id, questions_seen_at: new Date().toISOString() },
       { onConflict: "course_id,user_id" },
     );
 
   revalidatePath("/dashboard");
 }
 
-/** Idem, mais pour tous les cours d'une classe (zone « nouvelles questions »). */
+/** Idem pour la liste des résumés d'un cours (compteur « nouveaux résumés »). */
+export async function markCourseSummariesSeenAction(courseId: string): Promise<void> {
+  if (!courseId) return;
+  const user = await getUser();
+  if (!user) return;
+
+  const supabase = await createClient();
+  await supabase
+    .from("course_reads")
+    .upsert(
+      { course_id: courseId, user_id: user.id, summaries_seen_at: new Date().toISOString() },
+      { onConflict: "course_id,user_id" },
+    );
+
+  revalidatePath("/dashboard");
+}
+
+/** Idem, mais pour les questions de tous les cours d'une classe (zone « nouvelles questions »). */
 export async function markClassQuestionsSeenAction(classId: string): Promise<void> {
   if (!classId) return;
   const user = await getUser();
@@ -91,7 +108,7 @@ export async function markClassQuestionsSeenAction(classId: string): Promise<voi
   const rows = ((courses ?? []) as Array<{ id: string }>).map((c) => ({
     course_id: c.id,
     user_id: user.id,
-    seen_at: new Date().toISOString(),
+    questions_seen_at: new Date().toISOString(),
   }));
   if (rows.length > 0) {
     await supabase.from("course_reads").upsert(rows, { onConflict: "course_id,user_id" });

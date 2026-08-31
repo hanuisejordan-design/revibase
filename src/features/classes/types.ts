@@ -13,6 +13,8 @@ export interface ClassSummary {
   memberCount: number;
   /** Somme des « nouvelles questions » sur tous les cours de la classe. */
   newQuestionCount: number;
+  /** Somme des « nouveaux résumés » sur tous les cours de la classe. */
+  newSummaryCount: number;
   courses: CourseSummary[];
 }
 

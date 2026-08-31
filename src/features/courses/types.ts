@@ -13,6 +13,8 @@ export interface CourseSummary {
   summaryCount: number;
   /** Questions apparues depuis la dernière visite de la liste (hors les siennes). */
   newQuestionCount: number;
+  /** Résumés ajoutés depuis la dernière visite de la liste (hors les siens). */
+  newSummaryCount: number;
   /** Classe (promo) propriétaire, ou `null` si le cours est autonome. */
   classId: string | null;
 }

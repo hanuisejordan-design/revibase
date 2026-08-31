@@ -368,24 +368,29 @@ Calculé à la lecture, par priorité décroissante :
   (`MarkAllRead`, effet client au montage).
 - `services/notifications/` reste vide — la logique est en base + `features/`.
 
-## Nouvelles questions depuis la dernière visite (Phase 22, ADR 0022)
+## Nouveautés depuis la dernière visite (Phase 22, ADR 0022)
 
 - **Migration `0018`** : table `course_reads (course_id, user_id, seen_at)`,
   privée (RLS `user_id = auth.uid()`). Marqueur de lecture, pas une notif.
-  La migration retire aussi le trigger `new_question` de l'ancien `0017`
-  (abandonné).
-- **« Nouvelle »** = `question.created_at > course_reads.seen_at` (jamais vu
-  ⇒ tout), hors les siennes, hors supprimées.
-- `seen_at` remis à maintenant à l'ouverture de la liste des questions d'un
-  cours (`MarkCourseSeen` → `markCourseQuestionsSeenAction`) ou de la zone
-  classe (`MarkClassSeen` → `markClassQuestionsSeenAction`, un upsert par
-  cours de la classe).
-- `countNewQuestions()` (`features/courses/queries.ts`) alimente
-  `CourseSummary.newQuestionCount` (via `getMyClasses` / `getClassCourses` /
-  `getMyCourses`) et `ClassSummary.newQuestionCount` (somme).
-- **UI** : pastille ambre « N nouvelles » sur les vignettes de cours et de
-  classe ; encart au-dessus de « Créer un cours » sur la page de la classe ;
-  zone `class/[classId]/nouvelles` = liste agrégée tous cours, la plus
-  ancienne d'abord (`getClassNewQuestions`), chaque ligne → la question.
-- Requêtes tolérantes : si `0018` n'est pas appliquée, l'erreur de lecture
-  de `course_reads` ⇒ « aucune nouvelle » (jamais « tout est nouveau »).
+  Retire aussi le trigger `new_question` de l'ancien `0017` (abandonné).
+- **Migration `0019`** : `seen_at` → `questions_seen_at` + colonne
+  `summaries_seen_at`. Un `course_reads` = deux curseurs (questions,
+  résumés) par (cours, utilisateur).
+- **« Nouveau »** = `created_at > le curseur correspondant` (jamais vu ⇒
+  tout), hors ce que l'utilisateur a écrit, hors questions supprimées.
+- Curseurs remis à maintenant à l'ouverture de la liste : questions d'un
+  cours (`MarkCourseSeen` → `markCourseQuestionsSeenAction`), résumés d'un
+  cours (`MarkSummariesSeen` → `markCourseSummariesSeenAction`), zone classe
+  (`MarkClassSeen` → `markClassQuestionsSeenAction`, un upsert par cours).
+  `upsert` partiel : chaque action ne touche que son curseur.
+- `countNewQuestions()` / `countNewSummaries()`
+  (`features/courses/queries.ts`) alimentent `CourseSummary.newQuestionCount`
+  / `.newSummaryCount` (via `getMyClasses` / `getClassCourses` /
+  `getMyCourses`) ; les `ClassSummary.*` sont les sommes.
+- **UI** : pastilles ambre « N nouvelles questions » / « N nouveaux
+  résumés » sur les vignettes de cours et de classe ; encart questions
+  au-dessus de « Créer un cours » sur la page de la classe ; zone
+  `class/[classId]/nouvelles` = liste agrégée des questions de tous les
+  cours, la plus ancienne d'abord (`getClassNewQuestions`).
+- Requêtes tolérantes : si `0018`/`0019` non appliquées, l'erreur de lecture
+  ⇒ « aucune nouveauté » (jamais « tout est nouveau »).

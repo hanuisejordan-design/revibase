@@ -24,7 +24,14 @@ export function CourseCard({ course }: { course: CourseSummary }) {
         {course.role === "trainer" ? <span className={trainerBadge}>Formateur</span> : null}
         {course.newQuestionCount > 0 ? (
           <span className={newBadge}>
-            {course.newQuestionCount} nouvelle{course.newQuestionCount > 1 ? "s" : ""}
+            {course.newQuestionCount} nouvelle{course.newQuestionCount > 1 ? "s" : ""} question
+            {course.newQuestionCount > 1 ? "s" : ""}
+          </span>
+        ) : null}
+        {course.newSummaryCount > 0 ? (
+          <span className={newBadge}>
+            {course.newSummaryCount} nouveau{course.newSummaryCount > 1 ? "x" : ""} résumé
+            {course.newSummaryCount > 1 ? "s" : ""}
           </span>
         ) : null}
         {bits.join(" · ")}

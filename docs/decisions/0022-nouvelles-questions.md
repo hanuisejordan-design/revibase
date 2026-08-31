@@ -1,8 +1,9 @@
-# 0022 — Nouvelles questions depuis la dernière visite
+# 0022 — Nouveautés depuis la dernière visite (questions & résumés)
 
 - Statut : accepté
 - Date : 2026-08-31
-- Voir aussi : [0021](0021-notifications.md), [0008](0008-questions.md)
+- Voir aussi : [0021](0021-notifications.md), [0008](0008-questions.md),
+  [0018](0018-resumes-par-cours.md)
 
 ## Contexte
 
@@ -23,36 +24,48 @@ mélangeait deux natures de signal. « Nouvelle question » n'est pas un
 - **Migration `0018`** : table `course_reads (course_id, user_id, seen_at)`,
   clé primaire `(course_id, user_id)`, strictement privée
   (RLS `user_id = auth.uid()`, comme `summary_pins`).
-- **« Nouvelle »** = `question.created_at > course_reads.seen_at` (jamais
-  visité ⇒ tout est nouveau), hors les questions de l'utilisateur, hors
-  supprimées.
-- **`seen_at` remis à maintenant** quand on ouvre la liste des questions d'un
-  cours (`MarkCourseSeen`, effet client → `markCourseQuestionsSeenAction`) ou
-  la zone « nouvelles questions » de la classe (`MarkClassSeen` →
-  `markClassQuestionsSeenAction`, upsert pour chaque cours de la classe).
-  Même principe que « ouvrir /notifications = tout lu » : le rendu courant
-  montre encore le neuf, la base est à jour pour la visite suivante.
-- **Comptage** : `countNewQuestions(supabase, userId, courseIds)` →
-  `Map<courseId, number>`, branché dans `getMyClasses` / `getClassCourses` /
-  `getMyCourses`. `CourseSummary.newQuestionCount` ;
-  `ClassSummary.newQuestionCount` = somme sur les cours.
+- **Migration `0019`** : le principe vaut aussi pour les résumés →
+  `seen_at` renommé `questions_seen_at`, colonne `summaries_seen_at` ajoutée.
+  Un `course_reads` porte donc **deux curseurs** par (cours, utilisateur).
+- **« Nouveau »** = `created_at > le curseur correspondant` (jamais visité ⇒
+  tout est nouveau), hors ce que l'utilisateur a lui-même écrit, hors
+  questions supprimées.
+- **Curseur remis à maintenant** à l'ouverture de la liste concernée :
+  - questions d'un cours → `MarkCourseSeen` → `markCourseQuestionsSeenAction`
+  - résumés d'un cours → `MarkSummariesSeen` → `markCourseSummariesSeenAction`
+  - zone « nouvelles questions » de la classe → `MarkClassSeen` →
+    `markClassQuestionsSeenAction` (upsert `questions_seen_at` par cours)
+
+  Chaque action fait un `upsert` partiel : elle ne touche que son curseur,
+  l'autre est préservé. Même principe que « ouvrir /notifications = tout
+  lu » : le rendu courant montre encore le neuf, la base est à jour pour la
+  visite suivante.
+- **Comptage** : `countNewQuestions()` / `countNewSummaries()`
+  (`features/courses/queries.ts`) → `Map<courseId, number>`, branchés dans
+  `getMyClasses` / `getClassCourses` / `getMyCourses`.
+  `CourseSummary.newQuestionCount` + `.newSummaryCount` ; les
+  `ClassSummary.*` sont les sommes sur les cours.
 - **Affichage** :
-  - vignette de cours (tableau de bord, page classe) : pastille ambre
-    « N nouvelles » ;
-  - vignette de classe : idem, somme sur les cours ;
+  - vignettes de cours et de classe : pastilles ambre « N nouvelles
+    questions » et « N nouveaux résumés » ;
   - page de la classe : encart ambre au-dessus de « Créer un cours »,
-    « N nouvelles questions depuis ta dernière visite → Les parcourir » ;
-  - zone `class/[classId]/nouvelles` : la liste agrégée de tous les cours,
-    **de la plus ancienne à la plus récente** (pour les enchaîner dans
-    l'ordre), chaque ligne → la question dans son cours.
-- Si `0018` n'est pas encore appliquée, les requêtes détectent l'erreur de
-  lecture et renvoient « aucune nouvelle » (pas « tout est nouveau »).
+    « N nouvelles questions depuis ta dernière visite → Les parcourir »
+    (questions seulement — c'est l'affordance « enchaîner / y répondre » ;
+    les résumés se consultent par cours) ;
+  - zone `class/[classId]/nouvelles` : liste agrégée des nouvelles questions
+    de tous les cours, **de la plus ancienne à la plus récente** (pour les
+    enchaîner dans l'ordre), chaque ligne → la question dans son cours.
+- Si `0018`/`0019` ne sont pas encore appliquées, les requêtes détectent
+  l'erreur de lecture et renvoient « aucune nouveauté » (jamais « tout est
+  nouveau »).
 
 ## Alternatives écartées
 
 - **Notification `new_question`** : cf. contexte — mauvais canal.
 - **Un `seen_at` global par utilisateur** (pas par cours) : impossible de
   dire quel cours a du neuf ; on veut la pastille par vignette.
+- **Un seul curseur pour questions + résumés** : ouvrir l'onglet Questions
+  éteindrait la pastille Résumés. Deux curseurs, deux listes.
 - **Marquer vu au niveau de chaque question** (comme « lu / non lu » par
   question) : beaucoup de lignes, et l'utilisateur ne veut pas cocher. Un
   seul curseur temporel par cours suffit.
@@ -61,8 +74,8 @@ mélangeait deux natures de signal. « Nouvelle question » n'est pas un
 
 ## Conséquences
 
-- Ouvrir la liste des questions d'un cours « consomme » le neuf de ce cours,
-  même sans le lire en détail — accepté (comme /notifications).
+- Ouvrir une liste (Questions ou Résumés) « consomme » le neuf de ce cours
+  pour ce type, même sans le lire en détail — accepté (comme /notifications).
 - `course_reads` ne référence pas `class_members` : un membre qui a accès à
   un cours via sa classe a quand même son propre curseur par cours.
 - Le compteur se rafraîchit à la navigation (pages dynamiques) ; pas de

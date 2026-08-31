@@ -57,7 +57,7 @@ export async function countNewQuestions(
   const [{ data: reads, error: readsError }, { data: qs }] = await Promise.all([
     supabase
       .from("course_reads")
-      .select("course_id, seen_at")
+      .select("course_id, questions_seen_at")
       .eq("user_id", userId)
       .in("course_id", courseIds),
     supabase
@@ -68,18 +68,60 @@ export async function countNewQuestions(
       .neq("author_id", userId),
   ]);
 
-  // Migration 0018 pas encore appliquée : pas de compteur plutôt que « tout est nouveau ».
+  // Migration 0018/0019 pas encore appliquée : pas de compteur plutôt que « tout est nouveau ».
   if (readsError) return out;
 
   const seenAt = new Map<string, number>();
-  for (const r of (reads ?? []) as Array<{ course_id: string; seen_at: string }>) {
-    seenAt.set(r.course_id, new Date(r.seen_at).getTime());
+  for (const r of (reads ?? []) as Array<{ course_id: string; questions_seen_at: string | null }>) {
+    if (r.questions_seen_at) seenAt.set(r.course_id, new Date(r.questions_seen_at).getTime());
   }
 
   for (const q of (qs ?? []) as Array<{ course_id: string; created_at: string }>) {
     const seen = seenAt.get(q.course_id);
     if (seen === undefined || new Date(q.created_at).getTime() > seen) {
       out.set(q.course_id, (out.get(q.course_id) ?? 0) + 1);
+    }
+  }
+  return out;
+}
+
+/**
+ * Nombre de résumés « nouveaux depuis la dernière visite » par cours :
+ * `created_at` postérieur au `summaries_seen_at` de `course_reads`, hors les
+ * résumés déposés par l'utilisateur lui-même.
+ */
+export async function countNewSummaries(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  courseIds: string[],
+): Promise<Map<string, number>> {
+  const out = new Map<string, number>();
+  if (courseIds.length === 0) return out;
+
+  const [{ data: reads, error: readsError }, { data: ss }] = await Promise.all([
+    supabase
+      .from("course_reads")
+      .select("course_id, summaries_seen_at")
+      .eq("user_id", userId)
+      .in("course_id", courseIds),
+    supabase
+      .from("summaries")
+      .select("course_id, created_at")
+      .in("course_id", courseIds)
+      .neq("author_id", userId),
+  ]);
+
+  if (readsError) return out;
+
+  const seenAt = new Map<string, number>();
+  for (const r of (reads ?? []) as Array<{ course_id: string; summaries_seen_at: string | null }>) {
+    if (r.summaries_seen_at) seenAt.set(r.course_id, new Date(r.summaries_seen_at).getTime());
+  }
+
+  for (const s of (ss ?? []) as Array<{ course_id: string; created_at: string }>) {
+    const seen = seenAt.get(s.course_id);
+    if (seen === undefined || new Date(s.created_at).getTime() > seen) {
+      out.set(s.course_id, (out.get(s.course_id) ?? 0) + 1);
     }
   }
   return out;
@@ -110,10 +152,11 @@ export const getMyCourses = cache(async (): Promise<CourseSummary[]> => {
 
   const courseIds = rows.map((r) => r.course_id);
 
-  const [{ data: allMembers }, content, newQuestions] = await Promise.all([
+  const [{ data: allMembers }, content, newQuestions, newSummaries] = await Promise.all([
     supabase.from("course_members").select("course_id").in("course_id", courseIds),
     countCourseContent(supabase, courseIds),
     countNewQuestions(supabase, user.id, courseIds),
+    countNewSummaries(supabase, user.id, courseIds),
   ]);
 
   const counts = new Map<string, number>();
@@ -133,6 +176,7 @@ export const getMyCourses = cache(async (): Promise<CourseSummary[]> => {
       questionCount: content.questions.get(r.course_id) ?? 0,
       summaryCount: content.summaries.get(r.course_id) ?? 0,
       newQuestionCount: newQuestions.get(r.course_id) ?? 0,
+      newSummaryCount: newSummaries.get(r.course_id) ?? 0,
       classId: r.courses.class_id,
     }));
 });

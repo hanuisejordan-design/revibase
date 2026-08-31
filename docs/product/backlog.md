@@ -40,19 +40,21 @@ un admin attribue « formateur ». Migration `0014`.
 Modifier titre / contexte / chapitre / options / photo (auteur ou formateur).
 Type non modifiable. Pas de migration (RLS déjà en place).
 
-### ✅ Nouvelles questions depuis la dernière visite — fait (Phase 22, ADR 0022)
+### ✅ Nouveautés depuis la dernière visite — fait (Phase 22, ADR 0022)
 
-Marqueur de lecture `course_reads (course_id, user_id, seen_at)` (migration
-`0018`, privé). Pastille ambre « N nouvelles » sur les vignettes de cours et
-de classe ; encart sur la page de la classe ; zone
-`class/[classId]/nouvelles` qui liste toutes les nouvelles questions de la
-classe, la plus ancienne d'abord, pour les enchaîner. `seen_at` remis à jour
-à l'ouverture de la liste des questions (cours) ou de la zone (classe).
-L'ancien trigger de notification `new_question` (`0017`) est abandonné : une
-nouvelle question n'est pas un événement adressé, c'est un état de lecture.
+Marqueur de lecture `course_reads` (migrations `0018` + `0019`, privé) : deux
+curseurs par (cours, utilisateur) — `questions_seen_at`, `summaries_seen_at`.
+Pastilles ambre « N nouvelles questions » / « N nouveaux résumés » sur les
+vignettes de cours et de classe ; encart questions sur la page de la classe ;
+zone `class/[classId]/nouvelles` qui liste toutes les nouvelles questions de
+la classe, la plus ancienne d'abord, pour les enchaîner. Curseur remis à jour
+à l'ouverture de la liste correspondante. L'ancien trigger de notification
+`new_question` (`0017`) est abandonné : une nouveauté n'est pas un événement
+adressé, c'est un état de lecture.
 
 Reste éventuel : mode « une par une » plein écran (bouton « suivante → »
-depuis la question). Pas prioritaire — la liste ordonnée suffit.
+depuis la question) ; une zone « nouveaux résumés » agrégée si le besoin se
+confirme. Pas prioritaires.
 
 - **Idée** : savoir ce qui est apparu depuis qu'on est passé.
   - Vignettes (tableau de bord) : badge « N nouvelles questions » par cours,

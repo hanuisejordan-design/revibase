@@ -5,7 +5,11 @@ import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
 import type { CourseRole } from "@/constants/app";
 import type { QuestionKind } from "@/constants/app";
-import { countCourseContent, countNewQuestions } from "@/features/courses/queries";
+import {
+  countCourseContent,
+  countNewQuestions,
+  countNewSummaries,
+} from "@/features/courses/queries";
 import { enrich } from "@/features/questions/queries";
 import type { CourseSummary } from "@/features/courses/types";
 import type { QuestionStatus } from "@/features/questions/types";
@@ -64,6 +68,7 @@ function toCourseSummary(
   myAdmin: Set<string>,
   content: ContentCounts,
   newQuestions: Map<string, number>,
+  newSummaries: Map<string, number>,
 ): CourseSummary {
   return {
     id: c.id,
@@ -75,6 +80,7 @@ function toCourseSummary(
     questionCount: content.questions.get(c.id) ?? 0,
     summaryCount: content.summaries.get(c.id) ?? 0,
     newQuestionCount: newQuestions.get(c.id) ?? 0,
+    newSummaryCount: newSummaries.get(c.id) ?? 0,
     classId: c.class_id,
   };
 }
@@ -113,10 +119,11 @@ export const getMyClasses = cache(async (): Promise<ClassSummary[]> => {
 
   const courses = (coursesData ?? []) as CourseRow[];
   const courseIds = courses.map((c) => c.id);
-  const [{ counts, myRole, myAdmin }, content, newQuestions] = await Promise.all([
+  const [{ counts, myRole, myAdmin }, content, newQuestions, newSummaries] = await Promise.all([
     courseMemberInfo(supabase, courseIds, user.id),
     countCourseContent(supabase, courseIds),
     countNewQuestions(supabase, user.id, courseIds),
+    countNewSummaries(supabase, user.id, courseIds),
   ]);
 
   const memberCount = new Map<string, number>();
@@ -129,7 +136,7 @@ export const getMyClasses = cache(async (): Promise<ClassSummary[]> => {
     .map((r) => {
       const classCourses = courses
         .filter((c) => c.class_id === r.class_id)
-        .map((c) => toCourseSummary(c, counts, myRole, myAdmin, content, newQuestions));
+        .map((c) => toCourseSummary(c, counts, myRole, myAdmin, content, newQuestions, newSummaries));
       return {
         id: r.classes.id,
         name: r.classes.name,
@@ -137,6 +144,7 @@ export const getMyClasses = cache(async (): Promise<ClassSummary[]> => {
         isAdmin: r.is_admin,
         memberCount: memberCount.get(r.class_id) ?? 1,
         newQuestionCount: classCourses.reduce((n, c) => n + c.newQuestionCount, 0),
+        newSummaryCount: classCourses.reduce((n, c) => n + c.newSummaryCount, 0),
         courses: classCourses,
       };
     });
@@ -190,13 +198,16 @@ export const getClassCourses = cache(async (classId: string): Promise<CourseSumm
 
   const courses = (data ?? []) as CourseRow[];
   const courseIds = courses.map((c) => c.id);
-  const [{ counts, myRole, myAdmin }, content, newQuestions] = await Promise.all([
+  const [{ counts, myRole, myAdmin }, content, newQuestions, newSummaries] = await Promise.all([
     courseMemberInfo(supabase, courseIds, user.id),
     countCourseContent(supabase, courseIds),
     countNewQuestions(supabase, user.id, courseIds),
+    countNewSummaries(supabase, user.id, courseIds),
   ]);
 
-  return courses.map((c) => toCourseSummary(c, counts, myRole, myAdmin, content, newQuestions));
+  return courses.map((c) =>
+    toCourseSummary(c, counts, myRole, myAdmin, content, newQuestions, newSummaries),
+  );
 });
 
 /**
@@ -225,7 +236,7 @@ export const getClassNewQuestions = cache(
     const [{ data: reads, error: readsError }, { data: qs }] = await Promise.all([
       supabase
         .from("course_reads")
-        .select("course_id, seen_at")
+        .select("course_id, questions_seen_at")
         .eq("user_id", user.id)
         .in("course_id", courseIds),
       supabase
@@ -241,8 +252,11 @@ export const getClassNewQuestions = cache(
     if (readsError) return [];
 
     const seenAt = new Map<string, number>();
-    for (const r of (reads ?? []) as Array<{ course_id: string; seen_at: string }>) {
-      seenAt.set(r.course_id, new Date(r.seen_at).getTime());
+    for (const r of (reads ?? []) as Array<{
+      course_id: string;
+      questions_seen_at: string | null;
+    }>) {
+      if (r.questions_seen_at) seenAt.set(r.course_id, new Date(r.questions_seen_at).getTime());
     }
 
     const rows = (
