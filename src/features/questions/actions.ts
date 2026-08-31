@@ -109,8 +109,8 @@ export async function createQuestionAction(
   revalidatePath(`/course/${courseId}/questions/${questionId}`);
 
   // Push best-effort aux autres membres du cours. Pas de notif in-app pour
-  // « nouvelle question » (cf. ADR 0022 : géré par les pastilles
-  // `course_reads`) — le push, lui, est explicitement voulu.
+  // « nouvelle question » (cf. ADR 0022 : géré par le suivi de lecture par
+  // élément) — le push, lui, est explicitement voulu.
   after(async () => {
     try {
       const audience = await courseAudience(courseId, user.id);

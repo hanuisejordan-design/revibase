@@ -2,6 +2,7 @@ import type { SummaryItem } from "@/features/summaries/types";
 import { relativeTime } from "@/lib/utils/date";
 import { DeleteSummaryButton } from "./delete-summary-button";
 import { SummaryPinButton } from "./summary-pin-button";
+import { SummaryReadLink } from "./summary-read-link";
 
 const KIND_LABEL: Record<SummaryItem["kind"], string> = {
   pdf: "PDF",
@@ -32,14 +33,13 @@ export function SummaryRow({ summary, courseId }: { summary: SummaryItem; course
         <SummaryPinButton courseId={courseId} summaryId={summary.id} pinned={summary.pinned} />
       </span>
       {summary.fileUrl ? (
-        <a
+        <SummaryReadLink
+          summaryId={summary.id}
           href={summary.fileUrl}
-          target="_blank"
-          rel="noopener noreferrer"
           className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 gap-y-1 py-2 pr-3 pl-1 text-sm"
         >
           {inner}
-        </a>
+        </SummaryReadLink>
       ) : (
         <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 gap-y-1 py-2 pr-3 pl-1 text-sm text-zinc-400">
           {inner} · aperçu indisponible

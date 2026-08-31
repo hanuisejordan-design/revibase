@@ -70,7 +70,7 @@ export async function createSummaryAction(
   revalidatePath(`/course/${courseId}`);
 
   // Push best-effort aux autres membres du cours (pas de notif in-app pour
-  // les résumés — pastilles `course_reads`).
+  // les résumés — suivi de lecture par élément).
   after(async () => {
     try {
       const audience = await courseAudience(courseId, user.id);

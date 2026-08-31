@@ -12,6 +12,7 @@ import {
 } from "@/features/courses/queries";
 import { enrich } from "@/features/questions/queries";
 import { kindOf, signSummaryFiles } from "@/features/summaries/queries";
+import { memberSinceByCourse, readQuestionIds, readSummaryIds } from "@/features/reads/queries";
 import type { CourseSummary } from "@/features/courses/types";
 import type { QuestionStatus } from "@/features/questions/types";
 import type {
@@ -218,9 +219,9 @@ export const getClassCourses = cache(async (classId: string): Promise<CourseSumm
 });
 
 /**
- * Questions « nouvelles depuis la dernière visite » de tous les cours de la
- * classe, les plus anciennes d'abord (pour les enchaîner dans l'ordre).
- * « Nouvelle » = `created_at > course_reads.seen_at`, hors les siennes.
+ * Questions non encore ouvertes de tous les cours de la classe, les plus
+ * anciennes d'abord (pour les enchaîner). « Nouvelle » = créée après
+ * l'arrivée du membre, pas de lui, et absente de `question_reads`.
  */
 export const getClassNewQuestions = cache(
   async (classId: string): Promise<ClassNewQuestion[]> => {
@@ -240,12 +241,8 @@ export const getClassNewQuestions = cache(
     const courseIds = courses.map((c) => c.id);
     const courseName = new Map(courses.map((c) => [c.id, c.name]));
 
-    const [{ data: reads, error: readsError }, { data: qs }] = await Promise.all([
-      supabase
-        .from("course_reads")
-        .select("course_id, questions_seen_at")
-        .eq("user_id", user.id)
-        .in("course_id", courseIds),
+    const [baseline, { data: qs }] = await Promise.all([
+      memberSinceByCourse(supabase, user.id, courseIds),
       supabase
         .from("questions")
         .select("id, title, kind, course_id, created_at, chapters(name), profiles(display_name)")
@@ -255,18 +252,7 @@ export const getClassNewQuestions = cache(
         .order("created_at", { ascending: true }),
     ]);
 
-    // Migration 0018 pas encore appliquée : rien à afficher plutôt que tout.
-    if (readsError) return [];
-
-    const seenAt = new Map<string, number>();
-    for (const r of (reads ?? []) as Array<{
-      course_id: string;
-      questions_seen_at: string | null;
-    }>) {
-      if (r.questions_seen_at) seenAt.set(r.course_id, new Date(r.questions_seen_at).getTime());
-    }
-
-    const rows = (
+    const candidates = (
       qs as unknown as Array<{
         id: string;
         title: string;
@@ -276,12 +262,21 @@ export const getClassNewQuestions = cache(
         chapters: { name: string } | null;
         profiles: { display_name: string } | null;
       }> | null
-    )?.filter((q) => {
-      const seen = seenAt.get(q.course_id);
-      return seen === undefined || new Date(q.created_at).getTime() > seen;
-    });
+    )?.filter(
+      (q) => new Date(q.created_at).getTime() > (baseline.get(q.course_id) ?? 0),
+    );
 
-    if (!rows || rows.length === 0) return [];
+    if (!candidates || candidates.length === 0) return [];
+
+    const read = await readQuestionIds(
+      supabase,
+      user.id,
+      candidates.map((c) => c.id),
+    );
+    if (!read) return []; // migration 0021 pas encore appliquée
+
+    const rows = candidates.filter((q) => !read.has(q.id));
+    if (rows.length === 0) return [];
 
     const meta = await enrich(
       supabase,
@@ -312,9 +307,9 @@ export const getClassNewQuestions = cache(
 );
 
 /**
- * Résumés « nouveaux depuis la dernière visite » de tous les cours de la
- * classe, les plus anciens d'abord. « Nouveau » = `created_at >
- * course_reads.summaries_seen_at`, hors les siens.
+ * Résumés non encore ouverts de tous les cours de la classe, les plus anciens
+ * d'abord. « Nouveau » = créé après l'arrivée du membre, pas de lui, et
+ * absent de `summary_reads`.
  */
 export const getClassNewSummaries = cache(
   async (classId: string): Promise<ClassNewSummary[]> => {
@@ -334,12 +329,8 @@ export const getClassNewSummaries = cache(
     const courseIds = courses.map((c) => c.id);
     const courseName = new Map(courses.map((c) => [c.id, c.name]));
 
-    const [{ data: reads, error: readsError }, { data: ss }] = await Promise.all([
-      supabase
-        .from("course_reads")
-        .select("course_id, summaries_seen_at")
-        .eq("user_id", user.id)
-        .in("course_id", courseIds),
+    const [baseline, { data: ss }] = await Promise.all([
+      memberSinceByCourse(supabase, user.id, courseIds),
       supabase
         .from("summaries")
         .select(
@@ -350,17 +341,7 @@ export const getClassNewSummaries = cache(
         .order("created_at", { ascending: true }),
     ]);
 
-    if (readsError) return [];
-
-    const seenAt = new Map<string, number>();
-    for (const r of (reads ?? []) as Array<{
-      course_id: string;
-      summaries_seen_at: string | null;
-    }>) {
-      if (r.summaries_seen_at) seenAt.set(r.course_id, new Date(r.summaries_seen_at).getTime());
-    }
-
-    const rows = (
+    const candidates = (
       ss as unknown as Array<{
         id: string;
         title: string;
@@ -371,12 +352,21 @@ export const getClassNewSummaries = cache(
         chapters: { name: string } | null;
         author: { display_name: string } | null;
       }> | null
-    )?.filter((s) => {
-      const seen = seenAt.get(s.course_id);
-      return seen === undefined || new Date(s.created_at).getTime() > seen;
-    });
+    )?.filter(
+      (s) => new Date(s.created_at).getTime() > (baseline.get(s.course_id) ?? 0),
+    );
 
-    if (!rows || rows.length === 0) return [];
+    if (!candidates || candidates.length === 0) return [];
+
+    const read = await readSummaryIds(
+      supabase,
+      user.id,
+      candidates.map((c) => c.id),
+    );
+    if (!read) return [];
+
+    const rows = candidates.filter((s) => !read.has(s.id));
+    if (rows.length === 0) return [];
 
     const urlByPath = await signSummaryFiles(
       supabase,

@@ -368,36 +368,33 @@ Calculé à la lecture, par priorité décroissante :
   (`MarkAllRead`, effet client au montage).
 - `services/notifications/` reste vide — la logique est en base + `features/`.
 
-## Nouveautés depuis la dernière visite (Phase 22, ADR 0022)
+## Nouveautés depuis la dernière visite (Phase 22 + 24, ADR 0022 / 0024)
 
-- **Migration `0018`** : table `course_reads (course_id, user_id, seen_at)`,
-  privée (RLS `user_id = auth.uid()`). Marqueur de lecture, pas une notif.
-  Retire aussi le trigger `new_question` de l'ancien `0017` (abandonné).
-- **Migration `0019`** : `seen_at` → `questions_seen_at` + colonne
-  `summaries_seen_at`. Un `course_reads` = deux curseurs (questions,
-  résumés) par (cours, utilisateur).
-- **« Nouveau »** = `created_at > le curseur correspondant` (jamais vu ⇒
-  tout), hors ce que l'utilisateur a écrit, hors questions supprimées.
-- Curseurs remis à maintenant à l'ouverture de la liste : questions d'un
-  cours (`MarkCourseSeen`), résumés d'un cours (`MarkSummariesSeen`), zone
-  questions de la classe (`MarkClassSeen`), zone résumés de la classe
-  (`MarkClassSummariesSeen`) → actions
-  `markCourse{Questions,Summaries}SeenAction` /
-  `markClass{Questions,Summaries}SeenAction`. `upsert` partiel : chaque
-  action ne touche que son curseur.
-- `countNewQuestions()` / `countNewSummaries()`
-  (`features/courses/queries.ts`) alimentent `CourseSummary.newQuestionCount`
-  / `.newSummaryCount` (via `getMyClasses` / `getClassCourses` /
-  `getMyCourses`) ; les `ClassSummary.*` sont les sommes.
-- **UI** : deux couleurs — **ambre** pour les questions, **vert (emerald)**
-  pour les résumés. Pastilles « N nouvelles questions » / « N nouveaux
-  résumés » sur les vignettes de cours et de classe ; sur la page de la
-  classe, deux encarts au-dessus de « Créer un cours » → zones
-  `class/[classId]/nouvelles` (questions, `getClassNewQuestions`) et
-  `class/[classId]/nouveaux-resumes` (résumés, `getClassNewSummaries`),
-  listes agrégées tous cours, la plus ancienne d'abord.
-- Requêtes tolérantes : si `0018`/`0019` non appliquées, l'erreur de lecture
-  ⇒ « aucune nouveauté » (jamais « tout est nouveau »).
+- **Suivi de lecture par élément** (ADR 0024, migration `0021`) :
+  `question_reads (question_id, user_id)` et `summary_reads (summary_id,
+  user_id)`, privées. Remplace le curseur horodaté `course_reads`
+  (migrations 0018/0019, table **supprimée** par 0021).
+- **« Nouveau »** pour l'utilisateur = créé après son arrivée
+  (`memberSinceByCourse` = min de `course_members.joined_at` /
+  `class_members.joined_at`), pas de lui, non supprimé, **et pas dans
+  `*_reads`**. Ouvrir une **liste** ne marque plus rien.
+- **Marquage** (seulement à l'ouverture réelle) : `MarkQuestionRead` (effet,
+  page détail) ; `SummaryReadLink` (au clic sur le fichier, partout) ;
+  boutons « Tout marquer comme lu » des zones de classe. Actions dans
+  `features/reads/actions.ts` (`markQuestionReadAction`,
+  `markSummaryReadAction`, `markAllClass{Questions,Summaries}ReadAction`).
+- Helpers `features/reads/queries.ts` (`memberSinceByCourse`,
+  `readQuestionIds`, `readSummaryIds`). `countNewQuestions()` /
+  `countNewSummaries()` (`features/courses/queries.ts`) alimentent
+  `CourseSummary.newQuestionCount` / `.newSummaryCount` ; les
+  `ClassSummary.*` sont les sommes.
+- **UI** : deux couleurs — **ambre** questions, **vert (emerald)** résumés.
+  Pastilles sur les vignettes de cours et de classe ; deux encarts sur la
+  page de la classe → zones `class/[classId]/nouvelles` (`getClassNewQuestions`)
+  et `class/[classId]/nouveaux-resumes` (`getClassNewSummaries`), listes
+  agrégées tous cours, la plus ancienne d'abord.
+- Requêtes tolérantes : si `0021` non appliquée, l'erreur de lecture de
+  `question_reads` / `summary_reads` ⇒ « aucune nouveauté ».
 
 ## PWA + notifications push (Phase 23, ADR 0023)
 

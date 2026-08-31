@@ -6,7 +6,6 @@ import { listQuestions } from "@/features/questions/queries";
 import { parseSort } from "@/features/questions/schema";
 import { QuestionCard } from "@/components/questions/question-card";
 import { QuestionFilters } from "@/components/questions/question-filters";
-import { MarkCourseSeen } from "@/components/questions/mark-course-seen";
 
 function first(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
@@ -38,7 +37,6 @@ export default async function QuestionsPage({
 
   return (
     <div className="flex flex-col gap-5">
-      <MarkCourseSeen courseId={courseId} />
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-lg font-semibold">Questions</h2>
         <Link

@@ -15,6 +15,7 @@ import { AnswerReveal } from "@/components/answers/answer-reveal";
 import { CreateAnswerForm } from "@/components/answers/create-answer-form";
 import { CommentList } from "@/components/discussions/comment-list";
 import { CreateCommentForm } from "@/components/discussions/create-comment-form";
+import { MarkQuestionRead } from "@/components/questions/mark-question-read";
 
 export async function generateMetadata({
   params,
@@ -77,6 +78,7 @@ export default async function QuestionPage({
 
   return (
     <div className="flex flex-col gap-6">
+      <MarkQuestionRead questionId={question.id} />
       <Link href={`/course/${courseId}/questions`} className="text-xs text-zinc-500 hover:underline">
         ← Questions
       </Link>

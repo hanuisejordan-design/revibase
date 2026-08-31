@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getClassContext, getClassNewSummaries } from "@/features/classes/queries";
-import { MarkClassSummariesSeen } from "@/components/classes/mark-class-summaries-seen";
+import { markAllClassSummariesReadAction } from "@/features/reads/actions";
+import { SummaryReadLink } from "@/components/summaries/summary-read-link";
 import { relativeTime } from "@/lib/utils/date";
 
 const KIND_LABEL = { pdf: "PDF", image: "IMG", other: "FICHIER" } as const;
@@ -17,20 +18,32 @@ export default async function ClassNewSummariesPage({
   if (!ctx) notFound();
 
   const summaries = await getClassNewSummaries(classId);
+  const markAll = markAllClassSummariesReadAction.bind(null, classId);
 
   return (
     <div className="flex flex-col gap-5">
-      <MarkClassSummariesSeen classId={classId} />
-
       <div className="flex flex-col gap-1">
         <Link href={`/class/${classId}`} className="text-xs text-zinc-500 hover:underline">
           ← {ctx.name}
         </Link>
-        <h2 className="text-lg font-semibold">
-          Nouveaux résumés{summaries.length > 0 ? ` (${summaries.length})` : ""}
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-lg font-semibold">
+            Nouveaux résumés{summaries.length > 0 ? ` (${summaries.length})` : ""}
+          </h2>
+          {summaries.length > 0 ? (
+            <form action={markAll}>
+              <button
+                type="submit"
+                className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
+              >
+                Tout marquer comme lu
+              </button>
+            </form>
+          ) : null}
+        </div>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          Depuis ta dernière visite, tous cours confondus, du plus ancien au plus récent.
+          Ce que tu n&apos;as pas encore ouvert, tous cours confondus. Un résumé disparaît d&apos;ici
+          une fois que tu l&apos;as ouvert.
         </p>
       </div>
 
@@ -58,14 +71,13 @@ export default async function ClassNewSummariesPage({
                 className="rounded-lg border border-zinc-200 transition-colors hover:border-emerald-400 dark:border-zinc-800 dark:hover:border-emerald-700"
               >
                 {s.fileUrl ? (
-                  <a
+                  <SummaryReadLink
+                    summaryId={s.id}
                     href={s.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="flex flex-wrap items-baseline gap-x-2 gap-y-1 px-3 py-2 text-sm"
                   >
                     {inner}
-                  </a>
+                  </SummaryReadLink>
                 ) : (
                   <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1 px-3 py-2 text-sm text-zinc-400">
                     {inner} · aperçu indisponible

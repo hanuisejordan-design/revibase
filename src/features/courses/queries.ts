@@ -4,6 +4,7 @@ import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
 import type { CourseRole } from "@/constants/app";
+import { memberSinceByCourse, readQuestionIds, readSummaryIds } from "@/features/reads/queries";
 import type { CourseContext, CourseMemberEntry, CourseSummary } from "./types";
 
 /**
@@ -42,9 +43,10 @@ export async function countCourseContent(
 }
 
 /**
- * Nombre de questions « nouvelles depuis la dernière visite » par cours :
- * `created_at` postérieur au `seen_at` de `course_reads` (jamais visité => tout
- * est nouveau), hors les questions de l'utilisateur et hors questions supprimées.
+ * Nombre de questions « nouvelles » par cours = créées après l'arrivée du
+ * membre, pas de lui, non supprimées, et **pas encore ouvertes** (table
+ * `question_reads`). Ouvrir la page ne change plus rien : seul un clic sur la
+ * question la retire du compte.
  */
 export async function countNewQuestions(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -54,42 +56,35 @@ export async function countNewQuestions(
   const out = new Map<string, number>();
   if (courseIds.length === 0) return out;
 
-  const [{ data: reads, error: readsError }, { data: qs }] = await Promise.all([
-    supabase
-      .from("course_reads")
-      .select("course_id, questions_seen_at")
-      .eq("user_id", userId)
-      .in("course_id", courseIds),
+  const [baseline, { data: qs }] = await Promise.all([
+    memberSinceByCourse(supabase, userId, courseIds),
     supabase
       .from("questions")
-      .select("course_id, created_at")
+      .select("id, course_id, created_at")
       .in("course_id", courseIds)
       .is("deleted_at", null)
       .neq("author_id", userId),
   ]);
 
-  // Migration 0018/0019 pas encore appliquée : pas de compteur plutôt que « tout est nouveau ».
-  if (readsError) return out;
+  const candidates = ((qs ?? []) as Array<{ id: string; course_id: string; created_at: string }>).filter(
+    (q) => new Date(q.created_at).getTime() > (baseline.get(q.course_id) ?? 0),
+  );
+  if (candidates.length === 0) return out;
 
-  const seenAt = new Map<string, number>();
-  for (const r of (reads ?? []) as Array<{ course_id: string; questions_seen_at: string | null }>) {
-    if (r.questions_seen_at) seenAt.set(r.course_id, new Date(r.questions_seen_at).getTime());
-  }
+  const read = await readQuestionIds(
+    supabase,
+    userId,
+    candidates.map((c) => c.id),
+  );
+  if (!read) return out; // migration 0021 pas encore appliquée
 
-  for (const q of (qs ?? []) as Array<{ course_id: string; created_at: string }>) {
-    const seen = seenAt.get(q.course_id);
-    if (seen === undefined || new Date(q.created_at).getTime() > seen) {
-      out.set(q.course_id, (out.get(q.course_id) ?? 0) + 1);
-    }
+  for (const q of candidates) {
+    if (!read.has(q.id)) out.set(q.course_id, (out.get(q.course_id) ?? 0) + 1);
   }
   return out;
 }
 
-/**
- * Nombre de résumés « nouveaux depuis la dernière visite » par cours :
- * `created_at` postérieur au `summaries_seen_at` de `course_reads`, hors les
- * résumés déposés par l'utilisateur lui-même.
- */
+/** Idem pour les résumés (`summary_reads`). */
 export async function countNewSummaries(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
@@ -98,31 +93,29 @@ export async function countNewSummaries(
   const out = new Map<string, number>();
   if (courseIds.length === 0) return out;
 
-  const [{ data: reads, error: readsError }, { data: ss }] = await Promise.all([
-    supabase
-      .from("course_reads")
-      .select("course_id, summaries_seen_at")
-      .eq("user_id", userId)
-      .in("course_id", courseIds),
+  const [baseline, { data: ss }] = await Promise.all([
+    memberSinceByCourse(supabase, userId, courseIds),
     supabase
       .from("summaries")
-      .select("course_id, created_at")
+      .select("id, course_id, created_at")
       .in("course_id", courseIds)
       .neq("author_id", userId),
   ]);
 
-  if (readsError) return out;
+  const candidates = ((ss ?? []) as Array<{ id: string; course_id: string; created_at: string }>).filter(
+    (s) => new Date(s.created_at).getTime() > (baseline.get(s.course_id) ?? 0),
+  );
+  if (candidates.length === 0) return out;
 
-  const seenAt = new Map<string, number>();
-  for (const r of (reads ?? []) as Array<{ course_id: string; summaries_seen_at: string | null }>) {
-    if (r.summaries_seen_at) seenAt.set(r.course_id, new Date(r.summaries_seen_at).getTime());
-  }
+  const read = await readSummaryIds(
+    supabase,
+    userId,
+    candidates.map((c) => c.id),
+  );
+  if (!read) return out;
 
-  for (const s of (ss ?? []) as Array<{ course_id: string; created_at: string }>) {
-    const seen = seenAt.get(s.course_id);
-    if (seen === undefined || new Date(s.created_at).getTime() > seen) {
-      out.set(s.course_id, (out.get(s.course_id) ?? 0) + 1);
-    }
+  for (const s of candidates) {
+    if (!read.has(s.id)) out.set(s.course_id, (out.get(s.course_id) ?? 0) + 1);
   }
   return out;
 }

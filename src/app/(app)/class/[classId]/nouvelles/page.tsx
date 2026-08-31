@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getClassContext, getClassNewQuestions } from "@/features/classes/queries";
-import { MarkClassSeen } from "@/components/classes/mark-class-seen";
+import { markAllClassQuestionsReadAction } from "@/features/reads/actions";
 import { relativeTime } from "@/lib/utils/date";
 import { QUESTION_KIND_LABELS } from "@/constants/app";
 
@@ -16,20 +16,32 @@ export default async function ClassNewQuestionsPage({
   if (!ctx) notFound();
 
   const questions = await getClassNewQuestions(classId);
+  const markAll = markAllClassQuestionsReadAction.bind(null, classId);
 
   return (
     <div className="flex flex-col gap-5">
-      <MarkClassSeen classId={classId} />
-
       <div className="flex flex-col gap-1">
         <Link href={`/class/${classId}`} className="text-xs text-zinc-500 hover:underline">
           ← {ctx.name}
         </Link>
-        <h2 className="text-lg font-semibold">
-          Nouvelles questions{questions.length > 0 ? ` (${questions.length})` : ""}
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-lg font-semibold">
+            Nouvelles questions{questions.length > 0 ? ` (${questions.length})` : ""}
+          </h2>
+          {questions.length > 0 ? (
+            <form action={markAll}>
+              <button
+                type="submit"
+                className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
+              >
+                Tout marquer comme lu
+              </button>
+            </form>
+          ) : null}
+        </div>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          Depuis ta dernière visite, tous cours confondus, de la plus ancienne à la plus récente.
+          Ce que tu n&apos;as pas encore ouvert, tous cours confondus, de la plus ancienne à la plus
+          récente. Une question disparaît d&apos;ici une fois que tu l&apos;as ouverte.
         </p>
       </div>
 

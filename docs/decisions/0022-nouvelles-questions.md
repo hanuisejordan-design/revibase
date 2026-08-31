@@ -1,6 +1,8 @@
 # 0022 — Nouveautés depuis la dernière visite (questions & résumés)
 
-- Statut : accepté
+- Statut : accepté — **mécanisme de « vu » remplacé par [0024](0024-lecture-par-element.md)**
+  (suivi par élément au lieu du curseur `course_reads`). Le reste (vignettes,
+  zones, code couleur) reste valable.
 - Date : 2026-08-31
 - Voir aussi : [0021](0021-notifications.md), [0008](0008-questions.md),
   [0018](0018-resumes-par-cours.md)

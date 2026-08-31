@@ -40,16 +40,16 @@ un admin attribue « formateur ». Migration `0014`.
 Modifier titre / contexte / chapitre / options / photo (auteur ou formateur).
 Type non modifiable. Pas de migration (RLS déjà en place).
 
-### ✅ Nouveautés depuis la dernière visite — fait (Phase 22, ADR 0022)
+### ✅ Nouveautés depuis la dernière visite — fait (Phase 22, ADR 0022 ; mécanisme revu Phase 24, ADR 0024)
 
-Marqueur de lecture `course_reads` (migrations `0018` + `0019`, privé) : deux
-curseurs par (cours, utilisateur) — `questions_seen_at`, `summaries_seen_at`.
-Deux couleurs : **ambre** pour les questions, **vert** pour les résumés.
-Pastilles « N nouvelles questions » / « N nouveaux résumés » sur les vignettes
-de cours et de classe ; deux encarts sur la page de la classe → zones
-`class/[classId]/nouvelles` et `class/[classId]/nouveaux-resumes` qui listent
-tout ce qui est nouveau, le plus ancien d'abord, pour l'enchaîner. Curseur
-(par type) remis à jour à l'ouverture de la liste correspondante. L'ancien
+Suivi de lecture **par élément** (`question_reads` / `summary_reads`,
+migration `0021`, privé — remplace le curseur `course_reads` de 0018/0019).
+Un élément ne quitte les « nouveautés » que quand on l'a **réellement
+ouvert** ; ouvrir une liste ne marque plus rien. Plancher « rien d'avant mon
+arrivée » via `joined_at`. Bouton « Tout marquer comme lu » sur les zones de
+classe. Deux couleurs : **ambre** questions, **vert** résumés. Pastilles sur
+les vignettes cours/classe ; deux encarts sur la page de la classe → zones
+`class/[classId]/nouvelles` et `class/[classId]/nouveaux-resumes`. L'ancien
 trigger de notification `new_question` (`0017`) est abandonné : une nouveauté
 n'est pas un événement adressé, c'est un état de lecture.
 
