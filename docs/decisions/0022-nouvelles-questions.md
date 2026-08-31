@@ -33,8 +33,10 @@ mélangeait deux natures de signal. « Nouvelle question » n'est pas un
 - **Curseur remis à maintenant** à l'ouverture de la liste concernée :
   - questions d'un cours → `MarkCourseSeen` → `markCourseQuestionsSeenAction`
   - résumés d'un cours → `MarkSummariesSeen` → `markCourseSummariesSeenAction`
-  - zone « nouvelles questions » de la classe → `MarkClassSeen` →
+  - zone questions de la classe → `MarkClassSeen` →
     `markClassQuestionsSeenAction` (upsert `questions_seen_at` par cours)
+  - zone résumés de la classe → `MarkClassSummariesSeen` →
+    `markClassSummariesSeenAction` (upsert `summaries_seen_at` par cours)
 
   Chaque action fait un `upsert` partiel : elle ne touche que son curseur,
   l'autre est préservé. Même principe que « ouvrir /notifications = tout
@@ -45,16 +47,20 @@ mélangeait deux natures de signal. « Nouvelle question » n'est pas un
   `getMyClasses` / `getClassCourses` / `getMyCourses`.
   `CourseSummary.newQuestionCount` + `.newSummaryCount` ; les
   `ClassSummary.*` sont les sommes sur les cours.
-- **Affichage** :
-  - vignettes de cours et de classe : pastilles ambre « N nouvelles
-    questions » et « N nouveaux résumés » ;
-  - page de la classe : encart ambre au-dessus de « Créer un cours »,
-    « N nouvelles questions depuis ta dernière visite → Les parcourir »
-    (questions seulement — c'est l'affordance « enchaîner / y répondre » ;
-    les résumés se consultent par cours) ;
-  - zone `class/[classId]/nouvelles` : liste agrégée des nouvelles questions
-    de tous les cours, **de la plus ancienne à la plus récente** (pour les
-    enchaîner dans l'ordre), chaque ligne → la question dans son cours.
+- **Affichage** — deux couleurs pour distinguer les deux natures :
+  **ambre** = questions, **vert (emerald)** = résumés.
+  - vignettes de cours et de classe : pastille ambre « N nouvelles
+    questions » et pastille verte « N nouveaux résumés » ;
+  - page de la classe : deux encarts au-dessus de « Créer un cours » —
+    ambre « N nouvelles questions… → Les parcourir » vers
+    `class/[classId]/nouvelles`, vert « N nouveaux résumés… → Les
+    parcourir » vers `class/[classId]/nouveaux-resumes` ;
+  - `class/[classId]/nouvelles` : liste agrégée des nouvelles questions de
+    tous les cours, **de la plus ancienne à la plus récente** (pour les
+    enchaîner), chaque ligne → la question dans son cours ;
+  - `class/[classId]/nouveaux-resumes` : idem pour les résumés
+    (`getClassNewSummaries`, URL signées via `signSummaryFiles`), chaque
+    ligne → le fichier (nouvel onglet).
 - Si `0018`/`0019` ne sont pas encore appliquées, les requêtes détectent
   l'erreur de lecture et renvoient « aucune nouveauté » (jamais « tout est
   nouveau »).

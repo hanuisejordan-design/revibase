@@ -11,9 +11,16 @@ import {
   countNewSummaries,
 } from "@/features/courses/queries";
 import { enrich } from "@/features/questions/queries";
+import { kindOf, signSummaryFiles } from "@/features/summaries/queries";
 import type { CourseSummary } from "@/features/courses/types";
 import type { QuestionStatus } from "@/features/questions/types";
-import type { ClassContext, ClassMemberEntry, ClassNewQuestion, ClassSummary } from "./types";
+import type {
+  ClassContext,
+  ClassMemberEntry,
+  ClassNewQuestion,
+  ClassNewSummary,
+  ClassSummary,
+} from "./types";
 
 type ContentCounts = { questions: Map<string, number>; summaries: Map<string, number> };
 
@@ -301,6 +308,92 @@ export const getClassNewQuestions = cache(
         status: m.status,
       };
     });
+  },
+);
+
+/**
+ * Résumés « nouveaux depuis la dernière visite » de tous les cours de la
+ * classe, les plus anciens d'abord. « Nouveau » = `created_at >
+ * course_reads.summaries_seen_at`, hors les siens.
+ */
+export const getClassNewSummaries = cache(
+  async (classId: string): Promise<ClassNewSummary[]> => {
+    const user = await getUser();
+    if (!user) return [];
+
+    const supabase = await createClient();
+
+    const { data: coursesData } = await supabase
+      .from("courses")
+      .select("id, name")
+      .eq("class_id", classId);
+
+    const courses = (coursesData ?? []) as Array<{ id: string; name: string }>;
+    if (courses.length === 0) return [];
+
+    const courseIds = courses.map((c) => c.id);
+    const courseName = new Map(courses.map((c) => [c.id, c.name]));
+
+    const [{ data: reads, error: readsError }, { data: ss }] = await Promise.all([
+      supabase
+        .from("course_reads")
+        .select("course_id, summaries_seen_at")
+        .eq("user_id", user.id)
+        .in("course_id", courseIds),
+      supabase
+        .from("summaries")
+        .select(
+          "id, title, course_id, created_at, file_path, file_name, chapters(name), author:profiles!summaries_author_id_fkey(display_name)",
+        )
+        .in("course_id", courseIds)
+        .neq("author_id", user.id)
+        .order("created_at", { ascending: true }),
+    ]);
+
+    if (readsError) return [];
+
+    const seenAt = new Map<string, number>();
+    for (const r of (reads ?? []) as Array<{
+      course_id: string;
+      summaries_seen_at: string | null;
+    }>) {
+      if (r.summaries_seen_at) seenAt.set(r.course_id, new Date(r.summaries_seen_at).getTime());
+    }
+
+    const rows = (
+      ss as unknown as Array<{
+        id: string;
+        title: string;
+        course_id: string;
+        created_at: string;
+        file_path: string;
+        file_name: string;
+        chapters: { name: string } | null;
+        author: { display_name: string } | null;
+      }> | null
+    )?.filter((s) => {
+      const seen = seenAt.get(s.course_id);
+      return seen === undefined || new Date(s.created_at).getTime() > seen;
+    });
+
+    if (!rows || rows.length === 0) return [];
+
+    const urlByPath = await signSummaryFiles(
+      supabase,
+      rows.map((r) => r.file_path),
+    );
+
+    return rows.map((r) => ({
+      id: r.id,
+      title: r.title,
+      kind: kindOf(r.file_name),
+      courseId: r.course_id,
+      courseName: courseName.get(r.course_id) ?? "Cours",
+      chapterName: r.chapters?.name ?? null,
+      authorName: r.author?.display_name ?? "Membre",
+      createdAt: r.created_at,
+      fileUrl: urlByPath.get(r.file_path) ?? null,
+    }));
   },
 );
 

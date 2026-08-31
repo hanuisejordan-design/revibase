@@ -16,6 +16,7 @@ export default async function ClassCoursesPage({
 
   const courses = await getClassCourses(classId);
   const newCount = courses.reduce((n, c) => n + c.newQuestionCount, 0);
+  const newSummaryCount = courses.reduce((n, c) => n + c.newSummaryCount, 0);
 
   return (
     <div className="flex flex-col gap-6">
@@ -36,6 +37,19 @@ export default async function ClassCoursesPage({
             dernière visite
           </span>
           <span className="shrink-0 text-amber-800 dark:text-amber-300">Les parcourir →</span>
+        </Link>
+      ) : null}
+
+      {newSummaryCount > 0 ? (
+        <Link
+          href={`/class/${classId}/nouveaux-resumes`}
+          className="flex items-center justify-between gap-4 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm transition-colors hover:border-emerald-400 dark:border-emerald-900 dark:bg-emerald-950/40 dark:hover:border-emerald-800"
+        >
+          <span className="font-medium text-emerald-900 dark:text-emerald-200">
+            {newSummaryCount} nouveau{newSummaryCount > 1 ? "x" : ""} résumé
+            {newSummaryCount > 1 ? "s" : ""} depuis ta dernière visite
+          </span>
+          <span className="shrink-0 text-emerald-800 dark:text-emerald-300">Les parcourir →</span>
         </Link>
       ) : null}
 

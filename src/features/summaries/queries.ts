@@ -21,11 +21,27 @@ type SummaryRow = {
   author: { display_name: string } | null;
 };
 
-function kindOf(fileName: string): SummaryItem["kind"] {
+export function kindOf(fileName: string): SummaryItem["kind"] {
   const ext = fileName.toLowerCase().split(".").pop() ?? "";
   if (["png", "jpg", "jpeg", "webp", "gif", "avif"].includes(ext)) return "image";
   if (ext === "pdf") return "pdf";
   return "other";
+}
+
+/** URL signées (1 h) pour un lot de chemins de fichiers du bucket `summaries`. */
+export async function signSummaryFiles(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  paths: string[],
+): Promise<Map<string, string>> {
+  const map = new Map<string, string>();
+  const unique = [...new Set(paths)];
+  if (unique.length === 0) return map;
+
+  const { data } = await supabase.storage.from(BUCKET).createSignedUrls(unique, URL_TTL);
+  for (const s of data ?? []) {
+    if (s.path && s.signedUrl && !s.error) map.set(s.path, s.signedUrl);
+  }
+  return map;
 }
 
 /** Résumés d'un cours, du plus récent au plus ancien. */

@@ -119,6 +119,29 @@ export async function markClassQuestionsSeenAction(classId: string): Promise<voi
   revalidatePath(`/class/${classId}/nouvelles`);
 }
 
+/** Idem pour les résumés de tous les cours d'une classe (zone « nouveaux résumés »). */
+export async function markClassSummariesSeenAction(classId: string): Promise<void> {
+  if (!classId) return;
+  const user = await getUser();
+  if (!user) return;
+
+  const supabase = await createClient();
+  const { data: courses } = await supabase.from("courses").select("id").eq("class_id", classId);
+
+  const rows = ((courses ?? []) as Array<{ id: string }>).map((c) => ({
+    course_id: c.id,
+    user_id: user.id,
+    summaries_seen_at: new Date().toISOString(),
+  }));
+  if (rows.length > 0) {
+    await supabase.from("course_reads").upsert(rows, { onConflict: "course_id,user_id" });
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath(`/class/${classId}`);
+  revalidatePath(`/class/${classId}/nouveaux-resumes`);
+}
+
 /** Quitte un cours. Réservé aux membres non créateurs (garde-fou côté UI). */
 export async function leaveCourseAction(formData: FormData): Promise<void> {
   const courseId = String(formData.get("courseId") ?? "");

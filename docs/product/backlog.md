@@ -44,17 +44,17 @@ Type non modifiable. Pas de migration (RLS déjà en place).
 
 Marqueur de lecture `course_reads` (migrations `0018` + `0019`, privé) : deux
 curseurs par (cours, utilisateur) — `questions_seen_at`, `summaries_seen_at`.
-Pastilles ambre « N nouvelles questions » / « N nouveaux résumés » sur les
-vignettes de cours et de classe ; encart questions sur la page de la classe ;
-zone `class/[classId]/nouvelles` qui liste toutes les nouvelles questions de
-la classe, la plus ancienne d'abord, pour les enchaîner. Curseur remis à jour
-à l'ouverture de la liste correspondante. L'ancien trigger de notification
-`new_question` (`0017`) est abandonné : une nouveauté n'est pas un événement
-adressé, c'est un état de lecture.
+Deux couleurs : **ambre** pour les questions, **vert** pour les résumés.
+Pastilles « N nouvelles questions » / « N nouveaux résumés » sur les vignettes
+de cours et de classe ; deux encarts sur la page de la classe → zones
+`class/[classId]/nouvelles` et `class/[classId]/nouveaux-resumes` qui listent
+tout ce qui est nouveau, le plus ancien d'abord, pour l'enchaîner. Curseur
+(par type) remis à jour à l'ouverture de la liste correspondante. L'ancien
+trigger de notification `new_question` (`0017`) est abandonné : une nouveauté
+n'est pas un événement adressé, c'est un état de lecture.
 
-Reste éventuel : mode « une par une » plein écran (bouton « suivante → »
-depuis la question) ; une zone « nouveaux résumés » agrégée si le besoin se
-confirme. Pas prioritaires.
+Reste éventuel : mode « une par une » plein écran (bouton « suivante → »).
+Pas prioritaire.
 
 - **Idée** : savoir ce qui est apparu depuis qu'on est passé.
   - Vignettes (tableau de bord) : badge « N nouvelles questions » par cours,

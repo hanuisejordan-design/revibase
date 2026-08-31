@@ -379,18 +379,22 @@ Calculé à la lecture, par priorité décroissante :
 - **« Nouveau »** = `created_at > le curseur correspondant` (jamais vu ⇒
   tout), hors ce que l'utilisateur a écrit, hors questions supprimées.
 - Curseurs remis à maintenant à l'ouverture de la liste : questions d'un
-  cours (`MarkCourseSeen` → `markCourseQuestionsSeenAction`), résumés d'un
-  cours (`MarkSummariesSeen` → `markCourseSummariesSeenAction`), zone classe
-  (`MarkClassSeen` → `markClassQuestionsSeenAction`, un upsert par cours).
-  `upsert` partiel : chaque action ne touche que son curseur.
+  cours (`MarkCourseSeen`), résumés d'un cours (`MarkSummariesSeen`), zone
+  questions de la classe (`MarkClassSeen`), zone résumés de la classe
+  (`MarkClassSummariesSeen`) → actions
+  `markCourse{Questions,Summaries}SeenAction` /
+  `markClass{Questions,Summaries}SeenAction`. `upsert` partiel : chaque
+  action ne touche que son curseur.
 - `countNewQuestions()` / `countNewSummaries()`
   (`features/courses/queries.ts`) alimentent `CourseSummary.newQuestionCount`
   / `.newSummaryCount` (via `getMyClasses` / `getClassCourses` /
   `getMyCourses`) ; les `ClassSummary.*` sont les sommes.
-- **UI** : pastilles ambre « N nouvelles questions » / « N nouveaux
-  résumés » sur les vignettes de cours et de classe ; encart questions
-  au-dessus de « Créer un cours » sur la page de la classe ; zone
-  `class/[classId]/nouvelles` = liste agrégée des questions de tous les
-  cours, la plus ancienne d'abord (`getClassNewQuestions`).
+- **UI** : deux couleurs — **ambre** pour les questions, **vert (emerald)**
+  pour les résumés. Pastilles « N nouvelles questions » / « N nouveaux
+  résumés » sur les vignettes de cours et de classe ; sur la page de la
+  classe, deux encarts au-dessus de « Créer un cours » → zones
+  `class/[classId]/nouvelles` (questions, `getClassNewQuestions`) et
+  `class/[classId]/nouveaux-resumes` (résumés, `getClassNewSummaries`),
+  listes agrégées tous cours, la plus ancienne d'abord.
 - Requêtes tolérantes : si `0018`/`0019` non appliquées, l'erreur de lecture
   ⇒ « aucune nouveauté » (jamais « tout est nouveau »).
