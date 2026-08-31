@@ -40,13 +40,14 @@ un admin attribue « formateur ». Migration `0014`.
 Modifier titre / contexte / chapitre / options / photo (auteur ou formateur).
 Type non modifiable. Pas de migration (RLS déjà en place).
 
-### Nouvelles questions depuis la dernière visite (parké)
+### Feed « nouvelles questions depuis la dernière visite » (parké — UI)
 
 > Le **centre de notifications** (Phase 21, ADR 0021) couvre « on a agi sur
-> ton contenu » (réponse / commentaire / validation). Le « nouvelles
-> questions du cours depuis ma dernière visite » reste à part : c'est un
-> compteur de lecture, pas un événement — d'où `course_reads` plutôt qu'une
-> ligne `notifications` par membre. UI repoussée (« on verra à la fin »).
+> ton contenu » (réponse / commentaire / validation) **et** « nouvelle
+> question dans un cours » (notif `new_question`, migration `0017`, une ligne
+> par membre). Ce qui reste ici, c'est le **feed** : section « Nouvelles
+> questions (N) » en haut du cours, badge par vignette, mode « enchaîner ».
+> C'est de l'UI → repoussé, via un compteur de lecture `course_reads`.
 
 - **Idée** : savoir ce qui est apparu depuis qu'on est passé.
   - Vignettes (tableau de bord) : badge « N nouvelles questions » par cours,

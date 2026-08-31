@@ -354,6 +354,11 @@ Calculé à la lecture, par priorité décroissante :
   - `notify_on_validation` — `AFTER UPDATE` sur `answers`, quand
     `validated_by` passe à non-nul → l'auteur de la réponse
     (`type = 'validation'`).
+  - `notify_on_new_question` (migration `0017`) — `AFTER INSERT` sur
+    `questions` → **tous les autres membres du cours** : union
+    `course_members` (membres directs) + `class_members` sur
+    `courses.class_id` (membres via la classe), dédoublonnée
+    (`type = 'new_question'`).
   - Jamais de notification à soi-même (`actor_id <> user_id`).
 - `features/notifications/` : `queries.ts` (`listNotifications` — 50
   dernières, jointure `actor:profiles` + `questions` ; `countUnreadNotifications`
@@ -365,6 +370,6 @@ Calculé à la lecture, par priorité décroissante :
   question, « Tout marquer comme lu »). **Ouvrir la page marque tout lu**
   (`MarkAllRead`, effet client au montage).
 - `services/notifications/` reste vide — la logique est en base + `features/`.
-- Le type `new_question` existe dans l'enum mais n'est pas émis : « nouvelles
-  questions du cours depuis ma dernière visite » sera un compteur
-  `course_reads` (backlog), pas une ligne par membre.
+- Le *feed* « nouvelles questions depuis ma dernière visite » (section en
+  haut du cours) reste au backlog (`course_reads`) : c'est de l'UI. La
+  **notification** `new_question`, elle, est bien émise (`0017`).
