@@ -8,7 +8,11 @@ const newQuestionBadge =
 const newSummaryBadge =
   "inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300";
 
-/** Carte d'un cours, utilisée sur le tableau de bord et la page d'une classe. */
+/**
+ * Carte d'un cours (tableau de bord + page d'une classe). En mobile la grille
+ * est à 2 colonnes : la carte se resserre (padding réduit, badges « nouv. »
+ * abrégés, ligne « N questions · N résumés · N membres » masquée).
+ */
 export function CourseCard({ course }: { course: CourseSummary }) {
   const bits = [
     `${course.questionCount} question${course.questionCount > 1 ? "s" : ""}`,
@@ -19,24 +23,34 @@ export function CourseCard({ course }: { course: CourseSummary }) {
   return (
     <Link
       href={`/course/${course.id}`}
-      className="flex flex-col gap-2 rounded-xl border border-zinc-200 p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
+      className="flex h-full flex-col gap-1.5 rounded-xl border border-zinc-200 p-3 transition-colors hover:border-zinc-400 sm:gap-2 sm:p-4 dark:border-zinc-800 dark:hover:border-zinc-600"
     >
       <span className="font-medium">{course.name}</span>
-      <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-zinc-500">
+      <span className="mt-auto flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-zinc-500">
         {course.role === "trainer" ? <span className={trainerBadge}>Formateur</span> : null}
         {course.newQuestionCount > 0 ? (
           <span className={newQuestionBadge}>
-            {course.newQuestionCount} nouvelle{course.newQuestionCount > 1 ? "s" : ""} question
-            {course.newQuestionCount > 1 ? "s" : ""}
+            {course.newQuestionCount}
+            <span className="hidden sm:inline">
+              {" "}
+              nouvelle{course.newQuestionCount > 1 ? "s" : ""} question
+              {course.newQuestionCount > 1 ? "s" : ""}
+            </span>
+            <span className="sm:hidden"> nouv.</span>
           </span>
         ) : null}
         {course.newSummaryCount > 0 ? (
           <span className={newSummaryBadge}>
-            {course.newSummaryCount} nouveau{course.newSummaryCount > 1 ? "x" : ""} résumé
-            {course.newSummaryCount > 1 ? "s" : ""}
+            {course.newSummaryCount}
+            <span className="hidden sm:inline">
+              {" "}
+              nouveau{course.newSummaryCount > 1 ? "x" : ""} résumé
+              {course.newSummaryCount > 1 ? "s" : ""}
+            </span>
+            <span className="sm:hidden"> nouv.</span>
           </span>
         ) : null}
-        {bits.join(" · ")}
+        <span className="hidden sm:inline">{bits.join(" · ")}</span>
       </span>
     </Link>
   );

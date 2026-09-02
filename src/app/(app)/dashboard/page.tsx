@@ -54,7 +54,7 @@ export default async function DashboardPage() {
           <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
             Mes cours personnels
           </h2>
-          <ul className="grid gap-3 sm:grid-cols-2">
+          <ul className="grid grid-cols-2 gap-3">
             {standaloneCourses.map((c) => (
               <li key={c.id}>
                 <CourseCard course={c} />

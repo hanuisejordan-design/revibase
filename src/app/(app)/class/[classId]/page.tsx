@@ -70,7 +70,7 @@ export default async function ClassCoursesPage({
         </h2>
 
         {courses.length > 0 ? (
-          <ul className="grid gap-3 sm:grid-cols-2">
+          <ul className="grid grid-cols-2 gap-3">
             {courses.map((c) => (
               <li key={c.id}>
                 <CourseCard course={c} />
