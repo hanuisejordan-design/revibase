@@ -10,7 +10,7 @@ import { CreateSheet } from "./create-sheet";
 type Sheet = "courses" | "create" | null;
 
 const itemCls =
-  "flex flex-1 flex-col items-center justify-center gap-0.5 py-3 text-[10px] text-zinc-500 dark:text-zinc-400";
+  "flex flex-1 items-center justify-center py-3 text-xl leading-none text-zinc-500 dark:text-zinc-400";
 const activeCls = "text-zinc-900 dark:text-zinc-100";
 
 export function BottomNav({
@@ -32,34 +32,31 @@ export function BottomNav({
   return (
     <>
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200 bg-white pb-[env(safe-area-inset-bottom)] md:hidden dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="mx-auto flex max-w-3xl items-stretch">
+        {/* Cadre resserré et centré : les onglets ne collent pas aux bords. */}
+        <div className="mx-auto flex w-full max-w-[19rem] items-stretch">
           <Link
             href="/dashboard"
+            aria-label="Accueil"
             className={`${itemCls} ${isHome ? activeCls : ""}`}
             onClick={() => setSheet(null)}
           >
-            <span className="text-lg leading-none" aria-hidden>
-              🏠
-            </span>
-            Accueil
+            <span aria-hidden>🏠</span>
           </Link>
 
           <button
             type="button"
+            aria-label="Aller à un cours"
             onClick={() => setSheet(sheet === "courses" ? null : "courses")}
             className={`${itemCls} ${isCourses || sheet === "courses" ? activeCls : ""}`}
           >
-            <span className="text-lg leading-none" aria-hidden>
-              📚
-            </span>
-            Cours
+            <span aria-hidden>📚</span>
           </button>
 
           <button
             type="button"
             aria-label="Créer"
             onClick={() => setSheet(sheet === "create" ? null : "create")}
-            className="flex flex-1 flex-col items-center justify-center py-2"
+            className="flex flex-1 items-center justify-center py-2"
           >
             <span className="flex h-11 w-11 items-center justify-center rounded-full bg-zinc-900 text-2xl leading-none text-white dark:bg-zinc-100 dark:text-zinc-900">
               +
@@ -68,10 +65,11 @@ export function BottomNav({
 
           <Link
             href="/notifications"
+            aria-label="Notifications"
             className={`${itemCls} ${isNotifs ? activeCls : ""}`}
             onClick={() => setSheet(null)}
           >
-            <span className="relative text-lg leading-none" aria-hidden>
+            <span className="relative" aria-hidden>
               🔔
               {unread > 0 ? (
                 <span className="absolute -top-1 -right-2 inline-flex min-w-[1rem] items-center justify-center rounded-full bg-red-600 px-1 text-[9px] font-semibold text-white">
@@ -79,18 +77,15 @@ export function BottomNav({
                 </span>
               ) : null}
             </span>
-            Notifs
           </Link>
 
           <Link
             href="/parametres"
+            aria-label="Profil"
             className={`${itemCls} ${isProfil ? activeCls : ""}`}
             onClick={() => setSheet(null)}
           >
-            <span className="text-lg leading-none" aria-hidden>
-              👤
-            </span>
-            Profil
+            <span aria-hidden>👤</span>
           </Link>
         </div>
       </nav>
