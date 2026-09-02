@@ -3,14 +3,16 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth/dal";
 import { countUnreadNotifications } from "@/features/notifications/queries";
 import { getMyCourseOptions } from "@/features/courses/queries";
+import { getMyClassOptions } from "@/features/classes/queries";
 import { BottomNav } from "@/components/nav/bottom-nav";
 import { APP_NAME } from "@/constants/app";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
-  const [user, unread, courseOptions] = await Promise.all([
+  const [user, unread, courseOptions, classOptions] = await Promise.all([
     requireUser(),
     countUnreadNotifications(),
     getMyCourseOptions(),
+    getMyClassOptions(),
   ]);
 
   return (
@@ -46,7 +48,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 pt-6 pb-28 sm:px-6 sm:pt-8 md:pb-8">
         {children}
       </main>
-      <BottomNav unread={unread} courses={courseOptions} />
+      <BottomNav unread={unread} courses={courseOptions} classes={classOptions} />
     </div>
   );
 }

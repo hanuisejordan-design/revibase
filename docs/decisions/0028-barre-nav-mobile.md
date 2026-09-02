@@ -15,9 +15,12 @@ de bord.
 Une **barre fixe en bas**, accès au pouce, **mobile uniquement**
 (`md:hidden`) ; en desktop l'en-tête reste seul.
 
-- **5 onglets** : Accueil (`/dashboard`) · Cours · **+** (centre, mis en
-  avant) · Notifs (`/notifications`, badge non-lus) · Profil
-  (`/parametres`).
+- **5 onglets** : Accueil · Cours · **+** (centre, mis en avant) · Notifs
+  (`/notifications`, badge non-lus) · Profil (`/parametres`).
+- **Accueil** : lien direct vers `/dashboard` si l'utilisateur n'a aucune
+  classe ; sinon une **feuille** « Tableau de bord + mes classes » (saut vers
+  `/class/[id]`), sur le modèle de « Cours ». `getMyClassOptions()` (id +
+  nom, `cache()`).
 - **En-tête allégé sur mobile** : cloche + « Nom ⚙ » deviennent
   `hidden md:flex` ; il ne reste que le nom de l'app (les fils d'Ariane des
   pages restent).

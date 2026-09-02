@@ -93,6 +93,35 @@ function toCourseSummary(
   };
 }
 
+export interface ClassOption {
+  id: string;
+  name: string;
+}
+
+/**
+ * Liste plate et légère des classes de l'utilisateur (id + nom), triée par
+ * nom. Pour la navigation rapide (feuille « Accueil » de la barre du bas).
+ */
+export const getMyClassOptions = cache(async (): Promise<ClassOption[]> => {
+  const user = await getUser();
+  if (!user) return [];
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("class_members")
+    .select("classes(id, name)")
+    .eq("user_id", user.id);
+
+  const out: ClassOption[] = [];
+  for (const row of (data ?? []) as unknown as Array<{
+    classes: { id: string; name: string } | { id: string; name: string }[] | null;
+  }>) {
+    const c = Array.isArray(row.classes) ? (row.classes[0] ?? null) : row.classes;
+    if (c) out.push({ id: c.id, name: c.name });
+  }
+  return out.sort((a, b) => a.name.localeCompare(b.name, "fr"));
+});
+
 /** Toutes les classes (promos) dont l'utilisateur est membre, avec leurs cours. */
 export const getMyClasses = cache(async (): Promise<ClassSummary[]> => {
   const user = await getUser();

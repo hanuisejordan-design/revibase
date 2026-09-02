@@ -429,11 +429,15 @@ Calculé à la lecture, par priorité décroissante :
 
 - `src/components/nav/` : `bottom-nav.tsx` (barre `md:hidden`, 5 onglets
   Accueil / Cours / **+** / Notifs / Profil, état actif via `usePathname`),
-  `nav-sheet.tsx` (feuille remontante + backdrop), `courses-sheet.tsx`,
-  `create-sheet.tsx`.
+  `nav-sheet.tsx` (feuille remontante + backdrop), `home-sheet.tsx`,
+  `courses-sheet.tsx`, `create-sheet.tsx`.
 - Layout `(app)` : en-tête → cloche + `Nom ⚙` en `hidden md:flex` ; rend
-  `<BottomNav>` avec `unread` + `getMyCourseOptions()` (id/nom/classe,
-  `cache()`). `<main>` en `pb-24 md:pb-8`.
+  `<BottomNav>` avec `unread` + `getMyCourseOptions()` +
+  `getMyClassOptions()` (listes légères id/nom, `cache()`). `<main>` en
+  `pb-28 md:pb-8`.
+- Feuille **Accueil** : « Tableau de bord » + saut vers une classe
+  (`/class/[id]`). L'onglet reste un simple lien si l'utilisateur n'a aucune
+  classe.
 - Feuille **Cours** : saut direct vers n'importe quel cours accessible.
 - Feuille **+** : 2 temps — d'abord le **type** (question / résumé / quiz),
   puis le **cours** (pré-rempli si on y est) + le **chapitre**

@@ -4,10 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { CourseOption } from "@/features/courses/queries";
+import type { ClassOption } from "@/features/classes/queries";
 import { CoursesSheet } from "./courses-sheet";
 import { CreateSheet } from "./create-sheet";
+import { HomeSheet } from "./home-sheet";
 
-type Sheet = "courses" | "create" | null;
+type Sheet = "home" | "courses" | "create" | null;
 
 const itemCls =
   "flex flex-1 items-center justify-center py-3 text-xl leading-none text-zinc-500 dark:text-zinc-400";
@@ -16,9 +18,11 @@ const activeCls = "text-zinc-900 dark:text-zinc-100";
 export function BottomNav({
   unread,
   courses,
+  classes,
 }: {
   unread: number;
   courses: CourseOption[];
+  classes: ClassOption[];
 }) {
   const pathname = usePathname();
   const [sheet, setSheet] = useState<Sheet>(null);
@@ -34,14 +38,25 @@ export function BottomNav({
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200 bg-white pb-[env(safe-area-inset-bottom)] md:hidden dark:border-zinc-800 dark:bg-zinc-950">
         {/* Onglets répartis, avec une marge pour ne pas coller aux bords. */}
         <div className="mx-auto flex w-full max-w-md items-stretch px-6">
-          <Link
-            href="/dashboard"
-            aria-label="Accueil"
-            className={`${itemCls} ${isHome ? activeCls : ""}`}
-            onClick={() => setSheet(null)}
-          >
-            <span aria-hidden>🏠</span>
-          </Link>
+          {classes.length > 0 ? (
+            <button
+              type="button"
+              aria-label="Accueil"
+              onClick={() => setSheet(sheet === "home" ? null : "home")}
+              className={`${itemCls} ${isHome || sheet === "home" ? activeCls : ""}`}
+            >
+              <span aria-hidden>🏠</span>
+            </button>
+          ) : (
+            <Link
+              href="/dashboard"
+              aria-label="Accueil"
+              className={`${itemCls} ${isHome ? activeCls : ""}`}
+              onClick={() => setSheet(null)}
+            >
+              <span aria-hidden>🏠</span>
+            </Link>
+          )}
 
           <button
             type="button"
@@ -90,6 +105,7 @@ export function BottomNav({
         </div>
       </nav>
 
+      <HomeSheet open={sheet === "home"} onClose={() => setSheet(null)} classes={classes} />
       <CoursesSheet
         open={sheet === "courses"}
         onClose={() => setSheet(null)}
