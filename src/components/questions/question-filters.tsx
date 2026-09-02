@@ -93,7 +93,7 @@ export function QuestionFilters({
           </Chip>
         ))}
 
-        <Form action={basePath} className="ml-auto flex items-center gap-2">
+        <Form action={basePath} className="flex w-full items-center gap-2 sm:ml-auto sm:w-auto">
           {params.chapter ? <input type="hidden" name="chapter" value={params.chapter} /> : null}
           {params.sort !== "recent" ? (
             <input type="hidden" name="sort" value={params.sort} />
@@ -103,7 +103,7 @@ export function QuestionFilters({
             name="q"
             defaultValue={params.q ?? ""}
             placeholder="Rechercher…"
-            className="w-40 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
+            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm focus:border-zinc-900 focus:outline-none sm:w-40 dark:border-zinc-700 dark:bg-zinc-950"
           />
         </Form>
       </div>

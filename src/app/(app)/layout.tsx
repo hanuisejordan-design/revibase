@@ -16,7 +16,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-full flex-1 flex-col">
       <header className="border-b border-zinc-200 dark:border-zinc-800">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-6 py-3">
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-4 py-3 sm:px-6">
           <Link href="/dashboard" className="font-semibold">
             {APP_NAME}
           </Link>
@@ -43,7 +43,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-3xl flex-1 px-6 pt-8 pb-24 md:pb-8">{children}</main>
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 pt-6 pb-24 sm:px-6 sm:pt-8 md:pb-8">
+        {children}
+      </main>
       <BottomNav unread={unread} courses={courseOptions} />
     </div>
   );

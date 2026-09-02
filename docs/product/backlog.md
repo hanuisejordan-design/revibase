@@ -77,8 +77,12 @@ Barre fixe en bas, `md:hidden` : Accueil · Cours (feuille de saut) · **+**
 (feuille : cours + chapitre + question/résumé/quiz) · Notifs · Profil.
 En-tête allégé sur mobile (cloche + « Nom ⚙ » descendent dans la barre).
 
-Reste : le **passage responsive mobile complet** (formulaires, page quiz,
-tableaux) — la Phase 28 n'a fait que la barre + l'allègement d'en-tête.
+Reste : le **passage responsive mobile complet** — la Phase 28 a fait la
+barre + l'allègement d'en-tête ; un premier pass de finition a corrigé
+l'en-tête de cours (nav empilée sous le titre en mobile), les marges
+latérales (`px-4 sm:px-6`) et le champ de recherche des questions
+(pleine largeur en mobile). À revoir encore : `QuizRunner`, listes de
+membres, éventuels tableaux.
 
 ### ✅ Distinguer l'intention d'une question — fait (Phase 26, ADR 0026)
 

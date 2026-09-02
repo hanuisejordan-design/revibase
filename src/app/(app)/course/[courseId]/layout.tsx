@@ -27,7 +27,7 @@ export default async function CourseLayout({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="flex flex-col items-start gap-1">
           <Link
             href={ctx.classId ? `/class/${ctx.classId}` : "/dashboard"}
@@ -39,7 +39,7 @@ export default async function CourseLayout({
             {ctx.name}
           </Link>
         </div>
-        <nav className="flex gap-3 pt-1 text-sm">
+        <nav className="flex gap-4 text-sm sm:gap-3 sm:pt-1">
           <Link
             href={`/course/${courseId}/questions`}
             className="text-zinc-600 hover:underline dark:text-zinc-400"
