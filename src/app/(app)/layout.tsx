@@ -43,7 +43,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 pt-6 pb-24 sm:px-6 sm:pt-8 md:pb-8">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 pt-6 pb-28 sm:px-6 sm:pt-8 md:pb-8">
         {children}
       </main>
       <BottomNav unread={unread} courses={courseOptions} />

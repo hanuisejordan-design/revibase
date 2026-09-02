@@ -10,7 +10,7 @@ import { CreateSheet } from "./create-sheet";
 type Sheet = "courses" | "create" | null;
 
 const itemCls =
-  "flex flex-1 flex-col items-center justify-center gap-0.5 py-1.5 text-[10px] text-zinc-500 dark:text-zinc-400";
+  "flex flex-1 flex-col items-center justify-center gap-0.5 py-3 text-[10px] text-zinc-500 dark:text-zinc-400";
 const activeCls = "text-zinc-900 dark:text-zinc-100";
 
 export function BottomNav({
@@ -59,9 +59,9 @@ export function BottomNav({
             type="button"
             aria-label="Créer"
             onClick={() => setSheet(sheet === "create" ? null : "create")}
-            className="flex flex-1 flex-col items-center justify-center py-1"
+            className="flex flex-1 flex-col items-center justify-center py-2"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-900 text-xl leading-none text-white dark:bg-zinc-100 dark:text-zinc-900">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-zinc-900 text-2xl leading-none text-white dark:bg-zinc-100 dark:text-zinc-900">
               +
             </span>
           </button>
