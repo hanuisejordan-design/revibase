@@ -32,8 +32,8 @@ export function BottomNav({
   return (
     <>
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200 bg-white pb-[env(safe-area-inset-bottom)] md:hidden dark:border-zinc-800 dark:bg-zinc-950">
-        {/* Cadre resserré et centré : les onglets ne collent pas aux bords. */}
-        <div className="mx-auto flex w-full max-w-[19rem] items-stretch">
+        {/* Onglets répartis, avec une marge pour ne pas coller aux bords. */}
+        <div className="mx-auto flex w-full max-w-md items-stretch px-6">
           <Link
             href="/dashboard"
             aria-label="Accueil"
