@@ -27,6 +27,12 @@ export function BottomNav({
   const pathname = usePathname();
   const [sheet, setSheet] = useState<Sheet>(null);
 
+  // « Accueil » = niveau tableau de bord (classes + cours perso) ;
+  // « Cours » = les cours situés dans une classe.
+  const personalCourses = courses.filter((c) => c.className === null);
+  const classCourses = courses.filter((c) => c.className !== null);
+  const hasHomeContent = classes.length > 0 || personalCourses.length > 0;
+
   const currentCourseId = pathname.match(/^\/course\/([^/]+)/)?.[1] ?? null;
   const isHome = pathname === "/dashboard" || pathname.startsWith("/class/");
   const isCourses = pathname.startsWith("/course/");
@@ -38,7 +44,7 @@ export function BottomNav({
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200 bg-white pb-[env(safe-area-inset-bottom)] md:hidden dark:border-zinc-800 dark:bg-zinc-950">
         {/* Onglets répartis, avec une marge pour ne pas coller aux bords. */}
         <div className="mx-auto flex w-full max-w-md items-stretch px-6">
-          {classes.length > 0 ? (
+          {hasHomeContent ? (
             <button
               type="button"
               aria-label="Accueil"
@@ -105,11 +111,16 @@ export function BottomNav({
         </div>
       </nav>
 
-      <HomeSheet open={sheet === "home"} onClose={() => setSheet(null)} classes={classes} />
+      <HomeSheet
+        open={sheet === "home"}
+        onClose={() => setSheet(null)}
+        classes={classes}
+        personalCourses={personalCourses}
+      />
       <CoursesSheet
         open={sheet === "courses"}
         onClose={() => setSheet(null)}
-        courses={courses}
+        courses={classCourses}
       />
       <CreateSheet
         key={sheet === "create" ? "create-open" : "create-closed"}

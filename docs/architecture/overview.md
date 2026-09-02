@@ -435,10 +435,11 @@ Calculé à la lecture, par priorité décroissante :
   `<BottomNav>` avec `unread` + `getMyCourseOptions()` +
   `getMyClassOptions()` (listes légères id/nom, `cache()`). `<main>` en
   `pb-28 md:pb-8`.
-- Feuille **Accueil** : « Tableau de bord » + saut vers une classe
-  (`/class/[id]`). L'onglet reste un simple lien si l'utilisateur n'a aucune
-  classe.
-- Feuille **Cours** : saut direct vers n'importe quel cours accessible.
+- Feuille **Accueil** = niveau tableau de bord : « Tableau de bord » +
+  classes (`/class/[id]`) + cours personnels (`/course/[id]`). Simple lien si
+  l'utilisateur n'a ni classe ni cours perso.
+- Feuille **Cours** = un cran plus bas : seulement les cours situés dans une
+  classe, groupés par classe (`classCourses` = `className !== null`).
 - Feuille **+** : 2 temps — d'abord le **type** (question / résumé / quiz),
   puis le **cours** (pré-rempli si on y est) + le **chapitre**
   (`listCourseChaptersAction`, question uniquement) → `questions/new?chapter=…`

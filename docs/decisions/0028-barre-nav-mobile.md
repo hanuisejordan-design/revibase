@@ -17,10 +17,15 @@ Une **barre fixe en bas**, accès au pouce, **mobile uniquement**
 
 - **5 onglets** : Accueil · Cours · **+** (centre, mis en avant) · Notifs
   (`/notifications`, badge non-lus) · Profil (`/parametres`).
-- **Accueil** : lien direct vers `/dashboard` si l'utilisateur n'a aucune
-  classe ; sinon une **feuille** « Tableau de bord + mes classes » (saut vers
-  `/class/[id]`), sur le modèle de « Cours ». `getMyClassOptions()` (id +
-  nom, `cache()`).
+- **Répartition Accueil / Cours** (par niveau, pour éviter les doublons) :
+  - **Accueil** = niveau tableau de bord → feuille « Tableau de bord + mes
+    classes (`/class/[id]`) + mes cours personnels (`/course/[id]`) ». Simple
+    lien vers `/dashboard` si l'utilisateur n'a ni classe ni cours perso.
+  - **Cours** = un cran plus bas → feuille listant **seulement** les cours
+    situés dans une classe, groupés par classe. (Les cours perso n'y sont
+    pas, ils sont dans « Accueil ».)
+  - `getMyClassOptions()` (id + nom) ; les cours perso / de classe sont
+    dérivés de `getMyCourseOptions()` (`className === null` ou non).
 - **En-tête allégé sur mobile** : cloche + « Nom ⚙ » deviennent
   `hidden md:flex` ; il ne reste que le nom de l'app (les fils d'Ariane des
   pages restent).

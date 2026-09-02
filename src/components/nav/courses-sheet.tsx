@@ -4,7 +4,10 @@ import { useRouter } from "next/navigation";
 import type { CourseOption } from "@/features/courses/queries";
 import { NavSheet } from "./nav-sheet";
 
-/** Feuille « Cours » : saute vers n'importe quel cours accessible. */
+/**
+ * Feuille « Cours » : saut vers un cours situé DANS une classe, groupé par
+ * classe. (Les cours personnels sont dans la feuille « Accueil ».)
+ */
 export function CoursesSheet({
   open,
   onClose,
@@ -21,10 +24,9 @@ export function CoursesSheet({
     router.push(`/course/${id}`);
   }
 
-  // Regroupé par classe (les cours autonomes en dernier).
   const groups = new Map<string, CourseOption[]>();
   for (const c of courses) {
-    const key = c.className ?? "￿Personnels";
+    const key = c.className ?? "";
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key)!.push(c);
   }
@@ -33,14 +35,18 @@ export function CoursesSheet({
   return (
     <NavSheet open={open} onClose={onClose} title="Aller à un cours">
       {courses.length === 0 ? (
-        <p className="py-4 text-sm text-zinc-500">Tu n&apos;as encore aucun cours.</p>
+        <p className="py-4 text-sm text-zinc-500">
+          Aucun cours dans une classe. Tes cours personnels sont dans « Accueil ».
+        </p>
       ) : (
         <div className="flex flex-col gap-4">
           {sortedKeys.map((key) => (
             <div key={key} className="flex flex-col gap-1">
-              <p className="px-1 text-xs font-semibold tracking-wide text-zinc-500 uppercase">
-                {key === "￿Personnels" ? "Cours personnels" : key}
-              </p>
+              {key ? (
+                <p className="px-1 text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+                  {key}
+                </p>
+              ) : null}
               {groups.get(key)!.map((c) => (
                 <button
                   key={c.id}
