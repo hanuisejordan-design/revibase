@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Bell, House, Layers, Plus, User } from "lucide-react";
 import type { CourseOption } from "@/features/courses/queries";
 import type { ClassOption } from "@/features/classes/queries";
 import { CoursesSheet } from "./courses-sheet";
@@ -12,8 +13,9 @@ import { HomeSheet } from "./home-sheet";
 type Sheet = "home" | "courses" | "create" | null;
 
 const itemCls =
-  "flex flex-1 items-center justify-center py-3 text-xl leading-none opacity-55";
-const activeCls = "opacity-100";
+  "flex flex-1 items-center justify-center py-3 text-muted transition-colors";
+const activeCls = "text-foreground";
+const iconSize = 22;
 
 export function BottomNav({
   unread,
@@ -51,7 +53,7 @@ export function BottomNav({
               onClick={() => setSheet(sheet === "home" ? null : "home")}
               className={`${itemCls} ${isHome || sheet === "home" ? activeCls : ""}`}
             >
-              <span aria-hidden>🏠</span>
+              <House size={iconSize} aria-hidden />
             </button>
           ) : (
             <Link
@@ -60,7 +62,7 @@ export function BottomNav({
               className={`${itemCls} ${isHome ? activeCls : ""}`}
               onClick={() => setSheet(null)}
             >
-              <span aria-hidden>🏠</span>
+              <House size={iconSize} aria-hidden />
             </Link>
           )}
 
@@ -70,7 +72,7 @@ export function BottomNav({
             onClick={() => setSheet(sheet === "courses" ? null : "courses")}
             className={`${itemCls} ${isCourses || sheet === "courses" ? activeCls : ""}`}
           >
-            <span aria-hidden>📚</span>
+            <Layers size={iconSize} aria-hidden />
           </button>
 
           <button
@@ -79,8 +81,8 @@ export function BottomNav({
             onClick={() => setSheet(sheet === "create" ? null : "create")}
             className="flex flex-1 items-center justify-center py-2"
           >
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand text-2xl leading-none text-brand-foreground">
-              +
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand text-brand-foreground">
+              <Plus size={22} aria-hidden />
             </span>
           </button>
 
@@ -90,10 +92,10 @@ export function BottomNav({
             className={`${itemCls} ${isNotifs ? activeCls : ""}`}
             onClick={() => setSheet(null)}
           >
-            <span className="relative" aria-hidden>
-              🔔
+            <span className="relative">
+              <Bell size={iconSize} aria-hidden />
               {unread > 0 ? (
-                <span className="absolute -top-1 -right-2 inline-flex min-w-[1rem] items-center justify-center rounded-full bg-red-600 px-1 text-[9px] font-semibold text-white">
+                <span className="absolute -top-1.5 -right-2 inline-flex min-w-[1rem] items-center justify-center rounded-full bg-red-600 px-1 text-[9px] font-semibold text-white">
                   {unread > 9 ? "9+" : unread}
                 </span>
               ) : null}
@@ -106,7 +108,7 @@ export function BottomNav({
             className={`${itemCls} ${isProfil ? activeCls : ""}`}
             onClick={() => setSheet(null)}
           >
-            <span aria-hidden>👤</span>
+            <User size={iconSize} aria-hidden />
           </Link>
         </div>
       </nav>

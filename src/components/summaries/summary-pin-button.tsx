@@ -1,7 +1,8 @@
+import { Star } from "lucide-react";
 import { toggleSummaryPinAction } from "@/features/summaries/actions";
 import { cn } from "@/lib/utils/cn";
 
-/** Étoile ☆ / ★ : favori privé de l'utilisateur courant. */
+/** Étoile : favori privé de l'utilisateur courant. */
 export function SummaryPinButton({
   courseId,
   summaryId,
@@ -20,13 +21,11 @@ export function SummaryPinButton({
         aria-pressed={pinned}
         aria-label={pinned ? "Retirer des favoris" : "Ajouter aux favoris"}
         className={cn(
-          "px-1 text-base leading-none transition-colors",
-          pinned
-            ? "text-amber-500"
-            : "text-zinc-300 hover:text-zinc-500 dark:text-zinc-600 dark:hover:text-zinc-400",
+          "px-1 transition-colors",
+          pinned ? "text-amber-500" : "text-muted/50 hover:text-muted",
         )}
       >
-        {pinned ? "★" : "☆"}
+        <Star size={16} aria-hidden fill={pinned ? "currentColor" : "none"} />
       </button>
     </form>
   );

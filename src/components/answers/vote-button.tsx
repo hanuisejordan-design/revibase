@@ -1,10 +1,11 @@
 "use client";
 
+import { ThumbsUp } from "lucide-react";
 import { toggleVoteAction } from "@/features/answers/actions";
 import { cn } from "@/lib/utils/cn";
 
 /**
- * « 👍 » = « je donnerais cette réponse aussi ». On peut soutenir la réponse
+ * Le pouce = « je donnerais cette réponse aussi ». On peut soutenir la réponse
  * d'un autre même si on a posté la sienne ; sa propre réponse est déjà
  * comptée automatiquement. Positif seulement, pas de « pouce bas ».
  */
@@ -41,9 +42,7 @@ export function VoteButton({
             : "border-zinc-300 text-zinc-600 hover:border-zinc-500 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-500",
         )}
       >
-        <span aria-hidden className="text-base leading-none">
-          👍
-        </span>
+        <ThumbsUp size={14} aria-hidden />
         <span className="text-sm font-medium">{count > 0 ? count : "Moi aussi"}</span>
       </button>
     </form>
