@@ -14,7 +14,7 @@ manuscrites scannées). Un endroit pour les déposer et les consulter manque,
 
 - **Un résumé = un fichier + un titre**, optionnellement rattaché à un
   chapitre. Table `summaries (course_id, chapter_id nullable, author_id,
-  title, file_path, file_name, created_at)`. Pas de table de pièces jointes
+title, file_path, file_name, created_at)`. Pas de table de pièces jointes
   multiples (v2 si besoin).
 - **Fichier dans un bucket Storage privé `summaries`**, chemin
   `{course_id}/{uuid}.ext` ; policies `storage.objects` = `is_course_member`

@@ -15,17 +15,17 @@ langage courant : pour une promo, le mot juste pour l'ensemble des gens est
 
 **Renommage complet, structure inchangée** (les 3 niveaux restent) :
 
-| Avant | Après |
-| --- | --- |
-| `groups` / « groupe » | `classes` / « classe » (la promo, code d'invitation, membres, admin) |
-| `classes` / « classe » | `courses` / « cours » (Maths, Français… ; questions, quiz) |
-| `chapters` | inchangé |
-| `group_members` | `class_members` |
-| `class_members` | `course_members` |
-| `<table>.class_id` (chapters, questions, quizzes) | `course_id` |
-| `classes.group_id` | `courses.class_id` |
-| fonctions `is_class_*`, `question_class`, … | `is_course_*`, `question_course`, … ; `is_group_*` → `is_class_*` |
-| RPC `create_class` / `join_class_by_code` | `create_course` / `join_course_by_code` ; `create_group` → `create_class` |
+| Avant                                             | Après                                                                     |
+| ------------------------------------------------- | ------------------------------------------------------------------------- |
+| `groups` / « groupe »                             | `classes` / « classe » (la promo, code d'invitation, membres, admin)      |
+| `classes` / « classe »                            | `courses` / « cours » (Maths, Français… ; questions, quiz)                |
+| `chapters`                                        | inchangé                                                                  |
+| `group_members`                                   | `class_members`                                                           |
+| `class_members`                                   | `course_members`                                                          |
+| `<table>.class_id` (chapters, questions, quizzes) | `course_id`                                                               |
+| `classes.group_id`                                | `courses.class_id`                                                        |
+| fonctions `is_class_*`, `question_class`, …       | `is_course_*`, `question_course`, … ; `is_group_*` → `is_class_*`         |
+| RPC `create_class` / `join_class_by_code`         | `create_course` / `join_course_by_code` ; `create_group` → `create_class` |
 
 - **Portée : tout** — base (migration `0011`), code (`features/groups` →
   `features/classes`, `features/classes` → `features/courses`, routes

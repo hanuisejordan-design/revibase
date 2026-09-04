@@ -16,13 +16,13 @@ c'est le rôle `trainer` qui autorise la validation d'une réponse
 
 Deux attributs **indépendants** sur `course_members` :
 
-| Attribut | Qui | Peut |
-| --- | --- | --- |
-| `is_admin` (booléen) | le créateur du cours ; peut en nommer d'autres | code d'invitation, gérer les membres, **attribuer le rôle formateur** |
-| `role` (`student` / `trainer`) | `trainer` **attribué par un admin** | **valider une réponse** (inchangé, [0011](0011-validation-formateur.md)) |
+| Attribut                       | Qui                                            | Peut                                                                     |
+| ------------------------------ | ---------------------------------------------- | ------------------------------------------------------------------------ |
+| `is_admin` (booléen)           | le créateur du cours ; peut en nommer d'autres | code d'invitation, gérer les membres, **attribuer le rôle formateur**    |
+| `role` (`student` / `trainer`) | `trainer` **attribué par un admin**            | **valider une réponse** (inchangé, [0011](0011-validation-formateur.md)) |
 
 - Arriver dans un cours (par code ou via la classe) = `is_admin = false,
-  role = 'student'` (**élève**).
+role = 'student'` (**élève**).
 - `create_course` (RPC) : le créateur devient `is_admin = true`. Une case
   **« Je suis le formateur de ce cours »** (décochée par défaut,
   `p_is_trainer`) le pose aussi `trainer` — pour l'enseignant qui monte son

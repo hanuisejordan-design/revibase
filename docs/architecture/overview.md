@@ -243,7 +243,7 @@ Calculé à la lecture, par priorité décroissante :
   `0014` : colonne `is_admin`, backfill des `trainer` actuels,
   `create_course` pose `is_admin = true` (créateur = admin) ; case « Je suis
   le formateur de ce cours » (`p_is_trainer`, décochée par défaut) → `role =
-  'trainer'` direct.
+'trainer'` direct.
 - `is_course_admin()` + policy `UPDATE` sur `course_members` réservée aux
   admins ; `setCourseAdminAction` / `setCourseTrainerAction` (refus de
   retirer le dernier admin). UI : `CourseMemberManager` dans les paramètres
@@ -339,7 +339,7 @@ Calculé à la lecture, par priorité décroissante :
   groupée par chapitre, **toute la ligne cliquable** = `<a>` vers l'URL
   signée, « Supprimer » à part) + un bouton « Ajouter un résumé ».
 - **Favori privé (Phase 17, migration `0013`)** : `summary_pins
-  (summary_id, user_id)`, RLS `user_id = auth.uid()` (strictement privé).
+(summary_id, user_id)`, RLS `user_id = auth.uid()` (strictement privé).
   Étoile ☆/★ par ligne (`toggleSummaryPinAction`), `listSummaries` renvoie
   `pinned` ; case « Mes favoris uniquement » = paramètre `?favoris=1` filtré
   côté serveur.
@@ -383,7 +383,7 @@ Calculé à la lecture, par priorité décroissante :
 
 - **Suivi de lecture par élément** (ADR 0024, migration `0021`) :
   `question_reads (question_id, user_id)` et `summary_reads (summary_id,
-  user_id)`, privées. Remplace le curseur horodaté `course_reads`
+user_id)`, privées. Remplace le curseur horodaté `course_reads`
   (migrations 0018/0019, table **supprimée** par 0021).
 - **« Nouveau »** pour l'utilisateur = créé après son arrivée
   (`memberSinceByCourse` = min de `course_members.joined_at` /
@@ -484,3 +484,25 @@ Calculé à la lecture, par priorité décroissante :
   restent la source de vérité ; le push est une couche de livraison.
 - **iOS** : push seulement si l'app est installée sur l'écran d'accueil
   (16.4+). Un encart l'explique dans `PushToggle`.
+
+## Identité visuelle (ADR 0029)
+
+- **Couche de tokens** dans `src/app/globals.css` : variables de marque
+  (`--background`, `--surface`, `--foreground`, `--muted`, `--border`,
+  `--brand`, `--brand-hover`, `--brand-foreground`, `--accent`) définies en
+  `:root`, redéfinies sous `@media (prefers-color-scheme: dark)` **et**
+  `:root[data-theme="dark"]`, exposées à Tailwind via `@theme inline`.
+  Palette **bleu encre (`#1f3a5f`) sur papier froid (`#f1f3f6`)**.
+- **Toute l'app utilise les classes de tokens** (`bg-surface`, `text-muted`,
+  `border-border`, `bg-brand`, `text-brand-foreground`…). Plus aucune
+  variante `dark:` de couleur : les tokens basculent seuls. Survol de
+  bordure = `hover:border-brand/40` ; élément actif (puce, bouton) =
+  `bg-brand`. Couleurs de statut conservées (vert / ambre / emerald /
+  violet / indigo / rouge).
+- **Typo** : Geist (corps), Fraunces (`.display`, titres de section),
+  **Gloria Hallelujah** (`.greeting`, uniquement le « Bonjour X. » du
+  tableau de bord) — chargées par `next/font/google` dans `app/layout.tsx`.
+- **Icônes** : `lucide-react` exclusivement, aucun emoji. Tableau de bord =
+  bandeau `bg-brand` pleine largeur + carte récap blanche « morning brief ».
+- Reste : convertir les flèches typographiques `←` / `→` des liens
+  « retour » en `lucide`.

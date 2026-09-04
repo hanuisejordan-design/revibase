@@ -20,13 +20,13 @@ Suites (arbitrées avec l'utilisateur) :
 
 - **Favori privé** (« épingler ») à la place d'un « 👍 utile » public :
   **fait — Phase 17** (migration `0013`). Table `summary_pins
-  (summary_id, user_id)` strictement privée (RLS `user_id = auth.uid()`),
+(summary_id, user_id)` strictement privée (RLS `user_id = auth.uid()`),
   étoile ☆/★ par ligne, case « Mes favoris uniquement » (`?favoris=1`). Un
   compteur agrégé public reste possible plus tard si le collectif se
   confirme.
 - **Éditeur de texte dans l'app** (`summaries.body` markdown) : **écarté** —
   ce n'est pas le rôle de l'app, d'autres outils le font mieux.
-- **Plusieurs fichiers par résumé** (`summary_files`) : *peut-être utile*
+- **Plusieurs fichiers par résumé** (`summary_files`) : _peut-être utile_
   (doc scanné multi-pages, PDF + annexes). Pas prioritaire.
 
 ### ✅ Rôles du cours : admin ≠ formateur — fait (Phase 18, ADR 0019)
@@ -64,9 +64,9 @@ Pas prioritaire.
     Questions (comme « Sans réponse ») ; un mode « une par une » plein écran
     seulement si le besoin se confirme.
 - **À faire** : table `course_reads (course_id, user_id,
-  questions_seen_at)` (RLS `user_id = auth.uid()`), mise à jour à l'ouverture
+questions_seen_at)` (RLS `user_id = auth.uid()`), mise à jour à l'ouverture
   de la liste des questions ; « nouvelle » = `question.created_at >
-  questions_seen_at` (pas les siennes, pas les supprimées).
+questions_seen_at` (pas les siennes, pas les supprimées).
   `getMyCourses` / requêtes classe renvoient `newQuestionCount`.
 - **Ampleur** : migration + comptages dans 2-3 requêtes + un filtre. L'UI
   fine (feed) est repoussée — « sobre et efficace » suffira.
@@ -112,7 +112,7 @@ phase dédiée au quiz.
 
 ### Supprimer un cours / une classe — hésitant, reporté
 
-- Aujourd'hui on ne peut que *quitter*. Suppression = ligne à effacer dans
+- Aujourd'hui on ne peut que _quitter_. Suppression = ligne à effacer dans
   Supabase (cascade FK OK).
 - **Réserve** : un admin qui supprimerait tout du jour au lendemain, ça fait
   peur. À réserver au **créateur** + garde-fous forts (re-saisie du nom,
@@ -144,15 +144,15 @@ navigateur. Reste : nettoyage des images orphelines (cf. reports).
 
 ## Reports connus (dette assumée)
 
-| Sujet                                           | Référence               | Note                                                                                               |
-| ----------------------------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------- |
-| Responsive mobile à peaufiner                   | brief §17, Phase 10     | Cible n°1 ; à faire avant adoption large par la classe                                             |
-| Notifications : pas de temps réel (WebSocket)           | Phase 21, ADR 0021      | Compteur rafraîchi à la navigation. Push navigateur : **fait** (Phase 23, ADR 0023) ; l'in-app n'est pas « live » pour autant |
-| Push : envoi depuis les Server Actions (best-effort)    | Phase 23, ADR 0023      | Pas depuis les triggers → un futur chemin d'écriture pourrait oublier le push. L'in-app reste garanti. Alternative Edge Function écartée (trop d'infra) |
-| Icône PWA provisoire                                    | Phase 23                | Monogramme « R » généré (`scripts/gen-icons.mjs`). À remplacer par un vrai visuel avec l'identité graphique |
-| Recherche plein-texte                           | ADR 0002, 0008          | Aujourd'hui : `ILIKE` sur le titre uniquement                                                      |
-| Types Supabase générés                          | `src/types/database.ts` | Remplacer les types écrits à la main par `supabase gen types`                                      |
-| États de chargement / erreurs soignés           | Phase 10                | `loading.tsx`, messages d'erreur, empty states                                                     |
-| Tests d'intégration (permissions inter-classes) | brief §27               | Aujourd'hui : tests unitaires des schémas seulement                                                |
-| Nom du produit / domaine                        | —                       | « Revibase » est provisoire                                                                        |
-| Images de question orphelines                   | ADR 0016                | Upload avant « Publier » réussi puis onglet fermé → fichier sans question. Nettoyage périodique à prévoir |
+| Sujet                                                | Référence               | Note                                                                                                                                                    |
+| ---------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Responsive mobile à peaufiner                        | brief §17, Phase 10     | Cible n°1 ; à faire avant adoption large par la classe                                                                                                  |
+| Notifications : pas de temps réel (WebSocket)        | Phase 21, ADR 0021      | Compteur rafraîchi à la navigation. Push navigateur : **fait** (Phase 23, ADR 0023) ; l'in-app n'est pas « live » pour autant                           |
+| Push : envoi depuis les Server Actions (best-effort) | Phase 23, ADR 0023      | Pas depuis les triggers → un futur chemin d'écriture pourrait oublier le push. L'in-app reste garanti. Alternative Edge Function écartée (trop d'infra) |
+| Icône PWA provisoire                                 | Phase 23                | Monogramme « R » généré (`scripts/gen-icons.mjs`). À remplacer par un vrai visuel avec l'identité graphique                                             |
+| Recherche plein-texte                                | ADR 0002, 0008          | Aujourd'hui : `ILIKE` sur le titre uniquement                                                                                                           |
+| Types Supabase générés                               | `src/types/database.ts` | Remplacer les types écrits à la main par `supabase gen types`                                                                                           |
+| États de chargement / erreurs soignés                | Phase 10                | `loading.tsx`, messages d'erreur, empty states                                                                                                          |
+| Tests d'intégration (permissions inter-classes)      | brief §27               | Aujourd'hui : tests unitaires des schémas seulement                                                                                                     |
+| Nom du produit / domaine                             | —                       | « Revibase » est provisoire                                                                                                                             |
+| Images de question orphelines                        | ADR 0016                | Upload avant « Publier » réussi puis onglet fermé → fichier sans question. Nettoyage périodique à prévoir                                               |

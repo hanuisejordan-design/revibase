@@ -44,6 +44,7 @@ mélangeait deux natures de signal. « Nouvelle question » n'est pas un
   l'autre est préservé. Même principe que « ouvrir /notifications = tout
   lu » : le rendu courant montre encore le neuf, la base est à jour pour la
   visite suivante.
+
 - **Comptage** : `countNewQuestions()` / `countNewSummaries()`
   (`features/courses/queries.ts`) → `Map<courseId, number>`, branchés dans
   `getMyClasses` / `getClassCourses` / `getMyCourses`.

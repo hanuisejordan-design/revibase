@@ -15,11 +15,11 @@ quand on répond / commente leur question, ni quand leur réponse est validée.
 
 **v1 — événements « quelqu'un a agi sur ton contenu »** :
 
-| Événement | Notifié |
-| --- | --- |
-| réponse ajoutée à une question | l'auteur de la question |
+| Événement                         | Notifié                 |
+| --------------------------------- | ----------------------- |
+| réponse ajoutée à une question    | l'auteur de la question |
 | commentaire ajouté à une question | l'auteur de la question |
-| réponse validée par un formateur | l'auteur de la réponse |
+| réponse validée par un formateur  | l'auteur de la réponse  |
 
 Le centre de notifications est réservé aux **échanges**. « Une nouvelle
 question est apparue dans un cours » n'y figure pas : c'est traité par une

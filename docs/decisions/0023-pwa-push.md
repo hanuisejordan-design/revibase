@@ -33,7 +33,7 @@ commentaire, validation, nouvelle question, nouveau résumé.
   simplement désactivé (`pushConfigured()` / `PushToggle` → « non
   disponible »).
 - **Migration `0020`** : table `push_subscriptions (user_id, endpoint unique,
-  p256dh, auth, user_agent)`, privée (RLS `user_id = auth.uid()`). Deux
+p256dh, auth, user_agent)`, privée (RLS `user_id = auth.uid()`). Deux
   fonctions `security definer` pour l'envoi : `list_push_targets(uuid[])`
   (abonnements des destinataires) et `delete_push_subscription_by_endpoint`
   (purge des abonnements périmés 404/410).
@@ -46,16 +46,17 @@ commentaire, validation, nouvelle question, nouveau résumé.
   produit un signal appelle `sendPushToUsers()` dans un `after()` (post
   réponse, non bloquant) :
 
-  | Action | Destinataire | Type |
-  | --- | --- | --- |
-  | `createAnswerAction` (vraie insertion) | auteur de la question | échange |
-  | `createCommentAction` | auteur de la question | échange |
-  | `toggleValidateAction` (passage à validé) | auteur de la réponse | échange |
-  | `createQuestionAction` | membres du cours (− auteur) | nouveauté |
-  | `createSummaryAction` | membres du cours (− auteur) | nouveauté |
+  | Action                                    | Destinataire                | Type      |
+  | ----------------------------------------- | --------------------------- | --------- |
+  | `createAnswerAction` (vraie insertion)    | auteur de la question       | échange   |
+  | `createCommentAction`                     | auteur de la question       | échange   |
+  | `toggleValidateAction` (passage à validé) | auteur de la réponse        | échange   |
+  | `createQuestionAction`                    | membres du cours (− auteur) | nouveauté |
+  | `createSummaryAction`                     | membres du cours (− auteur) | nouveauté |
 
   `courseAudience()` = `course_members` ∪ `class_members` (via
   `courses.class_id`).
+
 - **Best-effort assumé** : la notif in-app (triggers, ADR 0021) et les
   pastilles `course_reads` (ADR 0022) restent la source de vérité. Si un
   futur chemin d'écriture oublie le push, rien n'est perdu côté in-app.

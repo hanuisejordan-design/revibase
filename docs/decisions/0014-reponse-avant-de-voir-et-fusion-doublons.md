@@ -44,7 +44,7 @@ Retours d'usage sur les questions **ouvertes** :
   réponse** » (auteur inclus).
 - **Vote anonyme** : on n'affiche **que le total**, pas les noms des votants.
   Un vote est un signal léger (pas une contribution signée comme une réponse
-  ou un commentaire) ; exposer qui a soutenu quoi — ou n'a *pas* soutenu la
+  ou un commentaire) ; exposer qui a soutenu quoi — ou n'a _pas_ soutenu la
   réponse d'un camarade — crée une pression sociale et un effet de meute dans
   une petite classe. `listAnswers` ne renvoie que `voteCount` +
   `viewerHasVoted`, jamais l'identité des votants.

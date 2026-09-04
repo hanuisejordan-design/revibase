@@ -7,7 +7,7 @@
 ## Contexte
 
 Le modèle est plat : `classe → chapitres → questions`. Il marche pour une
-promo mono-domaine (la classe *est* le sujet), mais pas pour un cours
+promo mono-domaine (la classe _est_ le sujet), mais pas pour un cours
 « classique » à plusieurs matières : « Math », « Français », « Géo » sont trop
 larges pour être des chapitres, et un chapitre « Trigonométrie » créé à plat
 se retrouve au même niveau que « Math ».
@@ -74,5 +74,5 @@ tout le reste (chapitres, questions, réponses, quiz, RLS, routes).
   ligne `class_members` (accès à cette seule classe) — indépendant du groupe,
   c'est voulu.
 - Le point « créateur d'une classe = formateur d'office » reste ouvert
-  (backlog *rôles admin ≠ formateur*), maintenant avec un précédent :
+  (backlog _rôles admin ≠ formateur_), maintenant avec un précédent :
   `group_members.is_admin`.

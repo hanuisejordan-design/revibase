@@ -40,7 +40,7 @@ Uniquement quand `purpose = 'help'` (et question ouverte) :
 ## Conséquences
 
 - La bascule d'ordre est purement présentation (`discussionFirst = isOpen &&
-  purpose === 'help'` dans la page détail).
+purpose === 'help'` dans la page détail).
 - `NotificationItem` gagne `questionPurpose` ; `listNotifications` embarque
   `questions(... purpose)`.
 - Reclasser une question `challenge` → `help` (ou l'inverse) réordonne la
