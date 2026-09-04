@@ -38,6 +38,8 @@ export interface ClassNewQuestion {
   purpose: QuestionPurpose;
   courseId: string;
   courseName: string;
+  /** Nom de la classe parente, ou `null` pour un cours personnel. */
+  className: string | null;
   chapterName: string | null;
   authorName: string;
   createdAt: string;
@@ -56,6 +58,8 @@ export interface ClassNewSummary {
   kind: SummaryItem["kind"];
   courseId: string;
   courseName: string;
+  /** Nom de la classe parente, ou `null` pour un cours personnel. */
+  className: string | null;
   chapterName: string | null;
   authorName: string;
   createdAt: string;

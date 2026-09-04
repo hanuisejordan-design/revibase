@@ -25,6 +25,9 @@ import type {
 
 type ContentCounts = { questions: Map<string, number>; summaries: Map<string, number> };
 
+/** Nom d'un cours + nom de sa classe parente (`null` si cours personnel). */
+type CourseMeta = { name: string; className: string | null };
+
 type ClassRow = { id: string; name: string; join_code: string };
 type CourseRow = {
   id: string;
@@ -256,7 +259,7 @@ async function collectNewQuestions(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
   courseIds: string[],
-  courseName: Map<string, string>,
+  courseMeta: Map<string, CourseMeta>,
 ): Promise<ClassNewQuestion[]> {
   if (courseIds.length === 0) return [];
 
@@ -315,7 +318,8 @@ async function collectNewQuestions(
       kind: r.kind,
       purpose: r.purpose,
       courseId: r.course_id,
-      courseName: courseName.get(r.course_id) ?? "Cours",
+      courseName: courseMeta.get(r.course_id)?.name ?? "Cours",
+      className: courseMeta.get(r.course_id)?.className ?? null,
       chapterName: r.chapters?.name ?? null,
       authorName: r.author?.display_name ?? "Membre",
       createdAt: r.created_at,
@@ -331,7 +335,7 @@ async function collectNewSummaries(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
   courseIds: string[],
-  courseName: Map<string, string>,
+  courseMeta: Map<string, CourseMeta>,
 ): Promise<ClassNewSummary[]> {
   if (courseIds.length === 0) return [];
 
@@ -382,7 +386,8 @@ async function collectNewSummaries(
     title: r.title,
     kind: kindOf(r.file_name),
     courseId: r.course_id,
-    courseName: courseName.get(r.course_id) ?? "Cours",
+    courseName: courseMeta.get(r.course_id)?.name ?? "Cours",
+    className: courseMeta.get(r.course_id)?.className ?? null,
     chapterName: r.chapters?.name ?? null,
     authorName: r.author?.display_name ?? "Membre",
     createdAt: r.created_at,
@@ -390,30 +395,61 @@ async function collectNewSummaries(
   }));
 }
 
-/** Résout tous les cours accessibles (id + nom) pour l'agrégat « mes nouveautés ». */
-async function myCourseNames(
+/**
+ * Résout tous les cours accessibles (id → nom + classe parente) pour l'agrégat
+ * « mes nouveautés ». `className` vaut `null` pour un cours personnel.
+ */
+async function myCourseMeta(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
-): Promise<Map<string, string>> {
+): Promise<Map<string, CourseMeta>> {
   const [{ data: direct }, { data: myClasses }] = await Promise.all([
-    supabase.from("course_members").select("courses(id, name)").eq("user_id", userId),
-    supabase.from("class_members").select("class_id").eq("user_id", userId),
+    supabase
+      .from("course_members")
+      .select("courses(id, name, class_id, classes(name))")
+      .eq("user_id", userId),
+    supabase.from("class_members").select("class_id, classes(name)").eq("user_id", userId),
   ]);
-  const out = new Map<string, string>();
+
+  const one = <T>(v: T | T[] | null): T | null => (Array.isArray(v) ? (v[0] ?? null) : v);
+
+  const out = new Map<string, CourseMeta>();
   for (const row of (direct ?? []) as unknown as Array<{
-    courses: { id: string; name: string } | { id: string; name: string }[] | null;
+    courses: {
+      id: string;
+      name: string;
+      class_id: string | null;
+      classes: { name: string } | { name: string }[] | null;
+    } | Array<{
+      id: string;
+      name: string;
+      class_id: string | null;
+      classes: { name: string } | { name: string }[] | null;
+    }> | null;
   }>) {
-    const c = Array.isArray(row.courses) ? (row.courses[0] ?? null) : row.courses;
-    if (c) out.set(c.id, c.name);
+    const c = one(row.courses);
+    if (c) out.set(c.id, { name: c.name, className: one(c.classes)?.name ?? null });
   }
-  const classIds = ((myClasses ?? []) as Array<{ class_id: string }>).map((r) => r.class_id);
+
+  const classNameById = new Map<string, string>();
+  for (const row of (myClasses ?? []) as unknown as Array<{
+    class_id: string;
+    classes: { name: string } | { name: string }[] | null;
+  }>) {
+    const n = one(row.classes)?.name;
+    if (n) classNameById.set(row.class_id, n);
+  }
+
+  const classIds = [...classNameById.keys()];
   if (classIds.length > 0) {
     const { data: cc } = await supabase
       .from("courses")
-      .select("id, name")
+      .select("id, name, class_id")
       .in("class_id", classIds);
-    for (const c of (cc ?? []) as Array<{ id: string; name: string }>) {
-      if (!out.has(c.id)) out.set(c.id, c.name);
+    for (const c of (cc ?? []) as Array<{ id: string; name: string; class_id: string }>) {
+      if (!out.has(c.id)) {
+        out.set(c.id, { name: c.name, className: classNameById.get(c.class_id) ?? null });
+      }
     }
   }
   return out;
@@ -424,8 +460,8 @@ export const getMyNewQuestions = cache(async (): Promise<ClassNewQuestion[]> => 
   const user = await getUser();
   if (!user) return [];
   const supabase = await createClient();
-  const names = await myCourseNames(supabase, user.id);
-  return collectNewQuestions(supabase, user.id, [...names.keys()], names);
+  const meta = await myCourseMeta(supabase, user.id);
+  return collectNewQuestions(supabase, user.id, [...meta.keys()], meta);
 });
 
 /** Tous mes nouveaux résumés, tous cours confondus. */
@@ -433,8 +469,8 @@ export const getMyNewSummaries = cache(async (): Promise<ClassNewSummary[]> => {
   const user = await getUser();
   if (!user) return [];
   const supabase = await createClient();
-  const names = await myCourseNames(supabase, user.id);
-  return collectNewSummaries(supabase, user.id, [...names.keys()], names);
+  const meta = await myCourseMeta(supabase, user.id);
+  return collectNewSummaries(supabase, user.id, [...meta.keys()], meta);
 });
 
 /**
@@ -448,19 +484,20 @@ export const getClassNewQuestions = cache(
 
     const supabase = await createClient();
 
-    const { data: coursesData } = await supabase
-      .from("courses")
-      .select("id, name")
-      .eq("class_id", classId);
+    const [{ data: coursesData }, { data: cls }] = await Promise.all([
+      supabase.from("courses").select("id, name").eq("class_id", classId),
+      supabase.from("classes").select("name").eq("id", classId).maybeSingle(),
+    ]);
 
     const courses = (coursesData ?? []) as Array<{ id: string; name: string }>;
     if (courses.length === 0) return [];
 
+    const className = (cls as { name: string } | null)?.name ?? null;
     return collectNewQuestions(
       supabase,
       user.id,
       courses.map((c) => c.id),
-      new Map(courses.map((c) => [c.id, c.name])),
+      new Map(courses.map((c) => [c.id, { name: c.name, className }])),
     );
   },
 );
@@ -473,19 +510,20 @@ export const getClassNewSummaries = cache(
 
     const supabase = await createClient();
 
-    const { data: coursesData } = await supabase
-      .from("courses")
-      .select("id, name")
-      .eq("class_id", classId);
+    const [{ data: coursesData }, { data: cls }] = await Promise.all([
+      supabase.from("courses").select("id, name").eq("class_id", classId),
+      supabase.from("classes").select("name").eq("id", classId).maybeSingle(),
+    ]);
 
     const courses = (coursesData ?? []) as Array<{ id: string; name: string }>;
     if (courses.length === 0) return [];
 
+    const className = (cls as { name: string } | null)?.name ?? null;
     return collectNewSummaries(
       supabase,
       user.id,
       courses.map((c) => c.id),
-      new Map(courses.map((c) => [c.id, c.name])),
+      new Map(courses.map((c) => [c.id, { name: c.name, className }])),
     );
   },
 );

@@ -65,10 +65,14 @@ vide). On perd la trace de ce qu'on voulait consulter.
 - `0022` reste la référence pour tout le reste (UI, couleurs, zones).
 - **Page `/nouvelles`** (agrégat « mes nouveautés », tous cours confondus —
   classes + perso) : `getMyNewQuestions()` / `getMyNewSummaries()`
-  (`features/classes/queries`, cœur partagé `collectNew*`),
-  `markAllMy{Questions,Summaries}ReadAction`. Le récap du tableau de bord y
-  renvoie (`/nouvelles#questions` / `#resumes`) au lieu de seulement
-  annoncer un compte.
+  (`features/classes/queries`, cœur partagé `collectNew*` ; `CourseMeta`
+  = nom du cours + nom de la classe parente, `null` si cours perso),
+  `markAllMy{Questions,Summaries}ReadAction`. La liste est **regroupée par
+  classe puis par cours** (`groupByClassCourse` dans la page) : une liste
+  à plat mélangeant français / math / géo ne veut rien dire. En-tête de
+  classe seulement s'il y a > 1 classe ; en-tête de cours toujours. Le
+  récap du tableau de bord y renvoie (`/nouvelles#questions` / `#resumes`)
+  au lieu de seulement annoncer un compte.
 - **Piège PostgREST** : `question_reads` / `summary_reads` ajoutent un 2ᵉ
   chemin `questions`↔`profiles` et `summaries`↔`profiles`. Les embeds
   `profiles(...)` sur `questions` deviennent ambigus (PGRST201) → il faut

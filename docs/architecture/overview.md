@@ -408,10 +408,14 @@ Calculé à la lecture, par priorité décroissante :
   — classes + cours personnels) : `getMyNewQuestions()` /
   `getMyNewSummaries()` (`features/classes/queries.ts`). Le cœur
   `collectNewQuestions` / `collectNewSummaries` est factorisé et partagé avec
-  `getClassNew{Questions,Summaries}` (devenus de simples wrappers). Boutons
-  « Tout marquer comme lu » → `markAllMy{Questions,Summaries}ReadAction`. Le
-  récap du tableau de bord y renvoie (`/nouvelles#questions` / `#resumes`)
-  avec de vrais boutons, au lieu de seulement afficher un compte.
+  `getClassNew{Questions,Summaries}` (devenus de simples wrappers) ; il reçoit
+  un `Map<courseId, {name, className}>` (`className = null` → cours perso).
+  La page **regroupe par classe puis par cours** (`groupByClassCourse`) —
+  en-tête de classe si > 1 classe, en-tête de cours toujours — pour ne pas
+  avoir une liste à plat qui mélange les matières. Boutons « Tout marquer
+  comme lu » → `markAllMy{Questions,Summaries}ReadAction`. Le récap du
+  tableau de bord y renvoie (`/nouvelles#questions` / `#resumes`) avec de
+  vrais boutons, au lieu de seulement afficher un compte.
 - Requêtes tolérantes : si `0021` non appliquée, l'erreur de lecture de
   `question_reads` / `summary_reads` ⇒ « aucune nouveauté ».
 - **Piège PostgREST** : `question_reads` / `summary_reads` créent un 2ᵉ
