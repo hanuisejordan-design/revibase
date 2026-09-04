@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import {
   deleteChapterAction,
   moveChapterAction,
@@ -72,7 +73,7 @@ function ChapterRow({
             disabled={isFirst}
             label="Monter"
           >
-            ↑
+            <ArrowUp size={15} aria-hidden />
           </IconButton>
           <IconButton
             action={moveChapterAction}
@@ -82,7 +83,7 @@ function ChapterRow({
             disabled={isLast}
             label="Descendre"
           >
-            ↓
+            <ArrowDown size={15} aria-hidden />
           </IconButton>
         </div>
 

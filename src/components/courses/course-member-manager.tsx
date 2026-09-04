@@ -1,3 +1,4 @@
+import { Check } from "lucide-react";
 import type { CourseMemberEntry } from "@/features/courses/types";
 import { setCourseAdminAction, setCourseTrainerAction } from "@/features/courses/actions";
 import { cn } from "@/lib/utils/cn";
@@ -27,13 +28,13 @@ function Toggle({
       <button
         type="submit"
         className={cn(
-          "rounded-md border px-2 py-0.5 text-xs transition-colors",
+          "inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs transition-colors",
           on
             ? "border-brand bg-brand text-brand-foreground"
             : "border-border text-muted hover:border-brand/40",
         )}
       >
-        {on ? "✓ " : ""}
+        {on ? <Check size={12} aria-hidden /> : null}
         {label}
       </button>
     </form>

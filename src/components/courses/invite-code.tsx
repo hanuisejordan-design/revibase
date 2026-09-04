@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Check } from "lucide-react";
 
 export function InviteCode({
   code,
@@ -33,9 +34,15 @@ export function InviteCode({
         <button
           type="button"
           onClick={copy}
-          className="text-muted hover:text-foreground text-sm underline"
+          className="text-muted hover:text-foreground inline-flex items-center gap-1 text-sm underline"
         >
-          {copied ? "Copié ✓" : "Copier"}
+          {copied ? (
+            <>
+              <Check size={13} aria-hidden /> Copié
+            </>
+          ) : (
+            "Copier"
+          )}
         </button>
       </div>
       <p className="text-muted text-sm">{hint}</p>

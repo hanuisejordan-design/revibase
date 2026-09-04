@@ -1,3 +1,4 @@
+import { Check } from "lucide-react";
 import type { AnswerStatus } from "@/features/answers/types";
 import { cn } from "@/lib/utils/cn";
 
@@ -24,7 +25,9 @@ export function AnswerStatusBadge({ status }: { status: AnswerStatus }) {
         STYLES[status],
       )}
     >
-      {status === "validated" || status === "accepted" ? "✓ " : null}
+      {status === "validated" || status === "accepted" ? (
+        <Check size={12} aria-hidden className="shrink-0" />
+      ) : null}
       {LABELS[status]}
     </span>
   );

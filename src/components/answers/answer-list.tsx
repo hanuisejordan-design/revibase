@@ -1,3 +1,4 @@
+import { ThumbsUp } from "lucide-react";
 import type { AnswerItem } from "@/features/answers/types";
 import { AnswerCard } from "./answer-card";
 
@@ -26,9 +27,9 @@ export function AnswerList({
 
   return (
     <>
-      <p className="text-muted text-xs">
-        👍 = « je donnerais cette réponse aussi ». Ta réponse est déjà comptée ; tu peux aussi
-        soutenir celle d&apos;un autre.
+      <p className="text-muted inline-flex flex-wrap items-center gap-1 text-xs">
+        <ThumbsUp size={12} aria-hidden className="shrink-0" />= « je donnerais cette réponse aussi
+        ». Ta réponse est déjà comptée ; tu peux aussi soutenir celle d&apos;un autre.
       </p>
       <ul className="mt-3 flex flex-col gap-3">
         {answers.map((answer) => (
