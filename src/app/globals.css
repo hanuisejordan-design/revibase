@@ -87,3 +87,11 @@ body {
   letter-spacing: -0.01em;
   line-height: 1.1;
 }
+
+/* Manuscrite : uniquement le « Bonjour X. » du tableau de bord */
+.greeting {
+  font-family: var(--font-hand), ui-serif, "Segoe Script", cursive;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+}

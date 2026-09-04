@@ -50,7 +50,7 @@ export default async function DashboardPage() {
         <p className="text-[11px] font-medium tracking-[0.16em] uppercase text-brand-foreground/60">
           {dateLabel}
         </p>
-        <h1 className="display mt-1 text-3xl">Bonjour {user.displayName}.</h1>
+        <h1 className="greeting mt-1 text-[2.75rem]">Bonjour {user.displayName}.</h1>
       </div>
 
       {/* Carte récap, posée sur le vert */}
