@@ -1,23 +1,36 @@
 import Link from "next/link";
 import type { CourseSummary } from "@/features/courses/types";
 
-const trainerBadge =
-  "hidden items-center rounded-full bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand sm:inline-flex";
 const newQuestionBadge =
   "inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900 dark:bg-amber-950 dark:text-amber-300";
 const newSummaryBadge =
   "inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300";
 
 /**
- * Carte d'un cours (tableau de bord + page d'une classe). Grille à 2 colonnes
- * dès le mobile. En dessous de `sm` : on montre les compteurs
- * questions / résumés (plus utiles que le badge « Formateur », qui reste en
- * desktop) ; les compteurs membres restent desktop seulement.
+ * Carte d'un cours.
+ * - `compact` (page d'une classe, grille 2 colonnes) : en dessous de `sm`,
+ *   badge « Formateur » masqué, badges « nouv. » abrégés, compteur membres
+ *   masqué.
+ * - défaut (tableau de bord) : rendu complet, comme la carte d'une classe.
  */
-export function CourseCard({ course }: { course: CourseSummary }) {
+export function CourseCard({
+  course,
+  compact = false,
+}: {
+  course: CourseSummary;
+  compact?: boolean;
+}) {
   const q = `${course.questionCount} question${course.questionCount > 1 ? "s" : ""}`;
   const r = `${course.summaryCount} résumé${course.summaryCount > 1 ? "s" : ""}`;
   const m = `${course.memberCount} membre${course.memberCount > 1 ? "s" : ""}`;
+  const nq = `${course.newQuestionCount} nouvelle${course.newQuestionCount > 1 ? "s" : ""} question${
+    course.newQuestionCount > 1 ? "s" : ""
+  }`;
+  const ns = `${course.newSummaryCount} nouveau${course.newSummaryCount > 1 ? "x" : ""} résumé${
+    course.newSummaryCount > 1 ? "s" : ""
+  }`;
+
+  const trainerCls = `${compact ? "hidden sm:inline-flex" : "inline-flex"} items-center rounded-full bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand`;
 
   return (
     <Link
@@ -26,33 +39,42 @@ export function CourseCard({ course }: { course: CourseSummary }) {
     >
       <span className="font-medium">{course.name}</span>
       <span className="mt-auto flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted">
-        {course.role === "trainer" ? <span className={trainerBadge}>Formateur</span> : null}
+        {course.role === "trainer" ? <span className={trainerCls}>Formateur</span> : null}
+
         {course.newQuestionCount > 0 ? (
           <span className={newQuestionBadge}>
-            <span className="hidden sm:inline">
-              {`${course.newQuestionCount} nouvelle${
-                course.newQuestionCount > 1 ? "s" : ""
-              } question${course.newQuestionCount > 1 ? "s" : ""}`}
-            </span>
-            <span className="sm:hidden">{`${course.newQuestionCount} nouv.`}</span>
+            {compact ? (
+              <>
+                <span className="hidden sm:inline">{nq}</span>
+                <span className="sm:hidden">{`${course.newQuestionCount} nouv.`}</span>
+              </>
+            ) : (
+              nq
+            )}
           </span>
         ) : null}
+
         {course.newSummaryCount > 0 ? (
           <span className={newSummaryBadge}>
-            <span className="hidden sm:inline">
-              {`${course.newSummaryCount} nouveau${
-                course.newSummaryCount > 1 ? "x" : ""
-              } résumé${course.newSummaryCount > 1 ? "s" : ""}`}
-            </span>
-            <span className="sm:hidden">{`${course.newSummaryCount} nouv.`}</span>
+            {compact ? (
+              <>
+                <span className="hidden sm:inline">{ns}</span>
+                <span className="sm:hidden">{`${course.newSummaryCount} nouv.`}</span>
+              </>
+            ) : (
+              ns
+            )}
           </span>
         ) : null}
-        <span className="sm:hidden">
-          {q} · {r}
-        </span>
-        <span className="hidden sm:inline">
-          {q} · {r} · {m}
-        </span>
+
+        {compact ? (
+          <>
+            <span className="sm:hidden">{`${q} · ${r}`}</span>
+            <span className="hidden sm:inline">{`${q} · ${r} · ${m}`}</span>
+          </>
+        ) : (
+          `${q} · ${r} · ${m}`
+        )}
       </span>
     </Link>
   );

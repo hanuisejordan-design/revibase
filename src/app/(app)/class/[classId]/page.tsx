@@ -73,7 +73,7 @@ export default async function ClassCoursesPage({
           <ul className="grid grid-cols-2 gap-3">
             {courses.map((c) => (
               <li key={c.id}>
-                <CourseCard course={c} />
+                <CourseCard course={c} compact />
               </li>
             ))}
           </ul>

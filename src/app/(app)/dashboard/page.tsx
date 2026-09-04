@@ -9,9 +9,9 @@ import { CourseCard } from "@/components/courses/course-card";
 export const metadata: Metadata = { title: "Tableau de bord" };
 
 const primaryLink =
-  "inline-flex items-center justify-center rounded-full bg-brand px-5 py-2.5 text-sm font-medium text-brand-foreground transition-colors hover:bg-brand-hover";
+  "flex w-full items-center justify-center rounded-full bg-brand px-5 py-3 text-sm font-medium text-brand-foreground transition-colors hover:bg-brand-hover";
 const secondaryLink =
-  "inline-flex items-center justify-center rounded-full border border-border bg-surface px-5 py-2.5 text-sm font-medium text-surface-foreground transition-colors hover:border-brand/40";
+  "flex w-full items-center justify-center rounded-full border border-border bg-surface px-5 py-3 text-sm font-medium text-surface-foreground transition-colors hover:border-brand/40";
 const sectionLabel =
   "text-[11px] font-semibold uppercase tracking-[0.14em] text-brand";
 
@@ -52,7 +52,7 @@ export default async function DashboardPage() {
       {standaloneCourses.length > 0 ? (
         <section className="flex flex-col gap-3">
           <h2 className={sectionLabel}>Mes cours personnels</h2>
-          <ul className="grid grid-cols-2 gap-3">
+          <ul className="grid gap-3 sm:grid-cols-2">
             {standaloneCourses.map((c) => (
               <li key={c.id}>
                 <CourseCard course={c} />
@@ -62,20 +62,16 @@ export default async function DashboardPage() {
         </section>
       ) : null}
 
-      <div className="flex flex-col gap-3 border-t border-border pt-7">
-        <div className="flex flex-wrap gap-3">
-          <Link href="/class/join" className={primaryLink}>
-            Rejoindre une classe
-          </Link>
-          <Link href="/class/new" className={secondaryLink}>
-            Créer une classe
-          </Link>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <Link href="/course/new" className={secondaryLink}>
-            Créer un cours personnel
-          </Link>
-        </div>
+      <div className="flex flex-col gap-2.5 border-t border-border pt-7">
+        <Link href="/class/join" className={primaryLink}>
+          Rejoindre une classe
+        </Link>
+        <Link href="/class/new" className={secondaryLink}>
+          Créer une classe
+        </Link>
+        <Link href="/course/new" className={secondaryLink}>
+          Créer un cours personnel
+        </Link>
       </div>
     </div>
   );
