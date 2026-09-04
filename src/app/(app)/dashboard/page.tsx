@@ -9,9 +9,11 @@ import { CourseCard } from "@/components/courses/course-card";
 export const metadata: Metadata = { title: "Tableau de bord" };
 
 const primaryLink =
-  "inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300";
+  "inline-flex items-center justify-center rounded-full bg-brand px-5 py-2.5 text-sm font-medium text-brand-foreground transition-colors hover:bg-brand-hover";
 const secondaryLink =
-  "inline-flex items-center justify-center rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900";
+  "inline-flex items-center justify-center rounded-full border border-border bg-surface px-5 py-2.5 text-sm font-medium text-surface-foreground transition-colors hover:border-brand/40";
+const sectionLabel =
+  "text-[11px] font-semibold uppercase tracking-[0.14em] text-brand";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -24,10 +26,10 @@ export default async function DashboardPage() {
   const isEmpty = classes.length === 0 && standaloneCourses.length === 0;
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-xl font-semibold">Bonjour {user.displayName}</h1>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+    <div className="flex flex-col gap-9">
+      <div className="flex flex-col gap-1.5">
+        <h1 className="display text-3xl">Bonjour {user.displayName}.</h1>
+        <p className="text-sm text-muted">
           {isEmpty
             ? "Rejoins ta classe avec le code d'invitation, ou crées-en une."
             : "Choisis une classe pour voir ses cours."}
@@ -36,9 +38,7 @@ export default async function DashboardPage() {
 
       {classes.length > 0 ? (
         <section className="flex flex-col gap-3">
-          <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
-            Mes classes
-          </h2>
+          <h2 className={sectionLabel}>Mes classes</h2>
           <ul className="grid gap-3 sm:grid-cols-2">
             {classes.map((cl) => (
               <li key={cl.id}>
@@ -51,9 +51,7 @@ export default async function DashboardPage() {
 
       {standaloneCourses.length > 0 ? (
         <section className="flex flex-col gap-3">
-          <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
-            Mes cours personnels
-          </h2>
+          <h2 className={sectionLabel}>Mes cours personnels</h2>
           <ul className="grid grid-cols-2 gap-3">
             {standaloneCourses.map((c) => (
               <li key={c.id}>
@@ -64,7 +62,7 @@ export default async function DashboardPage() {
         </section>
       ) : null}
 
-      <div className="flex flex-col gap-3 border-t border-zinc-200 pt-6 dark:border-zinc-800">
+      <div className="flex flex-col gap-3 border-t border-border pt-7">
         <div className="flex flex-wrap gap-3">
           <Link href="/class/join" className={primaryLink}>
             Rejoindre une classe

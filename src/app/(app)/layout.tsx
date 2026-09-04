@@ -17,9 +17,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
-      <header className="border-b border-zinc-200 dark:border-zinc-800">
+      <header className="border-b border-border">
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-4 py-3 sm:px-6">
-          <Link href="/dashboard" className="font-semibold">
+          <Link href="/dashboard" className="display text-lg">
             {APP_NAME}
           </Link>
           {/* Sur mobile, cloche + profil sont dans la barre du bas. */}
@@ -27,7 +27,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
             <Link
               href="/notifications"
               aria-label="Notifications"
-              className="relative rounded-md px-1 py-0.5 text-lg leading-none hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="relative rounded-md px-1 py-0.5 text-lg leading-none hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
             >
               <span aria-hidden>🔔</span>
               {unread > 0 ? (
@@ -38,7 +38,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
             </Link>
             <Link
               href="/parametres"
-              className="rounded-md px-2 py-1 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+              className="rounded-md px-2 py-1 text-muted hover:bg-black/[0.04] hover:text-foreground dark:hover:bg-white/[0.06]"
             >
               {user.displayName} <span aria-hidden>⚙</span>
             </Link>

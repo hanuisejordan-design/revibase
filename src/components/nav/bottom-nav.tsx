@@ -12,8 +12,8 @@ import { HomeSheet } from "./home-sheet";
 type Sheet = "home" | "courses" | "create" | null;
 
 const itemCls =
-  "flex flex-1 items-center justify-center py-3 text-xl leading-none text-zinc-500 dark:text-zinc-400";
-const activeCls = "text-zinc-900 dark:text-zinc-100";
+  "flex flex-1 items-center justify-center py-3 text-xl leading-none opacity-55";
+const activeCls = "opacity-100";
 
 export function BottomNav({
   unread,
@@ -41,7 +41,7 @@ export function BottomNav({
 
   return (
     <>
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200 bg-white pb-[env(safe-area-inset-bottom)] md:hidden dark:border-zinc-800 dark:bg-zinc-950">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] md:hidden">
         {/* Onglets répartis, avec une marge pour ne pas coller aux bords. */}
         <div className="mx-auto flex w-full max-w-md items-stretch px-6">
           {hasHomeContent ? (
@@ -79,7 +79,7 @@ export function BottomNav({
             onClick={() => setSheet(sheet === "create" ? null : "create")}
             className="flex flex-1 items-center justify-center py-2"
           >
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-zinc-900 text-2xl leading-none text-white dark:bg-zinc-100 dark:text-zinc-900">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand text-2xl leading-none text-brand-foreground">
               +
             </span>
           </button>

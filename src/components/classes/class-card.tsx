@@ -12,10 +12,10 @@ export function ClassCard({ cls }: { cls: ClassSummary }) {
   return (
     <Link
       href={`/class/${cls.id}`}
-      className="flex flex-col gap-2 rounded-xl border border-zinc-200 p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
+      className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-4 text-surface-foreground shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-colors hover:border-brand/40"
     >
       <span className="font-medium">{cls.name}</span>
-      <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-zinc-500">
+      <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted">
         {cls.newQuestionCount > 0 ? (
           <span className={amberBadge}>
             {cls.newQuestionCount} nouvelle{cls.newQuestionCount > 1 ? "s" : ""} question

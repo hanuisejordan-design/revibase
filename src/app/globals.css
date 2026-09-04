@@ -15,27 +15,62 @@
   }
 }
 
+/* ── Tokens de marque (essai identité visuelle : vert profond + papier chaud
+   + serif éditorial). Clair par défaut ; équivalents sombres plus bas. ── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f4f2ec; /* papier chaud */
+  --foreground: #1c1c1a;
+  --surface: #ffffff; /* cartes */
+  --surface-foreground: #1c1c1a;
+  --muted: #6f6d64; /* texte secondaire */
+  --border: #e6e3da; /* filet chaud */
+  --brand: #1f4436; /* vert pin */
+  --brand-hover: #17372c;
+  --brand-foreground: #f4f2ec;
+  --accent: #2f7d5f; /* vert vif : points, petits accents */
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #14181a;
+    --foreground: #ececea;
+    --surface: #1c2123;
+    --surface-foreground: #ececea;
+    --muted: #9a9a92;
+    --border: #2b3134;
+    --brand: #3f8f6d;
+    --brand-hover: #4a9d7b;
+    --brand-foreground: #0f1211;
+    --accent: #5bb48c;
   }
 }
 
 :root[data-theme="dark"] {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --background: #14181a;
+  --foreground: #ececea;
+  --surface: #1c2123;
+  --surface-foreground: #ececea;
+  --muted: #9a9a92;
+  --border: #2b3134;
+  --brand: #3f8f6d;
+  --brand-hover: #4a9d7b;
+  --brand-foreground: #0f1211;
+  --accent: #5bb48c;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-foreground: var(--surface-foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
+  --font-serif: var(--font-serif);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -43,4 +78,12 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Titres éditoriaux : utilitaire `.display` */
+.display {
+  font-family: var(--font-serif), ui-serif, Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
 }

@@ -1,11 +1,8 @@
 import Link from "next/link";
 import type { CourseSummary } from "@/features/courses/types";
 
-// `hidden` en base (mobile) + `sm:inline-flex` : le badge « Formateur » n'est
-// visible qu'en desktop, où la vignette a la place. (Pas de `inline-flex` en
-// base, sinon il l'emporterait sur `hidden`.)
 const trainerBadge =
-  "hidden items-center rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-800 sm:inline-flex dark:bg-sky-950 dark:text-sky-300";
+  "hidden items-center rounded-full bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand sm:inline-flex";
 const newQuestionBadge =
   "inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900 dark:bg-amber-950 dark:text-amber-300";
 const newSummaryBadge =
@@ -25,31 +22,29 @@ export function CourseCard({ course }: { course: CourseSummary }) {
   return (
     <Link
       href={`/course/${course.id}`}
-      className="flex h-full flex-col gap-2 rounded-xl border border-zinc-200 p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
+      className="flex h-full flex-col gap-2 rounded-2xl border border-border bg-surface p-4 text-surface-foreground shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-colors hover:border-brand/40"
     >
       <span className="font-medium">{course.name}</span>
-      <span className="mt-auto flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-zinc-500">
+      <span className="mt-auto flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted">
         {course.role === "trainer" ? <span className={trainerBadge}>Formateur</span> : null}
         {course.newQuestionCount > 0 ? (
           <span className={newQuestionBadge}>
-            {course.newQuestionCount}
             <span className="hidden sm:inline">
-              {" "}
-              nouvelle{course.newQuestionCount > 1 ? "s" : ""} question
-              {course.newQuestionCount > 1 ? "s" : ""}
+              {`${course.newQuestionCount} nouvelle${
+                course.newQuestionCount > 1 ? "s" : ""
+              } question${course.newQuestionCount > 1 ? "s" : ""}`}
             </span>
-            <span className="sm:hidden"> nouv.</span>
+            <span className="sm:hidden">{`${course.newQuestionCount} nouv.`}</span>
           </span>
         ) : null}
         {course.newSummaryCount > 0 ? (
           <span className={newSummaryBadge}>
-            {course.newSummaryCount}
             <span className="hidden sm:inline">
-              {" "}
-              nouveau{course.newSummaryCount > 1 ? "x" : ""} résumé
-              {course.newSummaryCount > 1 ? "s" : ""}
+              {`${course.newSummaryCount} nouveau${
+                course.newSummaryCount > 1 ? "x" : ""
+              } résumé${course.newSummaryCount > 1 ? "s" : ""}`}
             </span>
-            <span className="sm:hidden"> nouv.</span>
+            <span className="sm:hidden">{`${course.newSummaryCount} nouv.`}</span>
           </span>
         ) : null}
         <span className="sm:hidden">
