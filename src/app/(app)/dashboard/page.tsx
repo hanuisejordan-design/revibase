@@ -35,9 +35,6 @@ export default async function DashboardPage() {
     classes.reduce((n, c) => n + c.newSummaryCount, 0) +
     standaloneCourses.reduce((n, c) => n + c.newSummaryCount, 0);
 
-  const classesWithNews = classes.filter((c) => c.newQuestionCount + c.newSummaryCount > 0);
-  const oneNewsClass = classesWithNews.length === 1 ? classesWithNews[0] : null;
-
   const dateLabel = new Intl.DateTimeFormat("fr-FR", {
     weekday: "short",
     day: "numeric",
@@ -72,22 +69,30 @@ export default async function DashboardPage() {
               <p className="text-sm">Tu es à jour — rien de nouveau à lire.</p>
             </div>
           ) : (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3.5">
               <p className="display text-xl">
                 {newQ > 0 ? plural(newQ, "nouvelle question", "nouvelles questions") : null}
                 {newQ > 0 && newS > 0 ? <span className="text-muted"> · </span> : null}
                 {newS > 0 ? plural(newS, "nouveau résumé", "nouveaux résumés") : null}
               </p>
-              {oneNewsClass ? (
-                <Link
-                  href={`/class/${oneNewsClass.id}/nouvelles`}
-                  className="inline-flex w-fit items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-sm font-medium text-brand-foreground transition-colors hover:bg-brand-hover"
-                >
-                  Les parcourir <ArrowRight size={15} aria-hidden />
-                </Link>
-              ) : (
-                <p className="text-sm text-muted">Les pastilles ci-dessous te disent où.</p>
-              )}
+              <div className="flex flex-wrap gap-2">
+                {newQ > 0 ? (
+                  <Link
+                    href="/nouvelles#questions"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-sm font-medium text-brand-foreground transition-colors hover:bg-brand-hover"
+                  >
+                    Voir les questions <ArrowRight size={15} aria-hidden />
+                  </Link>
+                ) : null}
+                {newS > 0 ? (
+                  <Link
+                    href="/nouvelles#resumes"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm font-medium text-surface-foreground transition-colors hover:border-brand/40"
+                  >
+                    Voir les résumés <ArrowRight size={15} aria-hidden />
+                  </Link>
+                ) : null}
+              </div>
             </div>
           )}
         </div>

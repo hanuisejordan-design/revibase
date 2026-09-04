@@ -3,7 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth/dal";
-import { getClassNewQuestions, getClassNewSummaries } from "@/features/classes/queries";
+import {
+  getClassNewQuestions,
+  getClassNewSummaries,
+  getMyNewQuestions,
+  getMyNewSummaries,
+} from "@/features/classes/queries";
 
 /**
  * Marque UNE question comme lue pour l'utilisateur courant. Appelé au montage
@@ -88,4 +93,40 @@ export async function markAllClassSummariesReadAction(classId: string): Promise<
   revalidatePath("/dashboard");
   revalidatePath(`/class/${classId}`);
   revalidatePath(`/class/${classId}/nouveaux-resumes`);
+}
+
+/** « Tout marquer comme lu » — toutes mes nouvelles questions (page /nouvelles). */
+export async function markAllMyQuestionsReadAction(): Promise<void> {
+  const user = await getUser();
+  if (!user) return;
+
+  const items = await getMyNewQuestions();
+  if (items.length === 0) return;
+
+  const supabase = await createClient();
+  await supabase.from("question_reads").upsert(
+    items.map((q) => ({ question_id: q.id, user_id: user.id, seen_at: new Date().toISOString() })),
+    { onConflict: "question_id,user_id", ignoreDuplicates: true },
+  );
+
+  revalidatePath("/dashboard");
+  revalidatePath("/nouvelles");
+}
+
+/** « Tout marquer comme lu » — tous mes nouveaux résumés. */
+export async function markAllMySummariesReadAction(): Promise<void> {
+  const user = await getUser();
+  if (!user) return;
+
+  const items = await getMyNewSummaries();
+  if (items.length === 0) return;
+
+  const supabase = await createClient();
+  await supabase.from("summary_reads").upsert(
+    items.map((s) => ({ summary_id: s.id, user_id: user.id, seen_at: new Date().toISOString() })),
+    { onConflict: "summary_id,user_id", ignoreDuplicates: true },
+  );
+
+  revalidatePath("/dashboard");
+  revalidatePath("/nouvelles");
 }

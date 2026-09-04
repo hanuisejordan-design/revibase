@@ -248,9 +248,198 @@ export const getClassCourses = cache(async (classId: string): Promise<CourseSumm
 });
 
 /**
+ * Cœur partagé : questions non encore ouvertes des cours donnés, les plus
+ * anciennes d'abord. « Nouvelle » = créée après l'arrivée du membre, pas de
+ * lui, et absente de `question_reads`.
+ */
+async function collectNewQuestions(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  courseIds: string[],
+  courseName: Map<string, string>,
+): Promise<ClassNewQuestion[]> {
+  if (courseIds.length === 0) return [];
+
+  const [baseline, { data: qs }] = await Promise.all([
+    memberSinceByCourse(supabase, userId, courseIds),
+    supabase
+      .from("questions")
+      .select(
+        "id, title, kind, purpose, course_id, created_at, chapters(name), author:profiles!questions_author_id_fkey(display_name)",
+      )
+      .in("course_id", courseIds)
+      .is("deleted_at", null)
+      .neq("author_id", userId)
+      .order("created_at", { ascending: true }),
+  ]);
+
+  const candidates = (
+    qs as unknown as Array<{
+      id: string;
+      title: string;
+      kind: QuestionKind;
+      purpose: QuestionPurpose;
+      course_id: string;
+      created_at: string;
+      chapters: { name: string } | null;
+      author: { display_name: string } | null;
+    }> | null
+  )?.filter((q) => new Date(q.created_at).getTime() > (baseline.get(q.course_id) ?? 0));
+
+  if (!candidates || candidates.length === 0) return [];
+
+  const read = await readQuestionIds(
+    supabase,
+    userId,
+    candidates.map((c) => c.id),
+  );
+  if (!read) return [];
+
+  const rows = candidates.filter((q) => !read.has(q.id));
+  if (rows.length === 0) return [];
+
+  const meta = await enrich(
+    supabase,
+    rows.map((r) => r.id),
+  );
+
+  return rows.map((r) => {
+    const m = meta.get(r.id) ?? {
+      answerCount: 0,
+      commentCount: 0,
+      status: "unanswered" as QuestionStatus,
+    };
+    return {
+      id: r.id,
+      title: r.title,
+      kind: r.kind,
+      purpose: r.purpose,
+      courseId: r.course_id,
+      courseName: courseName.get(r.course_id) ?? "Cours",
+      chapterName: r.chapters?.name ?? null,
+      authorName: r.author?.display_name ?? "Membre",
+      createdAt: r.created_at,
+      answerCount: m.answerCount,
+      commentCount: m.commentCount,
+      status: m.status,
+    };
+  });
+}
+
+/** Cœur partagé : résumés non encore ouverts des cours donnés. */
+async function collectNewSummaries(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  courseIds: string[],
+  courseName: Map<string, string>,
+): Promise<ClassNewSummary[]> {
+  if (courseIds.length === 0) return [];
+
+  const [baseline, { data: ss }] = await Promise.all([
+    memberSinceByCourse(supabase, userId, courseIds),
+    supabase
+      .from("summaries")
+      .select(
+        "id, title, course_id, created_at, file_path, file_name, chapters(name), author:profiles!summaries_author_id_fkey(display_name)",
+      )
+      .in("course_id", courseIds)
+      .neq("author_id", userId)
+      .order("created_at", { ascending: true }),
+  ]);
+
+  const candidates = (
+    ss as unknown as Array<{
+      id: string;
+      title: string;
+      course_id: string;
+      created_at: string;
+      file_path: string;
+      file_name: string;
+      chapters: { name: string } | null;
+      author: { display_name: string } | null;
+    }> | null
+  )?.filter((s) => new Date(s.created_at).getTime() > (baseline.get(s.course_id) ?? 0));
+
+  if (!candidates || candidates.length === 0) return [];
+
+  const read = await readSummaryIds(
+    supabase,
+    userId,
+    candidates.map((c) => c.id),
+  );
+  if (!read) return [];
+
+  const rows = candidates.filter((s) => !read.has(s.id));
+  if (rows.length === 0) return [];
+
+  const urlByPath = await signSummaryFiles(
+    supabase,
+    rows.map((r) => r.file_path),
+  );
+
+  return rows.map((r) => ({
+    id: r.id,
+    title: r.title,
+    kind: kindOf(r.file_name),
+    courseId: r.course_id,
+    courseName: courseName.get(r.course_id) ?? "Cours",
+    chapterName: r.chapters?.name ?? null,
+    authorName: r.author?.display_name ?? "Membre",
+    createdAt: r.created_at,
+    fileUrl: urlByPath.get(r.file_path) ?? null,
+  }));
+}
+
+/** Résout tous les cours accessibles (id + nom) pour l'agrégat « mes nouveautés ». */
+async function myCourseNames(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+): Promise<Map<string, string>> {
+  const [{ data: direct }, { data: myClasses }] = await Promise.all([
+    supabase.from("course_members").select("courses(id, name)").eq("user_id", userId),
+    supabase.from("class_members").select("class_id").eq("user_id", userId),
+  ]);
+  const out = new Map<string, string>();
+  for (const row of (direct ?? []) as unknown as Array<{
+    courses: { id: string; name: string } | { id: string; name: string }[] | null;
+  }>) {
+    const c = Array.isArray(row.courses) ? (row.courses[0] ?? null) : row.courses;
+    if (c) out.set(c.id, c.name);
+  }
+  const classIds = ((myClasses ?? []) as Array<{ class_id: string }>).map((r) => r.class_id);
+  if (classIds.length > 0) {
+    const { data: cc } = await supabase
+      .from("courses")
+      .select("id, name")
+      .in("class_id", classIds);
+    for (const c of (cc ?? []) as Array<{ id: string; name: string }>) {
+      if (!out.has(c.id)) out.set(c.id, c.name);
+    }
+  }
+  return out;
+}
+
+/** Toutes mes nouvelles questions, tous cours confondus (classes + perso). */
+export const getMyNewQuestions = cache(async (): Promise<ClassNewQuestion[]> => {
+  const user = await getUser();
+  if (!user) return [];
+  const supabase = await createClient();
+  const names = await myCourseNames(supabase, user.id);
+  return collectNewQuestions(supabase, user.id, [...names.keys()], names);
+});
+
+/** Tous mes nouveaux résumés, tous cours confondus. */
+export const getMyNewSummaries = cache(async (): Promise<ClassNewSummary[]> => {
+  const user = await getUser();
+  if (!user) return [];
+  const supabase = await createClient();
+  const names = await myCourseNames(supabase, user.id);
+  return collectNewSummaries(supabase, user.id, [...names.keys()], names);
+});
+
+/**
  * Questions non encore ouvertes de tous les cours de la classe, les plus
- * anciennes d'abord (pour les enchaîner). « Nouvelle » = créée après
- * l'arrivée du membre, pas de lui, et absente de `question_reads`.
+ * anciennes d'abord (pour les enchaîner).
  */
 export const getClassNewQuestions = cache(
   async (classId: string): Promise<ClassNewQuestion[]> => {
@@ -267,84 +456,16 @@ export const getClassNewQuestions = cache(
     const courses = (coursesData ?? []) as Array<{ id: string; name: string }>;
     if (courses.length === 0) return [];
 
-    const courseIds = courses.map((c) => c.id);
-    const courseName = new Map(courses.map((c) => [c.id, c.name]));
-
-    const [baseline, { data: qs }] = await Promise.all([
-      memberSinceByCourse(supabase, user.id, courseIds),
-      supabase
-        .from("questions")
-        // Depuis 0021 (`question_reads`), `questions` a 2 chemins vers `profiles`.
-        .select(
-          "id, title, kind, purpose, course_id, created_at, chapters(name), author:profiles!questions_author_id_fkey(display_name)",
-        )
-        .in("course_id", courseIds)
-        .is("deleted_at", null)
-        .neq("author_id", user.id)
-        .order("created_at", { ascending: true }),
-    ]);
-
-    const candidates = (
-      qs as unknown as Array<{
-        id: string;
-        title: string;
-        kind: QuestionKind;
-        purpose: QuestionPurpose;
-        course_id: string;
-        created_at: string;
-        chapters: { name: string } | null;
-        author: { display_name: string } | null;
-      }> | null
-    )?.filter(
-      (q) => new Date(q.created_at).getTime() > (baseline.get(q.course_id) ?? 0),
-    );
-
-    if (!candidates || candidates.length === 0) return [];
-
-    const read = await readQuestionIds(
+    return collectNewQuestions(
       supabase,
       user.id,
-      candidates.map((c) => c.id),
+      courses.map((c) => c.id),
+      new Map(courses.map((c) => [c.id, c.name])),
     );
-    if (!read) return []; // migration 0021 pas encore appliquée
-
-    const rows = candidates.filter((q) => !read.has(q.id));
-    if (rows.length === 0) return [];
-
-    const meta = await enrich(
-      supabase,
-      rows.map((r) => r.id),
-    );
-
-    return rows.map((r) => {
-      const m = meta.get(r.id) ?? {
-        answerCount: 0,
-        commentCount: 0,
-        status: "unanswered" as QuestionStatus,
-      };
-      return {
-        id: r.id,
-        title: r.title,
-        kind: r.kind,
-        purpose: r.purpose,
-        courseId: r.course_id,
-        courseName: courseName.get(r.course_id) ?? "Cours",
-        chapterName: r.chapters?.name ?? null,
-        authorName: r.author?.display_name ?? "Membre",
-        createdAt: r.created_at,
-        answerCount: m.answerCount,
-        commentCount: m.commentCount,
-        status: m.status,
-      };
-    });
   },
 );
 
-/**
- * Résumés non encore ouverts de tous les cours de la classe, les plus anciens
- * d'abord. « Nouveau » = créé après l'arrivée du membre, pas de lui, et
- * absent de `summary_reads`.
- */
+/** Résumés non encore ouverts de tous les cours de la classe, les plus anciens d'abord. */
 export const getClassNewSummaries = cache(
   async (classId: string): Promise<ClassNewSummary[]> => {
     const user = await getUser();
@@ -360,64 +481,12 @@ export const getClassNewSummaries = cache(
     const courses = (coursesData ?? []) as Array<{ id: string; name: string }>;
     if (courses.length === 0) return [];
 
-    const courseIds = courses.map((c) => c.id);
-    const courseName = new Map(courses.map((c) => [c.id, c.name]));
-
-    const [baseline, { data: ss }] = await Promise.all([
-      memberSinceByCourse(supabase, user.id, courseIds),
-      supabase
-        .from("summaries")
-        .select(
-          "id, title, course_id, created_at, file_path, file_name, chapters(name), author:profiles!summaries_author_id_fkey(display_name)",
-        )
-        .in("course_id", courseIds)
-        .neq("author_id", user.id)
-        .order("created_at", { ascending: true }),
-    ]);
-
-    const candidates = (
-      ss as unknown as Array<{
-        id: string;
-        title: string;
-        course_id: string;
-        created_at: string;
-        file_path: string;
-        file_name: string;
-        chapters: { name: string } | null;
-        author: { display_name: string } | null;
-      }> | null
-    )?.filter(
-      (s) => new Date(s.created_at).getTime() > (baseline.get(s.course_id) ?? 0),
-    );
-
-    if (!candidates || candidates.length === 0) return [];
-
-    const read = await readSummaryIds(
+    return collectNewSummaries(
       supabase,
       user.id,
-      candidates.map((c) => c.id),
+      courses.map((c) => c.id),
+      new Map(courses.map((c) => [c.id, c.name])),
     );
-    if (!read) return [];
-
-    const rows = candidates.filter((s) => !read.has(s.id));
-    if (rows.length === 0) return [];
-
-    const urlByPath = await signSummaryFiles(
-      supabase,
-      rows.map((r) => r.file_path),
-    );
-
-    return rows.map((r) => ({
-      id: r.id,
-      title: r.title,
-      kind: kindOf(r.file_name),
-      courseId: r.course_id,
-      courseName: courseName.get(r.course_id) ?? "Cours",
-      chapterName: r.chapters?.name ?? null,
-      authorName: r.author?.display_name ?? "Membre",
-      createdAt: r.created_at,
-      fileUrl: urlByPath.get(r.file_path) ?? null,
-    }));
   },
 );
 
