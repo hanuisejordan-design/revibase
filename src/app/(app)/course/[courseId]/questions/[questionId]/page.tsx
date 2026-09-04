@@ -144,25 +144,25 @@ export default async function QuestionPage({
         <p className="text-muted text-sm">
           Posée par {question.authorName} · {relativeTime(question.createdAt)}
         </p>
-        {question.body ? (
-          <p className="border-border bg-surface text-surface-foreground rounded-xl border p-4 whitespace-pre-wrap">
-            {question.body}
-          </p>
-        ) : null}
-        {question.imageUrl ? (
-          <a
-            href={question.imageUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-fit"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={question.imageUrl}
-              alt="Photo de la question"
-              className="border-border max-h-[28rem] rounded-lg border object-contain"
-            />
-          </a>
+        {question.body || question.imageUrl ? (
+          <div className="border-border bg-surface text-surface-foreground flex flex-col gap-3 rounded-xl border p-4">
+            {question.body ? <p className="whitespace-pre-wrap">{question.body}</p> : null}
+            {question.imageUrl ? (
+              <a
+                href={question.imageUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-fit"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={question.imageUrl}
+                  alt="Photo de la question"
+                  className="border-border max-h-[28rem] rounded-lg border object-contain"
+                />
+              </a>
+            ) : null}
+          </div>
         ) : null}
       </article>
 

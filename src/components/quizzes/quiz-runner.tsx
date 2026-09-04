@@ -80,16 +80,18 @@ export function QuizRunner({
           </span>
         ) : null}
         <h2 className="text-lg font-semibold">{current.title}</h2>
-        {current.body ? (
-          <p className="text-muted text-sm whitespace-pre-wrap">{current.body}</p>
-        ) : null}
-        {current.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={current.imageUrl}
-            alt="Photo de la question"
-            className="border-border max-h-72 rounded-lg border object-contain"
-          />
+        {current.body || current.imageUrl ? (
+          <div className="border-border bg-surface flex flex-col gap-3 rounded-xl border p-4">
+            {current.body ? <p className="text-sm whitespace-pre-wrap">{current.body}</p> : null}
+            {current.imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={current.imageUrl}
+                alt="Photo de la question"
+                className="max-h-72 rounded-lg object-contain"
+              />
+            ) : null}
+          </div>
         ) : null}
       </div>
 

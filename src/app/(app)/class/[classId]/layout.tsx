@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getClassContext } from "@/features/classes/queries";
+import { PageHero, heroNavLink } from "@/components/layout/page-hero";
 
 export async function generateMetadata({
   params,
@@ -27,25 +28,17 @@ export default async function ClassLayout({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <Link
-            href="/dashboard"
-            className="text-muted hover:bg-background hover:text-foreground -ml-2 inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium"
-          >
-            <span aria-hidden>←</span> Tableau de bord
+      <PageHero
+        backHref="/dashboard"
+        backLabel="Tableau de bord"
+        title={ctx.name}
+        titleHref={`/class/${classId}`}
+        nav={
+          <Link href={`/class/${classId}/settings`} className={heroNavLink}>
+            Paramètres
           </Link>
-          <Link href={`/class/${classId}`} className="text-xl font-semibold hover:underline">
-            {ctx.name}
-          </Link>
-        </div>
-        <Link
-          href={`/class/${classId}/settings`}
-          className="text-muted pt-1 text-sm hover:underline"
-        >
-          Paramètres
-        </Link>
-      </div>
+        }
+      />
       {children}
     </div>
   );
