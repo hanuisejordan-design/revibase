@@ -17,7 +17,7 @@ export default async function ClassSettingsPage({
 
   return (
     <div className="flex flex-col gap-8">
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="text-muted text-sm">
         Le code d&apos;invitation est sur la{" "}
         <Link href={`/class/${classId}`} className="underline">
           page de la classe
@@ -26,7 +26,7 @@ export default async function ClassSettingsPage({
       </p>
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+        <h2 className="text-muted text-xs font-semibold tracking-wide uppercase">
           Membres ({members.length})
         </h2>
         <ul className="flex flex-col gap-1 text-sm">
@@ -44,7 +44,7 @@ export default async function ClassSettingsPage({
       </section>
 
       {!ctx.isAdmin ? (
-        <section className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
+        <section className="border-border border-t pt-4">
           <LeaveClassButton classId={ctx.id} />
         </section>
       ) : null}

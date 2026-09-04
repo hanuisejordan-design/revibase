@@ -15,8 +15,7 @@ const TYPES: { value: CreateType; label: string; cta: string }[] = [
   { value: "quiz", label: "Faire un quiz", cta: "Lancer le quiz" },
 ];
 
-const selectCls =
-  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950";
+const selectCls = "w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm";
 
 /** Feuille « + » : d'abord QUOI créer, puis dans quel cours (et chapitre). */
 export function CreateSheet({
@@ -87,7 +86,7 @@ export function CreateSheet({
               key={t.value}
               type="button"
               onClick={() => setType(t.value)}
-              className="rounded-lg border border-zinc-300 px-3 py-3 text-left text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+              className="border-border hover:bg-background rounded-lg border px-3 py-3 text-left text-sm font-medium"
             >
               {t.label}
             </button>
@@ -98,7 +97,7 @@ export function CreateSheet({
           <button
             type="button"
             onClick={() => setType(null)}
-            className="w-fit text-xs text-zinc-500 hover:underline"
+            className="text-muted w-fit text-xs hover:underline"
           >
             ← Autre type
           </button>
@@ -150,7 +149,7 @@ export function CreateSheet({
             type="button"
             disabled={!courseId}
             onClick={submit}
-            className="mt-1 rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900"
+            className="bg-brand text-brand-foreground mt-1 rounded-lg px-3 py-2 text-sm font-medium disabled:opacity-40"
           >
             {chosen?.cta}
           </button>

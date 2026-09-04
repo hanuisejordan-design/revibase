@@ -23,7 +23,7 @@ export default async function ClassNewSummariesPage({
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <Link href={`/class/${classId}`} className="text-xs text-zinc-500 hover:underline">
+        <Link href={`/class/${classId}`} className="text-muted text-xs hover:underline">
           ← {ctx.name}
         </Link>
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -32,18 +32,15 @@ export default async function ClassNewSummariesPage({
           </h2>
           {summaries.length > 0 ? (
             <form action={markAll}>
-              <button
-                type="submit"
-                className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
-              >
+              <button type="submit" className="text-muted text-sm hover:underline">
                 Tout marquer comme lu
               </button>
             </form>
           ) : null}
         </div>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          Ce que tu n&apos;as pas encore ouvert, tous cours confondus. Un résumé disparaît d&apos;ici
-          une fois que tu l&apos;as ouvert.
+        <p className="text-muted text-sm">
+          Ce que tu n&apos;as pas encore ouvert, tous cours confondus. Un résumé disparaît
+          d&apos;ici une fois que tu l&apos;as ouvert.
         </p>
       </div>
 
@@ -52,14 +49,14 @@ export default async function ClassNewSummariesPage({
           {summaries.map((s) => {
             const inner = (
               <>
-                <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                <span className="bg-background text-muted rounded px-1.5 py-0.5 text-[10px] font-semibold tracking-wide">
                   {KIND_LABEL[s.kind]}
                 </span>
                 <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">
                   {s.courseName}
                 </span>
                 <span className="font-medium">{s.title}</span>
-                <span className="text-xs text-zinc-500">
+                <span className="text-muted text-xs">
                   {s.chapterName ?? "Sans chapitre"} · par {s.authorName} ·{" "}
                   {relativeTime(s.createdAt)}
                 </span>
@@ -68,7 +65,7 @@ export default async function ClassNewSummariesPage({
             return (
               <li
                 key={s.id}
-                className="rounded-lg border border-zinc-200 transition-colors hover:border-emerald-400 dark:border-zinc-800 dark:hover:border-emerald-700"
+                className="border-border rounded-lg border transition-colors hover:border-emerald-400 dark:hover:border-emerald-700"
               >
                 {s.fileUrl ? (
                   <SummaryReadLink
@@ -79,7 +76,7 @@ export default async function ClassNewSummariesPage({
                     {inner}
                   </SummaryReadLink>
                 ) : (
-                  <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1 px-3 py-2 text-sm text-zinc-400">
+                  <span className="text-muted flex flex-wrap items-baseline gap-x-2 gap-y-1 px-3 py-2 text-sm">
                     {inner} · aperçu indisponible
                   </span>
                 )}
@@ -88,7 +85,7 @@ export default async function ClassNewSummariesPage({
           })}
         </ul>
       ) : (
-        <p className="rounded-xl border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
+        <p className="border-border text-muted rounded-xl border border-dashed p-6 text-center text-sm">
           Aucun nouveau résumé. Tu es à jour.
         </p>
       )}

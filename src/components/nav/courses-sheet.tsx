@@ -35,7 +35,7 @@ export function CoursesSheet({
   return (
     <NavSheet open={open} onClose={onClose} title="Aller à un cours">
       {courses.length === 0 ? (
-        <p className="py-4 text-sm text-zinc-500">
+        <p className="text-muted py-4 text-sm">
           Aucun cours dans une classe. Tes cours personnels sont dans « Accueil ».
         </p>
       ) : (
@@ -43,7 +43,7 @@ export function CoursesSheet({
           {sortedKeys.map((key) => (
             <div key={key} className="flex flex-col gap-1">
               {key ? (
-                <p className="px-1 text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+                <p className="text-muted px-1 text-xs font-semibold tracking-wide uppercase">
                   {key}
                 </p>
               ) : null}
@@ -52,7 +52,7 @@ export function CoursesSheet({
                   key={c.id}
                   type="button"
                   onClick={() => go(c.id)}
-                  className="rounded-lg px-3 py-2 text-left text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  className="hover:bg-background rounded-lg px-3 py-2 text-left text-sm"
                 >
                   {c.name}
                 </button>

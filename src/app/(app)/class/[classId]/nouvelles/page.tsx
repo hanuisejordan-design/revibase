@@ -22,7 +22,7 @@ export default async function ClassNewQuestionsPage({
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <Link href={`/class/${classId}`} className="text-xs text-zinc-500 hover:underline">
+        <Link href={`/class/${classId}`} className="text-muted text-xs hover:underline">
           ← {ctx.name}
         </Link>
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -31,16 +31,13 @@ export default async function ClassNewQuestionsPage({
           </h2>
           {questions.length > 0 ? (
             <form action={markAll}>
-              <button
-                type="submit"
-                className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
-              >
+              <button type="submit" className="text-muted text-sm hover:underline">
                 Tout marquer comme lu
               </button>
             </form>
           ) : null}
         </div>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-muted text-sm">
           Ce que tu n&apos;as pas encore ouvert, tous cours confondus, de la plus ancienne à la plus
           récente. Une question disparaît d&apos;ici une fois que tu l&apos;as ouverte.
         </p>
@@ -52,14 +49,14 @@ export default async function ClassNewQuestionsPage({
             <li key={q.id}>
               <Link
                 href={`/course/${q.courseId}/questions/${q.id}`}
-                className="flex flex-col gap-2 rounded-xl border border-zinc-200 p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
+                className="border-border hover:border-brand/40 flex flex-col gap-2 rounded-xl border p-4 transition-colors"
               >
                 <h3 className="font-medium">{q.title}</h3>
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500">
-                  <span className="rounded-full bg-zinc-100 px-2 py-0.5 font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                <div className="text-muted flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+                  <span className="bg-background text-muted rounded-full px-2 py-0.5 font-medium">
                     {q.courseName}
                   </span>
-                  <span className="rounded-full border border-zinc-200 px-2 py-0.5 dark:border-zinc-800">
+                  <span className="border-border rounded-full border px-2 py-0.5">
                     {q.chapterName ?? "Sans chapitre"}
                   </span>
                   <PurposeBadge purpose={q.purpose} />
@@ -79,7 +76,7 @@ export default async function ClassNewQuestionsPage({
           ))}
         </ul>
       ) : (
-        <p className="rounded-xl border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
+        <p className="border-border text-muted rounded-xl border border-dashed p-6 text-center text-sm">
           Aucune nouvelle question. Tu es à jour.
         </p>
       )}

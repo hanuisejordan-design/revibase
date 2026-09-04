@@ -18,7 +18,7 @@ export function AnswerList({
 }) {
   if (answers.length === 0) {
     return (
-      <p className="text-sm text-zinc-500">
+      <p className="text-muted text-sm">
         Aucune réponse pour l&apos;instant. Sois le premier à répondre.
       </p>
     );
@@ -26,9 +26,9 @@ export function AnswerList({
 
   return (
     <>
-      <p className="text-xs text-zinc-500">
-        👍 = « je donnerais cette réponse aussi ». Ta réponse est déjà comptée ; tu peux
-        aussi soutenir celle d&apos;un autre.
+      <p className="text-muted text-xs">
+        👍 = « je donnerais cette réponse aussi ». Ta réponse est déjà comptée ; tu peux aussi
+        soutenir celle d&apos;un autre.
       </p>
       <ul className="mt-3 flex flex-col gap-3">
         {answers.map((answer) => (

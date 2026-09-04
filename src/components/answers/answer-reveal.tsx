@@ -25,16 +25,16 @@ export function AnswerReveal({
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-dashed border-zinc-300 p-4 text-sm dark:border-zinc-700">
-      <p className="text-zinc-600 dark:text-zinc-400">
+    <div className="border-border flex flex-col gap-3 rounded-xl border border-dashed p-4 text-sm">
+      <p className="text-muted">
         {answerCount} réponse{answerCount > 1 ? "s" : ""} pour l&apos;instant masquée
-        {answerCount > 1 ? "s" : ""}. Réponds d&apos;abord — tu compareras ensuite sans
-        te faire influencer.
+        {answerCount > 1 ? "s" : ""}. Réponds d&apos;abord — tu compareras ensuite sans te faire
+        influencer.
       </p>
       <button
         type="button"
         onClick={() => setRevealed(true)}
-        className="w-fit text-zinc-600 underline hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+        className="text-muted hover:text-foreground w-fit underline"
       >
         Voir les {answerCount} réponse{answerCount > 1 ? "s" : ""} sans répondre
       </button>

@@ -38,8 +38,8 @@ export function VoteButton({
         className={cn(
           "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 transition-colors",
           active
-            ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
-            : "border-zinc-300 text-zinc-600 hover:border-zinc-500 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-500",
+            ? "border-brand bg-brand text-brand-foreground"
+            : "border-border text-muted hover:border-brand/40",
         )}
       >
         <ThumbsUp size={14} aria-hidden />

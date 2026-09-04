@@ -6,17 +6,17 @@ import { Button } from "@/components/ui/button";
 export function QuizResultView({ courseId, result }: { courseId: string; result: QuizResult }) {
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col items-center gap-1 rounded-xl border border-zinc-200 p-6 text-center dark:border-zinc-800">
-        <p className="text-xs tracking-wide text-zinc-500 uppercase">{result.chapterLabel}</p>
+      <div className="border-border flex flex-col items-center gap-1 rounded-xl border p-6 text-center">
+        <p className="text-muted text-xs tracking-wide uppercase">{result.chapterLabel}</p>
         <p className="text-4xl font-semibold">
           {result.score} / {result.total}
         </p>
-        <p className="text-lg text-zinc-600 dark:text-zinc-400">{result.percentage} %</p>
+        <p className="text-muted text-lg">{result.percentage} %</p>
       </div>
 
       {result.toReview.length > 0 ? (
         <section className="flex flex-col gap-2">
-          <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+          <h2 className="text-muted text-xs font-semibold tracking-wide uppercase">
             Questions à revoir
           </h2>
           <ul className="flex flex-col gap-1 text-sm">
@@ -24,7 +24,7 @@ export function QuizResultView({ courseId, result }: { courseId: string; result:
               <li key={q.questionId}>
                 <Link
                   href={`/course/${courseId}/questions/${q.questionId}`}
-                  className="text-zinc-700 underline hover:text-zinc-900 dark:text-zinc-300"
+                  className="text-muted hover:text-foreground underline"
                 >
                   {q.title}
                 </Link>
@@ -48,7 +48,7 @@ export function QuizResultView({ courseId, result }: { courseId: string; result:
         </form>
         <Link
           href={`/course/${courseId}/quiz`}
-          className="inline-flex items-center justify-center rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+          className="border-border hover:bg-background inline-flex items-center justify-center rounded-lg border px-4 py-2 text-sm font-medium"
         >
           Nouveau quiz
         </Link>

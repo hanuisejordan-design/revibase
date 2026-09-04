@@ -8,11 +8,11 @@ export default function JoinClassPage() {
   return (
     <div className="mx-auto flex max-w-sm flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <Link href="/dashboard" className="text-xs text-zinc-500 hover:underline">
+        <Link href="/dashboard" className="text-muted text-xs hover:underline">
           ← Retour
         </Link>
         <h1 className="text-xl font-semibold">Rejoindre une classe</h1>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-muted text-sm">
           Saisis le code de la classe. Tu auras accès à tous ses cours.
         </p>
       </div>

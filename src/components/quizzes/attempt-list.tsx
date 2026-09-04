@@ -10,7 +10,7 @@ export function AttemptList({
   attempts: AttemptSummary[];
 }) {
   if (attempts.length === 0) {
-    return <p className="text-sm text-zinc-500">Aucun quiz pour l&apos;instant.</p>;
+    return <p className="text-muted text-sm">Aucun quiz pour l&apos;instant.</p>;
   }
 
   return (
@@ -19,12 +19,12 @@ export function AttemptList({
         <li key={a.id}>
           <Link
             href={`/course/${courseId}/quiz/${a.id}`}
-            className="flex items-center justify-between gap-3 rounded-lg border border-zinc-200 px-4 py-2 text-sm hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
+            className="border-border hover:border-brand/40 flex items-center justify-between gap-3 rounded-lg border px-4 py-2 text-sm"
           >
             <span>
               {a.chapterLabel} · {relativeTime(a.startedAt)}
             </span>
-            <span className="text-zinc-500">
+            <span className="text-muted">
               {a.completedAt && a.total ? `${a.score} / ${a.total}` : "à terminer"}
             </span>
           </Link>

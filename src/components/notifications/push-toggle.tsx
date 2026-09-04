@@ -1,10 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  subscribeToPushAction,
-  unsubscribeFromPushAction,
-} from "@/features/push/actions";
+import { subscribeToPushAction, unsubscribeFromPushAction } from "@/features/push/actions";
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 
@@ -33,9 +30,7 @@ export function PushToggle() {
         return;
       }
       const supported =
-        "serviceWorker" in navigator &&
-        "PushManager" in window &&
-        "Notification" in window;
+        "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
 
       if (!supported) {
         const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
@@ -117,15 +112,14 @@ export function PushToggle() {
     }
   }, []);
 
-  const box =
-    "rounded-xl border border-zinc-200 p-4 text-sm dark:border-zinc-800";
+  const box = "rounded-xl border border-border p-4 text-sm";
 
   if (state === "loading") return null;
 
   if (state === "unsupported") {
     return (
       <div className={box}>
-        <p className="text-zinc-500">
+        <p className="text-muted">
           Les notifications push ne sont pas disponibles sur ce navigateur.
         </p>
       </div>
@@ -136,7 +130,7 @@ export function PushToggle() {
     return (
       <div className={box}>
         <p className="font-medium">Notifications sur iPhone / iPad</p>
-        <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+        <p className="text-muted mt-1">
           Ajoute d&apos;abord Revibase à ton écran d&apos;accueil : bouton Partager{" "}
           <span aria-hidden>⎋</span> puis « Sur l&apos;écran d&apos;accueil ». Rouvre l&apos;app
           depuis l&apos;icône, puis reviens ici pour activer les notifications.
@@ -149,7 +143,7 @@ export function PushToggle() {
     return (
       <div className={box}>
         <p className="font-medium">Notifications bloquées</p>
-        <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+        <p className="text-muted mt-1">
           Tu as refusé les notifications pour ce site. Réautorise-les dans les réglages du
           navigateur ou du téléphone, puis recharge la page.
         </p>
@@ -161,7 +155,7 @@ export function PushToggle() {
     <div className={`${box} flex flex-wrap items-center justify-between gap-3`}>
       <div>
         <p className="font-medium">Notifications sur cet appareil</p>
-        <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+        <p className="text-muted mt-1">
           {state === "on"
             ? "Activées — tu recevras une alerte même l'app fermée."
             : "Reçois une alerte quand on répond, commente, valide, ou qu'une nouveauté arrive."}
@@ -172,7 +166,7 @@ export function PushToggle() {
         type="button"
         onClick={state === "on" ? disable : enable}
         disabled={state === "busy"}
-        className="shrink-0 rounded-lg border border-zinc-300 px-3 py-1.5 text-sm font-medium hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
+        className="border-border hover:bg-background shrink-0 rounded-lg border px-3 py-1.5 text-sm font-medium disabled:opacity-50"
       >
         {state === "busy" ? "…" : state === "on" ? "Désactiver" : "Activer"}
       </button>

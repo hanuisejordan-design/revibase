@@ -30,7 +30,7 @@ export function CreateCommentForm({
         rows={2}
         required
         placeholder="Ajouter au fil de discussion…"
-        className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
+        className="border-border bg-surface focus:border-brand w-full rounded-lg border px-3 py-2 text-sm focus:outline-none"
       />
       {state?.errors?.body ? (
         <p className="text-sm text-red-600 dark:text-red-400">{state.errors.body}</p>

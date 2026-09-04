@@ -32,10 +32,10 @@ export function AnswerCard({
   const canAccept = viewerId === questionAuthorId;
 
   return (
-    <li className="flex flex-col gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
+    <li className="border-border flex flex-col gap-3 rounded-xl border p-4">
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <AnswerStatusBadge status={statusOf(answer)} />
-        <p className="whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">{answer.body}</p>
+        <p className="text-muted whitespace-pre-wrap">{answer.body}</p>
         <div>
           <VoteButton
             courseId={courseId}
@@ -45,7 +45,7 @@ export function AnswerCard({
             active={answer.viewerHasVoted}
           />
         </div>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-500">
+        <div className="text-muted flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
           <span>
             {answer.authorName} · {relativeTime(answer.createdAt)}
           </span>

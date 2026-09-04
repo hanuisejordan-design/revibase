@@ -4,7 +4,13 @@ import { useActionState, useEffect, useRef } from "react";
 import { createAnswerAction, type AnswerFormState } from "@/features/answers/actions";
 import { Button } from "@/components/ui/button";
 
-export function CreateAnswerForm({ courseId, questionId }: { courseId: string; questionId: string }) {
+export function CreateAnswerForm({
+  courseId,
+  questionId,
+}: {
+  courseId: string;
+  questionId: string;
+}) {
   const [state, formAction, pending] = useActionState<AnswerFormState | undefined, FormData>(
     createAnswerAction,
     undefined,
@@ -30,7 +36,7 @@ export function CreateAnswerForm({ courseId, questionId }: { courseId: string; q
         rows={4}
         required
         placeholder="Ta réponse, avec le raisonnement si possible."
-        className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
+        className="border-border bg-surface focus:border-brand w-full rounded-lg border px-3 py-2 text-sm focus:outline-none"
       />
       {state?.errors?.body ? (
         <p className="text-sm text-red-600 dark:text-red-400">{state.errors.body}</p>

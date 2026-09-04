@@ -8,8 +8,8 @@ import { SignOutButton } from "@/components/auth/sign-out-button";
 
 export const metadata: Metadata = { title: "Paramètres" };
 
-const section = "flex flex-col gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800";
-const heading = "text-xs font-semibold tracking-wide text-zinc-500 uppercase";
+const section = "flex flex-col gap-3 rounded-xl border border-border p-4";
+const heading = "text-xs font-semibold tracking-wide text-muted uppercase";
 
 export default async function SettingsPage() {
   const [user, classes] = await Promise.all([requireUser(), getMyClasses()]);
@@ -21,7 +21,7 @@ export default async function SettingsPage() {
       <section className={section}>
         <span className={heading}>Thème</span>
         <ThemeToggle />
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-muted text-sm">
           « Système » suit le réglage de ton téléphone ou de ton ordinateur.
         </p>
       </section>
@@ -46,9 +46,7 @@ export default async function SettingsPage() {
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Tu n&apos;es dans aucune classe pour l&apos;instant.
-          </p>
+          <p className="text-muted text-sm">Tu n&apos;es dans aucune classe pour l&apos;instant.</p>
         )}
       </section>
 
@@ -56,9 +54,7 @@ export default async function SettingsPage() {
         <span className={heading}>Compte</span>
         <p className="text-sm">
           {user.displayName}
-          {user.email ? (
-            <span className="text-zinc-500 dark:text-zinc-400"> · {user.email}</span>
-          ) : null}
+          {user.email ? <span className="text-muted"> · {user.email}</span> : null}
         </p>
         <div>
           <SignOutButton />

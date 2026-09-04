@@ -50,7 +50,7 @@ export function ThemeToggle() {
     <div
       role="radiogroup"
       aria-label="Thème"
-      className="inline-flex rounded-lg border border-zinc-300 p-0.5 text-sm dark:border-zinc-700"
+      className="border-border inline-flex rounded-lg border p-0.5 text-sm"
     >
       {OPTIONS.map((o) => {
         const active = pref === o.value;
@@ -63,8 +63,8 @@ export function ThemeToggle() {
             onClick={() => choose(o.value)}
             className={
               active
-                ? "rounded-md bg-zinc-900 px-3 py-1 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
-                : "rounded-md px-3 py-1 text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                ? "bg-brand text-brand-foreground rounded-md px-3 py-1 font-medium"
+                : "text-muted hover:bg-background rounded-md px-3 py-1"
             }
           >
             {o.label}

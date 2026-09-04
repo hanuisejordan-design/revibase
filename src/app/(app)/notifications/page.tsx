@@ -28,23 +28,23 @@ export default async function NotificationsPage() {
         <h1 className="text-xl font-semibold">Notifications</h1>
         {hasUnread ? (
           <form action={markAllNotificationsReadAction}>
-            <button type="submit" className="text-sm text-zinc-600 hover:underline dark:text-zinc-400">
+            <button type="submit" className="text-muted text-sm hover:underline">
               Tout marquer comme lu
             </button>
           </form>
         ) : null}
       </div>
 
-      <p className="text-sm text-zinc-500">
+      <p className="text-muted text-sm">
         Activer les notifications sur cet appareil :{" "}
-        <Link href="/parametres" className="underline hover:text-zinc-700 dark:hover:text-zinc-300">
+        <Link href="/parametres" className="hover:text-foreground underline">
           Paramètres
         </Link>
         .
       </p>
 
       {notifications.length === 0 ? (
-        <p className="text-sm text-zinc-500">Aucune notification.</p>
+        <p className="text-muted text-sm">Aucune notification.</p>
       ) : (
         <ul className="flex flex-col gap-1.5">
           {notifications.map((n) => {
@@ -58,20 +58,18 @@ export default async function NotificationsPage() {
                 {n.questionTitle ? (
                   <>
                     {" "}
-                    « <span className="text-zinc-700 dark:text-zinc-300">{n.questionTitle}</span> »
+                    « <span className="text-muted">{n.questionTitle}</span> »
                   </>
                 ) : (
                   " une question"
                 )}
-                <span className="ml-2 text-xs text-zinc-500">{relativeTime(n.createdAt)}</span>
+                <span className="text-muted ml-2 text-xs">{relativeTime(n.createdAt)}</span>
               </>
             );
 
             const cls = cn(
               "block rounded-lg border px-3 py-2 text-sm",
-              n.isRead
-                ? "border-zinc-200 dark:border-zinc-800"
-                : "border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900",
+              n.isRead ? "border-border" : "border-border bg-background",
             );
 
             return (
@@ -79,7 +77,7 @@ export default async function NotificationsPage() {
                 {n.courseId && n.questionId ? (
                   <Link
                     href={`/course/${n.courseId}/questions/${n.questionId}`}
-                    className={cn(cls, "hover:border-zinc-400 dark:hover:border-zinc-600")}
+                    className={cn(cls, "hover:border-brand/40")}
                   >
                     {body}
                   </Link>

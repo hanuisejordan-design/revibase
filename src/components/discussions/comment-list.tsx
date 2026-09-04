@@ -17,7 +17,7 @@ export function CommentList({
   viewerIsTrainer: boolean;
 }) {
   if (comments.length === 0) {
-    return <p className="text-sm text-zinc-500">Aucun message pour l&apos;instant.</p>;
+    return <p className="text-muted text-sm">Aucun message pour l&apos;instant.</p>;
   }
 
   return (
@@ -29,10 +29,8 @@ export function CommentList({
             key={comment.id}
             className={cn("flex flex-col gap-1", mine ? "items-end" : "items-start")}
           >
-            <div className="flex items-baseline gap-2 px-1 text-xs text-zinc-500">
-              <span className="font-medium text-zinc-700 dark:text-zinc-300">
-                {mine ? "Toi" : comment.authorName}
-              </span>
+            <div className="text-muted flex items-baseline gap-2 px-1 text-xs">
+              <span className="text-muted font-medium">{mine ? "Toi" : comment.authorName}</span>
               <span>{relativeTime(comment.createdAt)}</span>
               {mine || viewerIsTrainer ? (
                 <DeleteCommentButton
@@ -46,8 +44,8 @@ export function CommentList({
               className={cn(
                 "max-w-[85%] rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap",
                 mine
-                  ? "rounded-br-sm bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
-                  : "rounded-bl-sm bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200",
+                  ? "bg-brand text-brand-foreground rounded-br-sm"
+                  : "bg-background text-foreground rounded-bl-sm",
               )}
             >
               {comment.body}

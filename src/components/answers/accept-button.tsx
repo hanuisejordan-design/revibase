@@ -25,7 +25,7 @@ export function AcceptButton({
           "text-sm underline",
           accepted
             ? "text-indigo-700 hover:text-indigo-900 dark:text-indigo-400"
-            : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100",
+            : "text-muted hover:text-foreground",
         )}
       >
         {accepted ? "Retirer « retenue »" : "Retenir cette réponse"}

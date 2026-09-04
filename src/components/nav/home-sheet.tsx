@@ -28,18 +28,13 @@ export function HomeSheet({
     router.push(path);
   }
 
-  const rowCls = "rounded-lg px-3 py-2 text-left text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800";
-  const headCls =
-    "mt-2 px-1 text-xs font-semibold tracking-wide text-zinc-500 uppercase";
+  const rowCls = "rounded-lg px-3 py-2 text-left text-sm hover:bg-background";
+  const headCls = "mt-2 px-1 text-xs font-semibold tracking-wide text-muted uppercase";
 
   return (
     <NavSheet open={open} onClose={onClose} title="Aller à">
       <div className="flex flex-col gap-1">
-        <button
-          type="button"
-          onClick={() => go("/dashboard")}
-          className={`${rowCls} font-medium`}
-        >
+        <button type="button" onClick={() => go("/dashboard")} className={`${rowCls} font-medium`}>
           Tableau de bord
         </button>
 
@@ -47,7 +42,12 @@ export function HomeSheet({
           <>
             <p className={headCls}>Mes classes</p>
             {classes.map((c) => (
-              <button key={c.id} type="button" onClick={() => go(`/class/${c.id}`)} className={rowCls}>
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => go(`/class/${c.id}`)}
+                className={rowCls}
+              >
                 {c.name}
               </button>
             ))}

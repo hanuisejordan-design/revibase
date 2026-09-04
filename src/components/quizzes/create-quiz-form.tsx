@@ -29,7 +29,7 @@ export function CreateQuizForm({
           id="chapterId"
           name="chapterId"
           defaultValue=""
-          className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
+          className="border-border bg-surface focus:border-brand w-full rounded-lg border px-3 py-2 text-sm focus:outline-none"
         >
           <option value="">Tous les chapitres</option>
           {chapters.map((ch) => (

@@ -25,7 +25,7 @@ export function ValidateButton({
           "text-sm underline",
           validated
             ? "text-green-700 hover:text-green-900 dark:text-green-400"
-            : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100",
+            : "text-muted hover:text-foreground",
         )}
       >
         {validated ? "Retirer la validation" : "Valider (formateur)"}
