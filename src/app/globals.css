@@ -15,19 +15,19 @@
   }
 }
 
-/* ── Tokens de marque (essai identité visuelle : vert profond + papier chaud
+/* ── Tokens de marque (identité visuelle : bleu encre + papier froid
    + serif éditorial). Clair par défaut ; équivalents sombres plus bas. ── */
 :root {
-  --background: #f4f2ec; /* papier chaud */
-  --foreground: #1c1c1a;
+  --background: #f1f3f6; /* papier froid, léger bleuté */
+  --foreground: #1a1d22;
   --surface: #ffffff; /* cartes */
-  --surface-foreground: #1c1c1a;
-  --muted: #6f6d64; /* texte secondaire */
-  --border: #e6e3da; /* filet chaud */
-  --brand: #1f4436; /* vert pin */
-  --brand-hover: #17372c;
-  --brand-foreground: #f4f2ec;
-  --accent: #2f7d5f; /* vert vif : points, petits accents */
+  --surface-foreground: #1a1d22;
+  --muted: #676e7a; /* texte secondaire (gris froid) */
+  --border: #e3e6ec; /* filet froid */
+  --brand: #1f3a5f; /* bleu encre */
+  --brand-hover: #182f4d;
+  --brand-foreground: #f1f3f6;
+  --accent: #35618e; /* bleu franc : points, petits accents */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -38,10 +38,10 @@
     --surface-foreground: #ececea;
     --muted: #9a9a92;
     --border: #2b3134;
-    --brand: #3f8f6d;
-    --brand-hover: #4a9d7b;
+    --brand: #5b8bc4;
+    --brand-hover: #6d9bd0;
     --brand-foreground: #0f1211;
-    --accent: #5bb48c;
+    --accent: #7ba7d7;
   }
 }
 
@@ -52,10 +52,10 @@
   --surface-foreground: #ececea;
   --muted: #9a9a92;
   --border: #2b3134;
-  --brand: #3f8f6d;
-  --brand-hover: #4a9d7b;
+  --brand: #5b8bc4;
+  --brand-hover: #6d9bd0;
   --brand-foreground: #0f1211;
-  --accent: #5bb48c;
+  --accent: #7ba7d7;
 }
 
 @theme inline {
