@@ -30,7 +30,7 @@ export default async function CourseHomePage({
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-wrap gap-3">
+      <div className="hidden flex-wrap gap-3 md:flex">
         <Link href={`/course/${courseId}/questions/new`} className={primaryBtn}>
           Poser une question
         </Link>

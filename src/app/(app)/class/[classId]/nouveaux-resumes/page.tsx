@@ -65,7 +65,7 @@ export default async function ClassNewSummariesPage({
             return (
               <li
                 key={s.id}
-                className="border-border rounded-lg border transition-colors hover:border-emerald-400 dark:hover:border-emerald-700"
+                className="border-border bg-surface rounded-lg border transition-colors hover:border-emerald-400 dark:hover:border-emerald-700"
               >
                 {s.fileUrl ? (
                   <SummaryReadLink

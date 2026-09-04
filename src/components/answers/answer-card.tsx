@@ -32,7 +32,7 @@ export function AnswerCard({
   const canAccept = viewerId === questionAuthorId;
 
   return (
-    <li className="border-border flex flex-col gap-3 rounded-xl border p-4">
+    <li className="border-border bg-surface flex flex-col gap-3 rounded-xl border p-4">
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <AnswerStatusBadge status={statusOf(answer)} />
         <p className="text-muted whitespace-pre-wrap">{answer.body}</p>

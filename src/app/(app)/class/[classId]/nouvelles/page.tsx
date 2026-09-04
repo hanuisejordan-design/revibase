@@ -49,7 +49,7 @@ export default async function ClassNewQuestionsPage({
             <li key={q.id}>
               <Link
                 href={`/course/${q.courseId}/questions/${q.id}`}
-                className="border-border hover:border-brand/40 flex flex-col gap-2 rounded-xl border p-4 transition-colors"
+                className="border-border bg-surface text-surface-foreground hover:border-brand/40 flex flex-col gap-2 rounded-xl border p-4 transition-colors"
               >
                 <h3 className="font-medium">{q.title}</h3>
                 <div className="text-muted flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 export function QuizResultView({ courseId, result }: { courseId: string; result: QuizResult }) {
   return (
     <div className="flex flex-col gap-6">
-      <div className="border-border flex flex-col items-center gap-1 rounded-xl border p-6 text-center">
+      <div className="border-border bg-surface flex flex-col items-center gap-1 rounded-xl border p-6 text-center">
         <p className="text-muted text-xs tracking-wide uppercase">{result.chapterLabel}</p>
         <p className="text-4xl font-semibold">
           {result.score} / {result.total}

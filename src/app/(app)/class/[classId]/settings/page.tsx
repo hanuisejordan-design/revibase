@@ -18,9 +18,9 @@ export default async function ClassSettingsPage({
   return (
     <div className="flex flex-col gap-8">
       <p className="text-muted text-sm">
-        Le code d&apos;invitation est sur la{" "}
-        <Link href={`/class/${classId}`} className="underline">
-          page de la classe
+        Le code d&apos;invitation est dans{" "}
+        <Link href="/parametres" className="underline">
+          Paramètres
         </Link>
         .
       </p>

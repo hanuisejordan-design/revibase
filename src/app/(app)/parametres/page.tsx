@@ -8,7 +8,7 @@ import { SignOutButton } from "@/components/auth/sign-out-button";
 
 export const metadata: Metadata = { title: "Paramètres" };
 
-const section = "flex flex-col gap-3 rounded-xl border border-border p-4";
+const section = "bg-surface flex flex-col gap-3 rounded-xl border border-border p-4";
 const heading = "text-xs font-semibold tracking-wide text-muted uppercase";
 
 export default async function SettingsPage() {

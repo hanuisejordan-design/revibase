@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getClassContext, getClassCourses } from "@/features/classes/queries";
 import { CourseCard } from "@/components/courses/course-card";
-import { InviteCode } from "@/components/courses/invite-code";
 
 export default async function ClassCoursesPage({
   params,
@@ -20,13 +19,6 @@ export default async function ClassCoursesPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="border-border flex flex-col gap-3 rounded-xl border p-4">
-        <InviteCode
-          code={ctx.joinCode}
-          hint="Partage ce code pour faire entrer quelqu'un : il aura accès à tous les cours de la classe."
-        />
-      </section>
-
       {newCount > 0 ? (
         <Link
           href={`/class/${classId}/nouvelles`}

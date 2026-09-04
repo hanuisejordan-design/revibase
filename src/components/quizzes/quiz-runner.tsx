@@ -105,7 +105,7 @@ export function QuizRunner({
           </Button>
         ) : (
           <div className="flex flex-col gap-3">
-            <div className="border-border rounded-xl border p-4">
+            <div className="border-border bg-surface rounded-xl border p-4">
               {current.referenceAnswer ? (
                 <>
                   <p className="text-muted mb-1 text-xs font-medium">

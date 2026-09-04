@@ -85,6 +85,27 @@ basculent seuls.
 - **Garder les `dark:` manuels** : deux fois plus de classes à écrire et
   à ne pas oublier.
 
+## Retouches (suite aux remarques utilisateur du 2026-09-04)
+
+- **Cartes sans fond** : plusieurs « vignettes » n'avaient qu'une bordure
+  (`border-border`), sans `bg-surface` — sur le nouveau fond gris froid,
+  bordure et fond se confondaient (peu visible). Corrigé sur `QuestionCard`,
+  les lignes de `class/[classId]/nouvelles` et `nouveaux-resumes`,
+  `AnswerCard`, l'encart score de `quiz-result`, la réponse de référence de
+  `quiz-runner`, et les sections de `/parametres` et
+  `course/[courseId]/settings`.
+- **Code d'invitation en double** : la page de classe affichait son propre
+  encart code (sans fond, en plus), alors que `/parametres` → « Mes codes
+  d'invitation » liste déjà toutes les classes. Retiré de la page de classe ;
+  `class/[classId]/settings` pointe maintenant vers Paramètres. Le code
+  **d'un cours** (différent, propre à `course/[courseId]/settings`) reste à
+  sa place — pas de doublon ailleurs.
+- **Boutons d'action masqués sur mobile** : la page d'un cours avait 3
+  boutons (« Poser une question », « Ajouter un résumé », « Faire un
+  quiz ») qui faisaient doublon avec le bouton **+** de la barre de nav
+  basse (mobile uniquement). Masqués en `hidden md:flex` — restent la
+  seule voie sur desktop (pas de barre basse).
+
 ## Conséquences
 
 - Un seul fichier (`globals.css`) pour rééquilibrer toute la charte.

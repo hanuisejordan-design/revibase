@@ -24,7 +24,7 @@ export default async function ClassSettingsPage({
 
   return (
     <div className="flex flex-col gap-8">
-      <section className="border-border flex flex-col gap-3 rounded-xl border p-4">
+      <section className="border-border bg-surface flex flex-col gap-3 rounded-xl border p-4">
         <InviteCode code={ctx.joinCode} />
       </section>
 
