@@ -144,7 +144,11 @@ export default async function QuestionPage({
         <p className="text-muted text-sm">
           Posée par {question.authorName} · {relativeTime(question.createdAt)}
         </p>
-        {question.body ? <p className="text-muted whitespace-pre-wrap">{question.body}</p> : null}
+        {question.body ? (
+          <p className="border-border bg-surface text-surface-foreground rounded-xl border p-4 whitespace-pre-wrap">
+            {question.body}
+          </p>
+        ) : null}
         {question.imageUrl ? (
           <a
             href={question.imageUrl}

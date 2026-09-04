@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ImageIcon } from "lucide-react";
 import type { QuestionListItem } from "@/features/questions/types";
 import { relativeTime } from "@/lib/utils/date";
 import { QUESTION_KIND_LABELS } from "@/constants/app";
@@ -26,9 +25,6 @@ export function QuestionCard({
           {question.chapterName ?? "Sans chapitre"}
         </span>
         <PurposeBadge purpose={question.purpose} />
-        {question.imageUrl ? (
-          <ImageIcon size={13} aria-label="Photo jointe" className="text-muted" />
-        ) : null}
         {isOpen ? (
           <>
             <span>
