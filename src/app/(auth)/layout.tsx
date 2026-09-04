@@ -9,10 +9,7 @@ export default async function AuthLayout({ children }: { children: ReactNode }) 
 
   return (
     <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-8 px-6 py-16">
-      <Link
-        href="/"
-        className="text-center text-sm font-medium tracking-wide text-zinc-500 uppercase"
-      >
+      <Link href="/" className="text-muted text-center text-sm font-medium tracking-wide uppercase">
         {APP_NAME}
       </Link>
       {children}
