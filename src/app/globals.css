@@ -88,10 +88,10 @@ body {
   line-height: 1.1;
 }
 
-/* Manuscrite : uniquement le « Bonjour X. » du tableau de bord */
+/* Manuscrite « craie sur tableau » : uniquement le « Bonjour X. » du dashboard */
 .greeting {
-  font-family: var(--font-hand), ui-serif, "Segoe Script", cursive;
-  font-weight: 700;
+  font-family: var(--font-hand), "Segoe Script", "Bradley Hand", cursive;
+  font-weight: 400;
   letter-spacing: 0;
-  line-height: 1;
+  line-height: 1.15;
 }
