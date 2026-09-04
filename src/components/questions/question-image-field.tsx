@@ -2,18 +2,17 @@
 
 import { useEffect, useMemo, useRef } from "react";
 
-const helpCls = "text-xs text-zinc-500";
+const helpCls = "text-xs text-muted";
 const removeCls =
   "text-sm text-red-600 underline hover:text-red-700 disabled:opacity-50 dark:text-red-400";
 const fileCls =
-  "text-sm file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5 file:text-sm hover:file:bg-zinc-200 dark:file:bg-zinc-800 dark:hover:file:bg-zinc-700";
-const imgCls =
-  "max-h-64 rounded-lg border border-zinc-200 object-contain dark:border-zinc-800";
+  "text-sm file:mr-3 file:rounded-md file:border-0 file:bg-background file:px-3 file:py-1.5 file:text-sm hover:file:bg-border dark:file:bg-brand dark:hover:file:bg-brand";
+const imgCls = "max-h-64 rounded-lg border border-border object-contain";
 
 /**
  * Champ « photo » : à la création, sélection + aperçu local. À l'édition,
- * `existingUrl` affiche la photo actuelle, avec « Remplacer » et « Retirer »
- * (`removed` piloté par `onRemovedChange`). L'upload se fait au submit du
+ * `existingUrl`affiche la photo actuelle, avec « Remplacer » et « Retirer »
+ * (`removed`piloté par `onRemovedChange`). L'upload se fait au submit du
  * parent.
  */
 export function QuestionImageField({
@@ -66,7 +65,7 @@ export function QuestionImageField({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={existingUrl ?? ""} alt="Photo actuelle" className={imgCls} />
           <div className="flex items-center gap-4">
-            <label className="cursor-pointer text-sm text-zinc-600 underline hover:text-zinc-900 dark:text-zinc-400">
+            <label className="text-muted hover:text-foreground cursor-pointer text-sm underline">
               Remplacer
               <input
                 type="file"

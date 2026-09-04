@@ -55,7 +55,7 @@ export default async function QuestionPage({
 
   const answersBlock = (
     <section className="flex flex-col gap-3">
-      <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+      <h2 className="text-muted text-xs font-semibold tracking-wide uppercase">
         {answers.length} réponse{answers.length > 1 ? "s" : ""}
       </h2>
       <AnswerReveal hasAnswered={viewerHasAnswered} answerCount={answers.length}>
@@ -72,7 +72,7 @@ export default async function QuestionPage({
   );
 
   const answerFormBlock = (
-    <section className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
+    <section className="border-border border-t pt-4">
       <CreateAnswerForm courseId={courseId} questionId={question.id} />
     </section>
   );
@@ -91,18 +91,18 @@ export default async function QuestionPage({
     )
   ) : (
     <section className="flex flex-col gap-3">
-      <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">Réponse</h2>
+      <h2 className="text-muted text-xs font-semibold tracking-wide uppercase">Réponse</h2>
       <QuestionOptionsView options={question.options} />
     </section>
   );
 
   const discussionSection = (
-    <section className="flex flex-col gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+    <section className="border-border flex flex-col gap-3 border-t pt-4">
       <div className="flex flex-col gap-1">
-        <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+        <h2 className="text-muted text-xs font-semibold tracking-wide uppercase">
           Discussion ({comments.length})
         </h2>
-        <p className="text-xs text-zinc-500">
+        <p className="text-muted text-xs">
           Pour échanger autour de la question (formulation, cas limites, « pourquoi »…).
         </p>
       </div>
@@ -124,29 +124,27 @@ export default async function QuestionPage({
   return (
     <div className="flex flex-col gap-6">
       <MarkQuestionRead questionId={question.id} />
-      <Link href={`/course/${courseId}/questions`} className="text-xs text-zinc-500 hover:underline">
+      <Link href={`/course/${courseId}/questions`} className="text-muted text-xs hover:underline">
         ← Questions
       </Link>
 
       <article className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500">
-          <span className="rounded-full border border-zinc-200 px-2 py-0.5 dark:border-zinc-800">
+        <div className="text-muted flex flex-wrap items-center gap-2 text-xs">
+          <span className="border-border rounded-full border px-2 py-0.5">
             {question.chapterName ?? "Sans chapitre"}
           </span>
           <PurposeBadge purpose={question.purpose} />
           {!isOpen ? (
-            <span className="rounded-full bg-zinc-100 px-2 py-0.5 font-medium dark:bg-zinc-800">
+            <span className="bg-background rounded-full px-2 py-0.5 font-medium">
               {QUESTION_KIND_LABELS[question.kind]}
             </span>
           ) : null}
         </div>
         <h1 className="text-2xl font-semibold tracking-tight text-balance">{question.title}</h1>
-        <p className="text-sm text-zinc-500">
+        <p className="text-muted text-sm">
           Posée par {question.authorName} · {relativeTime(question.createdAt)}
         </p>
-        {question.body ? (
-          <p className="whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">{question.body}</p>
-        ) : null}
+        {question.body ? <p className="text-muted whitespace-pre-wrap">{question.body}</p> : null}
         {question.imageUrl ? (
           <a
             href={question.imageUrl}
@@ -158,7 +156,7 @@ export default async function QuestionPage({
             <img
               src={question.imageUrl}
               alt="Photo de la question"
-              className="max-h-[28rem] rounded-lg border border-zinc-200 object-contain dark:border-zinc-800"
+              className="border-border max-h-[28rem] rounded-lg border object-contain"
             />
           </a>
         ) : null}
@@ -177,10 +175,10 @@ export default async function QuestionPage({
       )}
 
       {question.isAuthor || ctx.role === "trainer" ? (
-        <div className="flex items-center gap-4 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+        <div className="border-border flex items-center gap-4 border-t pt-4">
           <Link
             href={`/course/${courseId}/questions/${question.id}/edit`}
-            className="text-sm text-zinc-600 underline hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            className="text-muted hover:text-foreground text-sm underline"
           >
             Modifier
           </Link>

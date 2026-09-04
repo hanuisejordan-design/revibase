@@ -18,7 +18,7 @@ export default async function QuizAttemptPage({
   if (result) {
     return (
       <div className="flex flex-col gap-6">
-        <Link href={`/course/${courseId}/quiz`} className="text-xs text-zinc-500 hover:underline">
+        <Link href={`/course/${courseId}/quiz`} className="text-muted text-xs hover:underline">
           ← Quiz
         </Link>
         <h1 className="text-xl font-semibold">Résultat</h1>
@@ -32,7 +32,7 @@ export default async function QuizAttemptPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <Link href={`/course/${courseId}/quiz`} className="text-xs text-zinc-500 hover:underline">
+      <Link href={`/course/${courseId}/quiz`} className="text-muted text-xs hover:underline">
         ← Quitter le quiz
       </Link>
       <QuizRunner courseId={courseId} attemptId={attemptId} questions={runner.questions} />

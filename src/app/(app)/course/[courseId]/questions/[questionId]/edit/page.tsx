@@ -31,7 +31,7 @@ export default async function EditQuestionPage({
       <div className="flex flex-col gap-2">
         <Link
           href={`/course/${courseId}/questions/${questionId}`}
-          className="text-xs text-zinc-500 hover:underline"
+          className="text-muted text-xs hover:underline"
         >
           ← Question
         </Link>

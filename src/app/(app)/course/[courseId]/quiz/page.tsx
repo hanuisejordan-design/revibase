@@ -13,22 +13,25 @@ export default async function QuizPage({ params }: { params: Promise<{ courseId:
   const ctx = await getCourseContext(courseId);
   if (!ctx) notFound();
 
-  const [chapters, attempts] = await Promise.all([listChapters(courseId), listMyAttempts(courseId)]);
+  const [chapters, attempts] = await Promise.all([
+    listChapters(courseId),
+    listMyAttempts(courseId),
+  ]);
 
   return (
     <div className="flex flex-col gap-8">
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold">Faire un quiz</h2>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          L&apos;app tire des questions du cours. Les QCM et vrai/faux sont corrigés
-          automatiquement ; pour les questions ouvertes, tu révèles la réponse de référence et tu
-          dis si tu la savais.
+        <p className="text-muted text-sm">
+          L&apos;app tire des questions du cours. Les QCM et vrai/faux sont corrigés automatiquement
+          ; pour les questions ouvertes, tu révèles la réponse de référence et tu dis si tu la
+          savais.
         </p>
         <CreateQuizForm courseId={courseId} chapters={chapters} />
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+        <h2 className="text-muted text-xs font-semibold tracking-wide uppercase">
           Mes quiz récents
         </h2>
         <AttemptList courseId={courseId} attempts={attempts} />

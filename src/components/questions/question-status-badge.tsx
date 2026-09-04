@@ -9,7 +9,7 @@ const LABELS: Record<QuestionStatus, string> = {
 
 const STYLES: Record<QuestionStatus, string> = {
   validated: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
-  answered: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
+  answered: "bg-background text-muted",
   unanswered: "border border-amber-300 text-amber-700 dark:border-amber-800 dark:text-amber-400",
 };
 

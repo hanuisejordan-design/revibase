@@ -7,13 +7,17 @@ import { QuestionCard } from "@/components/questions/question-card";
 import { SummaryRow } from "@/components/summaries/summary-list";
 
 const primaryBtn =
-  "inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300";
+  "inline-flex items-center justify-center rounded-lg bg-brand px-4 py-2 text-sm font-medium text-brand-foreground hover:bg-brand-hover";
 const secondaryBtn =
-  "inline-flex items-center justify-center rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900";
-const sectionTitle = "text-xs font-semibold tracking-wide text-zinc-500 uppercase";
-const seeAll = "text-sm text-zinc-600 hover:underline dark:text-zinc-400";
+  "inline-flex items-center justify-center rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-background";
+const sectionTitle = "text-xs font-semibold tracking-wide text-muted uppercase";
+const seeAll = "text-sm text-muted hover:underline";
 
-export default async function CourseHomePage({ params }: { params: Promise<{ courseId: string }> }) {
+export default async function CourseHomePage({
+  params,
+}: {
+  params: Promise<{ courseId: string }>;
+}) {
   const { courseId } = await params;
   const ctx = await getCourseContext(courseId);
   if (!ctx) notFound();
@@ -56,7 +60,7 @@ export default async function CourseHomePage({ params }: { params: Promise<{ cou
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-zinc-500">Aucune question pour l&apos;instant.</p>
+          <p className="text-muted text-sm">Aucune question pour l&apos;instant.</p>
         )}
       </section>
 
@@ -76,7 +80,7 @@ export default async function CourseHomePage({ params }: { params: Promise<{ cou
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-zinc-500">Aucun résumé pour l&apos;instant.</p>
+          <p className="text-muted text-sm">Aucun résumé pour l&apos;instant.</p>
         )}
       </section>
     </div>

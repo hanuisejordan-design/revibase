@@ -13,7 +13,7 @@ export function QuestionOptionsView({ options }: { options: QuestionOption[] }) 
   const [picked, setPicked] = useState<string | null>(null);
 
   if (options.length === 0) {
-    return <p className="text-sm text-zinc-500">Options manquantes pour cette question.</p>;
+    return <p className="text-muted text-sm">Options manquantes pour cette question.</p>;
   }
 
   const answered = picked !== null;
@@ -31,8 +31,7 @@ export function QuestionOptionsView({ options }: { options: QuestionOption[] }) 
                 onClick={() => setPicked(opt.id)}
                 className={cn(
                   "w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors",
-                  !answered &&
-                    "border-zinc-300 hover:border-zinc-500 dark:border-zinc-700 dark:hover:border-zinc-500",
+                  !answered && "border-border hover:border-brand/40",
                   answered &&
                     opt.isCorrect &&
                     "border-green-400 bg-green-50 text-green-900 dark:border-green-700 dark:bg-green-950 dark:text-green-200",
@@ -40,10 +39,7 @@ export function QuestionOptionsView({ options }: { options: QuestionOption[] }) 
                     isPicked &&
                     !opt.isCorrect &&
                     "border-red-400 bg-red-50 text-red-900 dark:border-red-700 dark:bg-red-950 dark:text-red-200",
-                  answered &&
-                    !isPicked &&
-                    !opt.isCorrect &&
-                    "border-zinc-200 text-zinc-500 dark:border-zinc-800",
+                  answered && !isPicked && !opt.isCorrect && "border-border text-muted",
                 )}
               >
                 {opt.body}

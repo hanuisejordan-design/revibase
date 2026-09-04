@@ -22,14 +22,11 @@ export default async function NewSummaryPage({
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <Link
-          href={`/course/${courseId}/summaries`}
-          className="text-xs text-zinc-500 hover:underline"
-        >
+        <Link href={`/course/${courseId}/summaries`} className="text-muted text-xs hover:underline">
           ← Résumés
         </Link>
         <h1 className="text-xl font-semibold">Ajouter un résumé</h1>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-muted text-sm">
           Un fichier (PDF ou photo de notes) + un titre. Visible par tous les membres du cours.
         </p>
       </div>

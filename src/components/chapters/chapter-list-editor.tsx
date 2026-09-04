@@ -36,7 +36,7 @@ function IconButton({
         type="submit"
         disabled={disabled}
         aria-label={label}
-        className="rounded-md px-1.5 py-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 disabled:opacity-30 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+        className="text-muted hover:bg-background hover:text-foreground rounded-md px-1.5 py-1 disabled:opacity-30"
       >
         {children}
       </button>
@@ -61,7 +61,7 @@ function ChapterRow({
   );
 
   return (
-    <li className="flex flex-col gap-1 border-b border-zinc-200 py-2 last:border-b-0 dark:border-zinc-800">
+    <li className="border-border flex flex-col gap-1 border-b py-2 last:border-b-0">
       <div className="flex items-center gap-2">
         <div className="flex flex-col">
           <IconButton
@@ -93,7 +93,7 @@ function ChapterRow({
           <button
             type="submit"
             disabled={pending}
-            className="text-sm text-zinc-600 underline hover:text-zinc-900 disabled:opacity-50 dark:text-zinc-400 dark:hover:text-zinc-100"
+            className="text-muted hover:text-foreground text-sm underline disabled:opacity-50"
           >
             Renommer
           </button>
@@ -142,7 +142,7 @@ export function ChapterListEditor({
   chapters: ChapterEntry[];
 }) {
   if (chapters.length === 0) {
-    return <p className="text-sm text-zinc-500">Aucun chapitre pour l&apos;instant.</p>;
+    return <p className="text-muted text-sm">Aucun chapitre pour l&apos;instant.</p>;
   }
 
   return (

@@ -45,8 +45,8 @@ function Chip({
       className={cn(
         "rounded-full border px-3 py-1 text-sm transition-colors",
         active
-          ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
-          : "border-zinc-200 hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600",
+          ? "border-brand bg-brand text-brand-foreground"
+          : "border-border hover:border-brand/40",
       )}
     >
       {children}
@@ -103,7 +103,7 @@ export function QuestionFilters({
             name="q"
             defaultValue={params.q ?? ""}
             placeholder="Rechercher…"
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm focus:border-zinc-900 focus:outline-none sm:w-40 dark:border-zinc-700 dark:bg-zinc-950"
+            className="border-border bg-surface focus:border-brand w-full rounded-lg border px-3 py-1.5 text-sm focus:outline-none sm:w-40"
           />
         </Form>
       </div>

@@ -18,11 +18,11 @@ export function QuestionCard({
   return (
     <Link
       href={`/course/${courseId}/questions/${question.id}`}
-      className="flex flex-col gap-2 rounded-xl border border-zinc-200 p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
+      className="border-border hover:border-brand/40 flex flex-col gap-2 rounded-xl border p-4 transition-colors"
     >
       <h3 className="font-medium">{question.title}</h3>
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500">
-        <span className="rounded-full border border-zinc-200 px-2 py-0.5 dark:border-zinc-800">
+      <div className="text-muted flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+        <span className="border-border rounded-full border px-2 py-0.5">
           {question.chapterName ?? "Sans chapitre"}
         </span>
         <PurposeBadge purpose={question.purpose} />
@@ -43,7 +43,7 @@ export function QuestionCard({
         {isOpen ? (
           <QuestionStatusBadge status={question.status} />
         ) : (
-          <span className="rounded-full bg-zinc-100 px-2 py-0.5 font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+          <span className="bg-background text-muted rounded-full px-2 py-0.5 font-medium">
             {QUESTION_KIND_LABELS[question.kind]}
           </span>
         )}

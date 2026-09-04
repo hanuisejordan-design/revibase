@@ -23,22 +23,22 @@ export function InviteCode({
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+      <span className="text-muted text-xs font-semibold tracking-wide uppercase">
         Code d&apos;invitation
       </span>
       <div className="flex items-center gap-3">
-        <code className="rounded-lg bg-zinc-100 px-3 py-1.5 font-mono text-lg tracking-widest dark:bg-zinc-800">
+        <code className="bg-background rounded-lg px-3 py-1.5 font-mono text-lg tracking-widest">
           {code}
         </code>
         <button
           type="button"
           onClick={copy}
-          className="text-sm text-zinc-600 underline hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+          className="text-muted hover:text-foreground text-sm underline"
         >
           {copied ? "Copié ✓" : "Copier"}
         </button>
       </div>
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">{hint}</p>
+      <p className="text-muted text-sm">{hint}</p>
     </div>
   );
 }

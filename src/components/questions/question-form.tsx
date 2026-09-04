@@ -39,7 +39,7 @@ export type QuestionFormInitial = {
 };
 
 const inputCls =
-  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950";
+  "w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm focus:border-brand focus:outline-none";
 
 function initialOptions(initial?: QuestionFormInitial): McqOption[] {
   if (initial && initial.kind === "mcq" && initial.options.length > 0) {
@@ -132,9 +132,8 @@ export function QuestionForm({
 
       <Field label="Type" htmlFor="kind-select">
         {isEdit ? (
-          <p id="kind-select" className="text-sm text-zinc-600 dark:text-zinc-400">
-            {QUESTION_KIND_LABELS[kind]}{" "}
-            <span className="text-zinc-400">(non modifiable)</span>
+          <p id="kind-select" className="text-muted text-sm">
+            {QUESTION_KIND_LABELS[kind]} <span className="text-muted">(non modifiable)</span>
           </p>
         ) : (
           <select
@@ -165,7 +164,7 @@ export function QuestionForm({
             </option>
           ))}
         </select>
-        <p className="mt-1 text-xs text-zinc-500">
+        <p className="text-muted mt-1 text-xs">
           « Défi » = tu connais la réponse, c&apos;est pour entraîner les autres et nourrir les
           quiz.
         </p>
@@ -254,7 +253,7 @@ export function QuestionForm({
                   type="button"
                   onClick={() => setOptions((prev) => prev.filter((_, j) => j !== i))}
                   aria-label="Retirer l'option"
-                  className="rounded-md px-2 py-1 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  className="text-muted hover:bg-background rounded-md px-2 py-1"
                 >
                   ×
                 </button>
@@ -265,7 +264,7 @@ export function QuestionForm({
             <button
               type="button"
               onClick={() => setOptions((prev) => [...prev, { body: "", correct: false }])}
-              className="w-fit text-sm text-zinc-600 underline hover:text-zinc-900 dark:text-zinc-400"
+              className="text-muted hover:text-foreground w-fit text-sm underline"
             >
               + Ajouter une option
             </button>

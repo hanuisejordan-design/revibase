@@ -31,7 +31,7 @@ export default async function CourseLayout({
         <div className="flex flex-col items-start gap-1">
           <Link
             href={ctx.classId ? `/class/${ctx.classId}` : "/dashboard"}
-            className="-ml-2 inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+            className="text-muted hover:bg-background hover:text-foreground -ml-2 inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium"
           >
             <span aria-hidden>←</span> {ctx.classId ? ctx.classLabel : "Mes cours"}
           </Link>
@@ -40,22 +40,13 @@ export default async function CourseLayout({
           </Link>
         </div>
         <nav className="flex gap-4 text-sm sm:gap-3 sm:pt-1">
-          <Link
-            href={`/course/${courseId}/questions`}
-            className="text-zinc-600 hover:underline dark:text-zinc-400"
-          >
+          <Link href={`/course/${courseId}/questions`} className="text-muted hover:underline">
             Questions
           </Link>
-          <Link
-            href={`/course/${courseId}/summaries`}
-            className="text-zinc-600 hover:underline dark:text-zinc-400"
-          >
+          <Link href={`/course/${courseId}/summaries`} className="text-muted hover:underline">
             Résumés
           </Link>
-          <Link
-            href={`/course/${courseId}/settings`}
-            className="text-zinc-600 hover:underline dark:text-zinc-400"
-          >
+          <Link href={`/course/${courseId}/settings`} className="text-muted hover:underline">
             Paramètres
           </Link>
         </nav>

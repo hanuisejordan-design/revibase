@@ -23,9 +23,9 @@ export function CreateCourseForm({ classId }: { classId?: string }) {
         <input type="checkbox" name="isTrainer" className="mt-0.5" />
         <span>
           Je suis le formateur de ce cours
-          <span className="block text-xs text-zinc-500">
-            Coche seulement si tu es enseignant : ça te permet de valider les réponses. Sinon, tu
-            en restes juste l&apos;administrateur.
+          <span className="text-muted block text-xs">
+            Coche seulement si tu es enseignant : ça te permet de valider les réponses. Sinon, tu en
+            restes juste l&apos;administrateur.
           </span>
         </span>
       </label>

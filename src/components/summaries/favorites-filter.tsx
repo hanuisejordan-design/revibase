@@ -8,7 +8,7 @@ export function FavoritesFilter({ active }: { active: boolean }) {
   const pathname = usePathname();
 
   return (
-    <label className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+    <label className="text-muted flex items-center gap-2 text-sm">
       <input
         type="checkbox"
         checked={active}

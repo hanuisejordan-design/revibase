@@ -42,7 +42,7 @@ export default async function QuestionsPage({
         <h2 className="text-lg font-semibold">Questions</h2>
         <Link
           href={`/course/${courseId}/questions/new`}
-          className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          className="bg-brand text-brand-foreground hover:bg-brand-hover inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium"
         >
           Poser une question
         </Link>
@@ -64,7 +64,7 @@ export default async function QuestionsPage({
           ))}
         </ul>
       ) : (
-        <p className="rounded-xl border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
+        <p className="border-border text-muted rounded-xl border border-dashed p-6 text-center text-sm">
           {q || chapter || purpose || sort !== "recent"
             ? "Aucune question ne correspond à ces filtres."
             : "Aucune question pour l'instant. Sois le premier à en poser une."}

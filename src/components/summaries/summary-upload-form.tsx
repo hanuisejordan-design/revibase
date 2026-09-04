@@ -12,7 +12,7 @@ const BUCKET = "summaries";
 const MAX_MB = 20;
 
 const inputCls =
-  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950";
+  "w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm focus:border-brand focus:outline-none";
 
 function extOf(name: string): string {
   const raw = name.toLowerCase().split(".").pop() ?? "";
@@ -56,7 +56,10 @@ export function SummaryUploadForm({
       const path = `${courseId}/${crypto.randomUUID()}.${extOf(file.name)}`;
       const { error } = await supabase.storage
         .from(BUCKET)
-        .upload(path, file, { contentType: file.type || "application/octet-stream", upsert: false });
+        .upload(path, file, {
+          contentType: file.type || "application/octet-stream",
+          upsert: false,
+        });
       if (error) throw error;
       fd.set("filePath", path);
       fd.set("fileName", file.name);
@@ -99,9 +102,9 @@ export function SummaryUploadForm({
             fileRef.current = e.target.files?.[0] ?? null;
             setUploadError(null);
           }}
-          className="text-sm file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5 file:text-sm hover:file:bg-zinc-200 dark:file:bg-zinc-800 dark:hover:file:bg-zinc-700"
+          className="file:bg-background hover:file:bg-border dark:file:bg-brand dark:hover:file:bg-brand text-sm file:mr-3 file:rounded-md file:border-0 file:px-3 file:py-1.5 file:text-sm"
         />
-        <p className="text-xs text-zinc-500">PDF ou image de préférence. Max {MAX_MB} Mo.</p>
+        <p className="text-muted text-xs">PDF ou image de préférence. Max {MAX_MB} Mo.</p>
       </div>
 
       {uploadError ? (

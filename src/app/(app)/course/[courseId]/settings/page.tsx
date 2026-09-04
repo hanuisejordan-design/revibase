@@ -17,20 +17,23 @@ export default async function ClassSettingsPage({
   const ctx = await getCourseContext(courseId);
   if (!ctx) notFound();
 
-  const [chapters, members] = await Promise.all([listChapters(courseId), getCourseMembers(courseId)]);
+  const [chapters, members] = await Promise.all([
+    listChapters(courseId),
+    getCourseMembers(courseId),
+  ]);
 
   return (
     <div className="flex flex-col gap-8">
-      <section className="flex flex-col gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
+      <section className="border-border flex flex-col gap-3 rounded-xl border p-4">
         <InviteCode code={ctx.joinCode} />
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">Chapitres</h2>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          Les chapitres rangent les questions par thème. Chaque membre du cours peut les
-          modifier. Supprimer un chapitre ne supprime pas ses questions : elles se retrouvent « sans
-          chapitre ».
+        <h2 className="text-muted text-xs font-semibold tracking-wide uppercase">Chapitres</h2>
+        <p className="text-muted text-sm">
+          Les chapitres rangent les questions par thème. Chaque membre du cours peut les modifier.
+          Supprimer un chapitre ne supprime pas ses questions : elles se retrouvent « sans chapitre
+          ».
         </p>
         <ChapterListEditor courseId={courseId} chapters={chapters} />
         <div className="pt-2">
@@ -39,21 +42,21 @@ export default async function ClassSettingsPage({
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">
+        <h2 className="text-muted text-xs font-semibold tracking-wide uppercase">
           Participants ({members.length})
         </h2>
         {ctx.isAdmin ? (
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            <strong>Admin</strong> : gère le cours (code, membres, rôles). <strong>Formateur</strong>{" "}
-            : peut valider une réponse. Un cours sans formateur n&apos;a simplement pas de réponses
-            « validées ».
+          <p className="text-muted text-sm">
+            <strong>Admin</strong> : gère le cours (code, membres, rôles).{" "}
+            <strong>Formateur</strong> : peut valider une réponse. Un cours sans formateur n&apos;a
+            simplement pas de réponses « validées ».
           </p>
         ) : null}
         <CourseMemberManager courseId={courseId} members={members} canManage={ctx.isAdmin} />
       </section>
 
       {ctx.classId ? (
-        <section className="border-t border-zinc-200 pt-4 text-sm text-zinc-600 dark:border-zinc-800 dark:text-zinc-400">
+        <section className="border-border text-muted border-t pt-4 text-sm">
           Cours rattaché à la classe{" "}
           <Link href={`/class/${ctx.classId}`} className="underline">
             {ctx.classLabel}
@@ -66,7 +69,7 @@ export default async function ClassSettingsPage({
       ) : null}
 
       {ctx.isExplicitMember && !ctx.isCreator ? (
-        <section className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
+        <section className="border-border border-t pt-4">
           <LeaveCourseButton courseId={ctx.id} />
         </section>
       ) : null}

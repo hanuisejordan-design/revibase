@@ -8,14 +8,14 @@ export default function NewCoursePage() {
   return (
     <div className="mx-auto flex max-w-sm flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <Link href="/dashboard" className="text-xs text-zinc-500 hover:underline">
+        <Link href="/dashboard" className="text-muted text-xs hover:underline">
           ← Retour
         </Link>
         <h1 className="text-xl font-semibold">Créer un cours personnel</h1>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-muted text-sm">
           Un espace de révision à toi (rattaché à aucune classe) : chapitres, questions, quiz,
-          résumés. Tu en es l&apos;administrateur. Des chapitres par défaut sont créés,
-          modifiables ensuite.
+          résumés. Tu en es l&apos;administrateur. Des chapitres par défaut sont créés, modifiables
+          ensuite.
         </p>
       </div>
       <CreateCourseForm />

@@ -28,17 +28,14 @@ export default async function NewQuestionPage({
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <Link
-          href={`/course/${courseId}/questions`}
-          className="text-xs text-zinc-500 hover:underline"
-        >
+        <Link href={`/course/${courseId}/questions`} className="text-muted text-xs hover:underline">
           ← Questions
         </Link>
         <h2 className="text-lg font-semibold">Poser une question</h2>
       </div>
 
       {chapters.length === 0 ? (
-        <div className="flex flex-col gap-2 rounded-xl border border-dashed border-zinc-300 p-4 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+        <div className="border-border text-muted flex flex-col gap-2 rounded-xl border border-dashed p-4 text-sm">
           <p>
             Ce cours n&apos;a pas encore de chapitre. Il en faut au moins un pour classer les
             questions.

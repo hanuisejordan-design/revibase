@@ -13,8 +13,8 @@ const KIND_LABEL: Record<SummaryItem["kind"], string> = {
 const NO_CHAPTER = "__none__";
 
 const badgeCls =
-  "rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300";
-const meta = "text-xs text-zinc-500";
+  "rounded bg-background px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-muted";
+const meta = "text-xs text-muted";
 
 export function SummaryRow({ summary, courseId }: { summary: SummaryItem; courseId: string }) {
   const inner = (
@@ -28,7 +28,7 @@ export function SummaryRow({ summary, courseId }: { summary: SummaryItem; course
   );
 
   return (
-    <li className="flex items-stretch gap-1 rounded-lg border border-zinc-200 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600">
+    <li className="border-border hover:border-brand/40 flex items-stretch gap-1 rounded-lg border transition-colors">
       <span className="flex items-center pl-2">
         <SummaryPinButton courseId={courseId} summaryId={summary.id} pinned={summary.pinned} />
       </span>
@@ -41,7 +41,7 @@ export function SummaryRow({ summary, courseId }: { summary: SummaryItem; course
           {inner}
         </SummaryReadLink>
       ) : (
-        <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 gap-y-1 py-2 pr-3 pl-1 text-sm text-zinc-400">
+        <span className="text-muted flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 gap-y-1 py-2 pr-3 pl-1 text-sm">
           {inner} · aperçu indisponible
         </span>
       )}
@@ -63,7 +63,7 @@ export function SummaryList({
 }) {
   if (summaries.length === 0) {
     return (
-      <p className="text-sm text-zinc-500">
+      <p className="text-muted text-sm">
         Aucun résumé pour l&apos;instant. Ajoute le premier avec le bouton ci-dessus.
       </p>
     );
@@ -81,7 +81,7 @@ export function SummaryList({
     <div className="flex flex-col gap-5">
       {[...groups.values()].map((g) => (
         <section key={g.label} className="flex flex-col gap-2">
-          <h3 className="text-xs font-semibold tracking-wide text-zinc-500 uppercase">{g.label}</h3>
+          <h3 className="text-muted text-xs font-semibold tracking-wide uppercase">{g.label}</h3>
           <ul className="flex flex-col gap-1.5">
             {g.items.map((s) => (
               <SummaryRow key={s.id} summary={s} courseId={courseId} />
