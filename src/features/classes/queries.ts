@@ -176,7 +176,9 @@ export const getMyClasses = cache(async (): Promise<ClassSummary[]> => {
     .map((r) => {
       const classCourses = courses
         .filter((c) => c.class_id === r.class_id)
-        .map((c) => toCourseSummary(c, counts, myRole, myAdmin, content, newQuestions, newSummaries));
+        .map((c) =>
+          toCourseSummary(c, counts, myRole, myAdmin, content, newQuestions, newSummaries),
+        );
       return {
         id: r.classes.id,
         name: r.classes.name,
@@ -415,17 +417,20 @@ async function myCourseMeta(
 
   const out = new Map<string, CourseMeta>();
   for (const row of (direct ?? []) as unknown as Array<{
-    courses: {
-      id: string;
-      name: string;
-      class_id: string | null;
-      classes: { name: string } | { name: string }[] | null;
-    } | Array<{
-      id: string;
-      name: string;
-      class_id: string | null;
-      classes: { name: string } | { name: string }[] | null;
-    }> | null;
+    courses:
+      | {
+          id: string;
+          name: string;
+          class_id: string | null;
+          classes: { name: string } | { name: string }[] | null;
+        }
+      | Array<{
+          id: string;
+          name: string;
+          class_id: string | null;
+          classes: { name: string } | { name: string }[] | null;
+        }>
+      | null;
   }>) {
     const c = one(row.courses);
     if (c) out.set(c.id, { name: c.name, className: one(c.classes)?.name ?? null });
@@ -477,56 +482,52 @@ export const getMyNewSummaries = cache(async (): Promise<ClassNewSummary[]> => {
  * Questions non encore ouvertes de tous les cours de la classe, les plus
  * anciennes d'abord (pour les enchaîner).
  */
-export const getClassNewQuestions = cache(
-  async (classId: string): Promise<ClassNewQuestion[]> => {
-    const user = await getUser();
-    if (!user) return [];
+export const getClassNewQuestions = cache(async (classId: string): Promise<ClassNewQuestion[]> => {
+  const user = await getUser();
+  if (!user) return [];
 
-    const supabase = await createClient();
+  const supabase = await createClient();
 
-    const [{ data: coursesData }, { data: cls }] = await Promise.all([
-      supabase.from("courses").select("id, name").eq("class_id", classId),
-      supabase.from("classes").select("name").eq("id", classId).maybeSingle(),
-    ]);
+  const [{ data: coursesData }, { data: cls }] = await Promise.all([
+    supabase.from("courses").select("id, name").eq("class_id", classId),
+    supabase.from("classes").select("name").eq("id", classId).maybeSingle(),
+  ]);
 
-    const courses = (coursesData ?? []) as Array<{ id: string; name: string }>;
-    if (courses.length === 0) return [];
+  const courses = (coursesData ?? []) as Array<{ id: string; name: string }>;
+  if (courses.length === 0) return [];
 
-    const className = (cls as { name: string } | null)?.name ?? null;
-    return collectNewQuestions(
-      supabase,
-      user.id,
-      courses.map((c) => c.id),
-      new Map(courses.map((c) => [c.id, { name: c.name, className }])),
-    );
-  },
-);
+  const className = (cls as { name: string } | null)?.name ?? null;
+  return collectNewQuestions(
+    supabase,
+    user.id,
+    courses.map((c) => c.id),
+    new Map(courses.map((c) => [c.id, { name: c.name, className }])),
+  );
+});
 
 /** Résumés non encore ouverts de tous les cours de la classe, les plus anciens d'abord. */
-export const getClassNewSummaries = cache(
-  async (classId: string): Promise<ClassNewSummary[]> => {
-    const user = await getUser();
-    if (!user) return [];
+export const getClassNewSummaries = cache(async (classId: string): Promise<ClassNewSummary[]> => {
+  const user = await getUser();
+  if (!user) return [];
 
-    const supabase = await createClient();
+  const supabase = await createClient();
 
-    const [{ data: coursesData }, { data: cls }] = await Promise.all([
-      supabase.from("courses").select("id, name").eq("class_id", classId),
-      supabase.from("classes").select("name").eq("id", classId).maybeSingle(),
-    ]);
+  const [{ data: coursesData }, { data: cls }] = await Promise.all([
+    supabase.from("courses").select("id, name").eq("class_id", classId),
+    supabase.from("classes").select("name").eq("id", classId).maybeSingle(),
+  ]);
 
-    const courses = (coursesData ?? []) as Array<{ id: string; name: string }>;
-    if (courses.length === 0) return [];
+  const courses = (coursesData ?? []) as Array<{ id: string; name: string }>;
+  if (courses.length === 0) return [];
 
-    const className = (cls as { name: string } | null)?.name ?? null;
-    return collectNewSummaries(
-      supabase,
-      user.id,
-      courses.map((c) => c.id),
-      new Map(courses.map((c) => [c.id, { name: c.name, className }])),
-    );
-  },
-);
+  const className = (cls as { name: string } | null)?.name ?? null;
+  return collectNewSummaries(
+    supabase,
+    user.id,
+    courses.map((c) => c.id),
+    new Map(courses.map((c) => [c.id, { name: c.name, className }])),
+  );
+});
 
 /** Membres de la classe, triés par date d'arrivée. */
 export const getClassMembers = cache(async (classId: string): Promise<ClassMemberEntry[]> => {

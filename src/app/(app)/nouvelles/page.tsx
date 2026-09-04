@@ -66,10 +66,10 @@ function QuestionRow({ q }: { q: ClassNewQuestion }) {
   return (
     <Link
       href={`/course/${q.courseId}/questions/${q.id}`}
-      className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-4 text-surface-foreground transition-colors hover:border-brand/40"
+      className="border-border bg-surface text-surface-foreground hover:border-brand/40 flex flex-col gap-2 rounded-2xl border p-4 transition-colors"
     >
       <h3 className="font-medium">{q.title}</h3>
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+      <div className="text-muted flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
         <span className={chip}>{q.chapterName ?? "Sans chapitre"}</span>
         <PurposeBadge purpose={q.purpose} />
         {q.kind === "open" ? (
@@ -90,27 +90,27 @@ function QuestionRow({ q }: { q: ClassNewQuestion }) {
 function SummaryRow({ s }: { s: ClassNewSummary }) {
   const inner = (
     <>
-      <span className="rounded bg-black/5 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-muted dark:bg-white/10">
+      <span className="text-muted rounded bg-black/5 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide dark:bg-white/10">
         {KIND_LABEL[s.kind]}
       </span>
       <span className="font-medium">{s.title}</span>
-      <span className="text-xs text-muted">
+      <span className="text-muted text-xs">
         {s.chapterName ?? "Sans chapitre"} · par {s.authorName} · {relativeTime(s.createdAt)}
       </span>
     </>
   );
   return (
-    <li className="rounded-xl border border-border bg-surface transition-colors hover:border-brand/40">
+    <li className="border-border bg-surface hover:border-brand/40 rounded-xl border transition-colors">
       {s.fileUrl ? (
         <SummaryReadLink
           summaryId={s.id}
           href={s.fileUrl}
-          className="flex flex-wrap items-baseline gap-x-2 gap-y-1 px-3 py-2 text-sm text-surface-foreground"
+          className="text-surface-foreground flex flex-wrap items-baseline gap-x-2 gap-y-1 px-3 py-2 text-sm"
         >
           {inner}
         </SummaryReadLink>
       ) : (
-        <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1 px-3 py-2 text-sm text-muted">
+        <span className="text-muted flex flex-wrap items-baseline gap-x-2 gap-y-1 px-3 py-2 text-sm">
           {inner} · aperçu indisponible
         </span>
       )}
@@ -127,25 +127,25 @@ export default async function MyNewPage() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">
-        <Link href="/dashboard" className="text-xs text-muted hover:underline">
+        <Link href="/dashboard" className="text-muted text-xs hover:underline">
           ← Tableau de bord
         </Link>
         <h1 className="display text-2xl">Mes nouveautés</h1>
-        <p className="text-sm text-muted">
-          Tout ce que tu n&apos;as pas encore ouvert, rangé par cours. Un élément disparaît d&apos;ici
-          une fois que tu l&apos;as ouvert.
+        <p className="text-muted text-sm">
+          Tout ce que tu n&apos;as pas encore ouvert, rangé par cours. Un élément disparaît
+          d&apos;ici une fois que tu l&apos;as ouvert.
         </p>
       </div>
 
       {/* Questions */}
-      <section id="questions" className="flex flex-col gap-4 scroll-mt-20">
+      <section id="questions" className="flex scroll-mt-20 flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-[11px] font-semibold tracking-[0.14em] text-brand uppercase">
+          <h2 className="text-brand text-[11px] font-semibold tracking-[0.14em] uppercase">
             Questions{questions.length > 0 ? ` (${questions.length})` : ""}
           </h2>
           {questions.length > 0 ? (
             <form action={markAllMyQuestionsReadAction}>
-              <button type="submit" className="text-sm text-muted hover:underline">
+              <button type="submit" className="text-muted text-sm hover:underline">
                 Tout marquer comme lu
               </button>
             </form>
@@ -153,7 +153,7 @@ export default async function MyNewPage() {
         </div>
 
         {questions.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-border p-5 text-center text-sm text-muted">
+          <p className="border-border text-muted rounded-2xl border border-dashed p-5 text-center text-sm">
             Aucune nouvelle question.
           </p>
         ) : (
@@ -180,14 +180,14 @@ export default async function MyNewPage() {
       </section>
 
       {/* Résumés */}
-      <section id="resumes" className="flex flex-col gap-4 scroll-mt-20">
+      <section id="resumes" className="flex scroll-mt-20 flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-[11px] font-semibold tracking-[0.14em] text-brand uppercase">
+          <h2 className="text-brand text-[11px] font-semibold tracking-[0.14em] uppercase">
             Résumés{summaries.length > 0 ? ` (${summaries.length})` : ""}
           </h2>
           {summaries.length > 0 ? (
             <form action={markAllMySummariesReadAction}>
-              <button type="submit" className="text-sm text-muted hover:underline">
+              <button type="submit" className="text-muted text-sm hover:underline">
                 Tout marquer comme lu
               </button>
             </form>
@@ -195,7 +195,7 @@ export default async function MyNewPage() {
         </div>
 
         {summaries.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-border p-5 text-center text-sm text-muted">
+          <p className="border-border text-muted rounded-2xl border border-dashed p-5 text-center text-sm">
             Aucun nouveau résumé.
           </p>
         ) : (

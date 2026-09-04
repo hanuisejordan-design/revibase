@@ -45,25 +45,25 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* En-tête vert pleine largeur */}
-      <div className="-mx-4 -mt-6 bg-brand px-4 pt-7 pb-16 text-brand-foreground sm:-mx-6 sm:-mt-8 sm:px-6 sm:pt-9">
-        <p className="text-[11px] font-medium tracking-[0.16em] uppercase text-brand-foreground/60">
+      {/* En-tête bleu encre pleine largeur */}
+      <div className="bg-brand text-brand-foreground -mx-4 -mt-6 px-4 pt-7 pb-16 sm:-mx-6 sm:-mt-8 sm:px-6 sm:pt-9">
+        <p className="text-brand-foreground/60 text-[11px] font-medium tracking-[0.16em] uppercase">
           {dateLabel}
         </p>
         <h1 className="greeting mt-1 text-4xl">Bonjour {user.displayName}.</h1>
       </div>
 
-      {/* Carte récap, posée sur le vert */}
+      {/* Carte récap, posée sur le bandeau */}
       <div className="-mt-14">
-        <div className="rounded-2xl border border-border bg-surface p-5 text-surface-foreground shadow-[0_2px_12px_rgba(0,0,0,0.07)]">
+        <div className="border-border bg-surface text-surface-foreground rounded-2xl border p-5 shadow-[0_2px_12px_rgba(0,0,0,0.07)]">
           {isEmpty ? (
-            <p className="text-sm text-muted">
+            <p className="text-muted text-sm">
               Bienvenue. Rejoins ta classe avec le code d&apos;invitation, ou crées-en une
               ci-dessous.
             </p>
           ) : newQ === 0 && newS === 0 ? (
             <div className="flex items-center gap-2.5">
-              <span className="flex size-6 items-center justify-center rounded-full bg-brand/10 text-brand">
+              <span className="bg-brand/10 text-brand flex size-6 items-center justify-center rounded-full">
                 <Check size={14} aria-hidden />
               </span>
               <p className="text-sm">Tu es à jour — rien de nouveau à lire.</p>
@@ -79,7 +79,7 @@ export default async function DashboardPage() {
                 {newQ > 0 ? (
                   <Link
                     href="/nouvelles#questions"
-                    className="inline-flex items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-sm font-medium text-brand-foreground transition-colors hover:bg-brand-hover"
+                    className="bg-brand text-brand-foreground hover:bg-brand-hover inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-colors"
                   >
                     Voir les questions <ArrowRight size={15} aria-hidden />
                   </Link>
@@ -87,7 +87,7 @@ export default async function DashboardPage() {
                 {newS > 0 ? (
                   <Link
                     href="/nouvelles#resumes"
-                    className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm font-medium text-surface-foreground transition-colors hover:border-brand/40"
+                    className="border-border text-surface-foreground hover:border-brand/40 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors"
                   >
                     Voir les résumés <ArrowRight size={15} aria-hidden />
                   </Link>
@@ -124,7 +124,7 @@ export default async function DashboardPage() {
         </section>
       ) : null}
 
-      <div className="flex flex-col gap-2.5 border-t border-border pt-7">
+      <div className="border-border flex flex-col gap-2.5 border-t pt-7">
         <Link href="/class/join" className={primaryLink}>
           Rejoindre une classe
         </Link>
