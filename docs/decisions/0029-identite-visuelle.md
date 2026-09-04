@@ -105,6 +105,24 @@ basculent seuls.
   quiz ») qui faisaient doublon avec le bouton **+** de la barre de nav
   basse (mobile uniquement). Masqués en `hidden md:flex` — restent la
   seule voie sur desktop (pas de barre basse).
+- **En-tête cours/classe au niveau du titre** : le petit menu (Questions /
+  Résumés / Paramètres) était aligné avec le fil d'Ariane (« ← Mes
+  cours »), pas avec le nom du cours — visuellement décalé. Restructuré en
+  bloc `titre + nav` sur une même ligne (`flex-wrap items-baseline
+  justify-between`), qui ne dépend plus d'un point de rupture.
+- **`PageHero`** (`src/components/layout/page-hero.tsx`) : les en-têtes de
+  cours/classe étaient à plat sur le fond, contraste flagrant avec le
+  bandeau `bg-brand` du tableau de bord. Nouveau composant partagé
+  reprenant exactement ce bandeau (bleed négatif, `.display` pour le
+  titre) ; fil d'Ariane + nom + petit menu dessus. Appliqué à
+  `course/[courseId]/layout.tsx` et `class/[classId]/layout.tsx`.
+- **Photo + texte d'une question dans une seule vignette** : `question.body`
+  et `question.imageUrl` étaient deux blocs séparés (texte nu, puis image
+  à part). Fusionnés dans une seule carte `bg-surface` — sur la page
+  détail et dans `QuizRunner`.
+- **Picto « photo jointe »** retiré de `QuestionCard` : information sans
+  conséquence pour le lecteur (« si y en a tant mieux, sinon ça ne change
+  rien »), pur bruit.
 
 ## Conséquences
 

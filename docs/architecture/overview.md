@@ -504,5 +504,15 @@ user_id)`, privées. Remplace le curseur horodaté `course_reads`
   tableau de bord) — chargées par `next/font/google` dans `app/layout.tsx`.
 - **Icônes** : `lucide-react` exclusivement, aucun emoji. Tableau de bord =
   bandeau `bg-brand` pleine largeur + carte récap blanche « morning brief ».
+- **`PageHero`** (`src/components/layout/page-hero.tsx`) : même bandeau
+  `bg-brand` que le tableau de bord, réutilisé en tête d'un cours
+  (`course/[courseId]/layout.tsx`) et d'une classe (`class/[classId]/layout.tsx`)
+  — fil d'Ariane, nom (`.display`), petit menu sur la même ligne que le nom.
+  Évite que ces pages tranchent à plat avec le dashboard.
+- **Cartes de contenu** : toute vignette avec bordure porte aussi
+  `bg-surface` (sinon elle se fond dans `--background`) — `QuestionCard`,
+  `AnswerCard`, le corps d'une question (texte **et** photo dans **une
+  seule** carte), les sections de `/parametres` et
+  `course/[courseId]/settings`, etc.
 - Reste : convertir les flèches typographiques `←` / `→` des liens
   « retour » en `lucide`.
