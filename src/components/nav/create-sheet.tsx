@@ -35,6 +35,7 @@ export function CreateSheet({
   const [type, setType] = useState<CreateType | null>(null);
   const [courseId, setCourseId] = useState<string>(currentCourseId ?? "");
   const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [chaptersFor, setChaptersFor] = useState<string>(""); // cours dont `chapters` dépend
   const [chapterId, setChapterId] = useState<string>("");
 
   // Chapitres du cours choisi — uniquement utile pour « poser une question ».
@@ -45,6 +46,7 @@ export function CreateSheet({
       .then((ch) => {
         if (cancelled) return;
         setChapters(ch);
+        setChaptersFor(courseId);
         setChapterId((cur) => cur || (ch[0]?.id ?? ""));
       })
       .catch(() => {});
@@ -56,8 +58,11 @@ export function CreateSheet({
   function pickCourse(id: string) {
     setCourseId(id);
     setChapters([]);
+    setChaptersFor("");
     setChapterId("");
   }
+
+  const chaptersLoading = Boolean(courseId) && chaptersFor !== courseId;
 
   function submit() {
     if (!type || !courseId) return;
@@ -115,19 +120,28 @@ export function CreateSheet({
             </select>
           </label>
 
-          {type === "question" && courseId && chapters.length > 0 ? (
+          {type === "question" ? (
             <label className="flex flex-col gap-1 text-sm">
               <span className="font-medium">Chapitre</span>
               <select
                 value={chapterId}
                 onChange={(e) => setChapterId(e.target.value)}
+                disabled={!courseId || chaptersLoading || chapters.length === 0}
                 className={selectCls}
               >
-                {chapters.map((ch) => (
-                  <option key={ch.id} value={ch.id}>
-                    {ch.name}
-                  </option>
-                ))}
+                {!courseId ? (
+                  <option value="">— Choisis d&apos;abord un cours —</option>
+                ) : chaptersLoading ? (
+                  <option value="">Chargement…</option>
+                ) : chapters.length === 0 ? (
+                  <option value="">— Ce cours n&apos;a pas de chapitre —</option>
+                ) : (
+                  chapters.map((ch) => (
+                    <option key={ch.id} value={ch.id}>
+                      {ch.name}
+                    </option>
+                  ))
+                )}
               </select>
             </label>
           ) : null}

@@ -37,9 +37,11 @@ Une **barre fixe en bas**, accès au pouce, **mobile uniquement**
 - **« + »** ouvre une feuille en **2 temps** : d'abord **quoi** (question /
   résumé / quiz), puis **dans quel cours** (pré-rempli avec le cours courant
   si on y est) et, pour une question, **quel chapitre** (chargé via
-  `listCourseChaptersAction`). Bouton final → `questions/new?chapter=…`,
-  `summaries/new` ou `quiz`. La feuille est `key`-remontée à chaque
-  ouverture pour repartir du contexte courant.
+  `listCourseChaptersAction`). Le champ Chapitre est **toujours affiché**
+  pour une question (désactivé tant qu'aucun cours, « Chargement… » pendant
+  le fetch) — pas d'apparition décalée. Bouton final →
+  `questions/new?chapter=…`, `summaries/new` ou `quiz`. La feuille est
+  `key`-remontée à chaque ouverture pour repartir du contexte courant.
 - `<main>` reçoit `pb-24 md:pb-8` ; la barre respecte
   `env(safe-area-inset-bottom)`.
 
