@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils/cn";
 
 const badge = "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium";
 const adminBadge = cn(badge, "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300");
-const trainerBadge = cn(badge, "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300");
+const trainerBadge = cn(badge, "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300");
 
 function Toggle({
   action,

@@ -66,7 +66,12 @@ basculent seuls.
   l'affordance) ; puce / bouton **actif** → `bg-brand`.
 - Couleurs **de statut conservées** : vert (validé), ambre (nouvelles
   questions / sans réponse), emerald (nouveaux résumés), violet (défi),
-  indigo (retenue), rouge (erreurs / suppression).
+  indigo (retenue), rose (badge « Formateur »), rouge (erreurs /
+  suppression).
+- Badge **« Formateur »** : était en `bg-brand/10 text-brand` sur la
+  vignette de cours (se fondait avec le bleu de marque) et en `sky` dans
+  la liste des membres — unifié en **rose** (`bg-rose-100 text-rose-800`)
+  aux deux endroits, clairement distinct du bleu.
 
 ## Alternatives écartées
 

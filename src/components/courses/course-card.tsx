@@ -30,7 +30,7 @@ export function CourseCard({
     course.newSummaryCount > 1 ? "s" : ""
   }`;
 
-  const trainerCls = `${compact ? "hidden sm:inline-flex" : "inline-flex"} items-center rounded-full bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand`;
+  const trainerCls = `${compact ? "hidden sm:inline-flex" : "inline-flex"} items-center rounded-full bg-rose-100 px-2 py-0.5 text-xs font-medium text-rose-800 dark:bg-rose-950 dark:text-rose-300`;
 
   return (
     <Link
